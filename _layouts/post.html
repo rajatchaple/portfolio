@@ -12,21 +12,74 @@
 
     <link rel="icon" href="/assets/img/favicon.png" type="image/png" sizes="16x16"/>
     <link href="/assets/css/Style.css" rel="stylesheet" media="all" class="default" />
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"> -->
 </head>
 
 <body>
-    <div class="container"> 
-        <div class="header">
-            <h1 class="site-title">Portfolio</h1>
-            <div class="nav">
-                <ul class="nav-menu">
-                    <li class="nav-menu-item">Top</li>
-                    <li class="nav-menu-item">Bottoms</li>
-                    <li class="nav-menu-item">Sale</li>
+    <div class="pf-container"> 
+        <div class="pf-header">
+            <h1 class="pf-title">Portfolio</h1>
+            <div class="pf-nav">
+                <ul class="pf-nav-menu">
+                    <li class="pf-nav-menu-item">About</li>
+                    <li class="pf-nav-menu-item">Projects</li>
+                    <li class="pf-nav-menu-item">Contact</li>
                 </ul>
             </div>
         </div> 
-        <hr class="separator"/>               
+        <hr class="pf-separator"/> 
+
+        <!-- <p>{{page.url}}</p> -->
+        {%- if page.url == "/" -%}
+        <!-- <p> {{site.page}}</p> -->
+        <!-- <div class="row row-cols-1 row-cols-md-3 g-4">
+            
+                <div class="col">
+                  <div class="card h-100">
+                    <img src="{{post.img}}" class="card-img-top img-thumbnail"  alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title">{{post.title}}</h5>
+                      <p class="card-text">{{post.desc}}</p>
+                    </div>
+                  </div>
+                </div>
+            
+        </div> -->
+
+        <main class="grid">
+            {%- for post in site.posts -%}
+            <article>
+                <a href="{{post.url}}" class="pf-a">
+                 
+              <img src="{{post.img}}" alt="Sample photo">
+            
+              <div class="FadeAway"></div>
+              <div class="text">
+                <h3>{{post.title}}</h3>
+                <p>{{post.desc}} </p>
+                <!-- <a href="{{post.url}}" class="pf_button">Stop here</a> -->
+                
+              </div>
+             
+            </a>
+            </article>
+        
+            {%- endfor -%}
+          </main>
+
+        {%- endif -%}
+
+
+
+       
+
+
+        <div class="content">
+            
+            {{content}}
+            
+        </div>              
+        
     </div>
 </body>
 </html>

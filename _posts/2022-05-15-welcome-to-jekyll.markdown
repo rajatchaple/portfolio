@@ -1,8 +1,9 @@
 ---
 layout: post
 title: "Welcome to Jekyll!"
-date: 2022-05-15 19:12:19 -0600
-categories: jekyll update
+permalink: kachara
+img: /assets/img/20220211_230629.jpg
+desc: This is kachara description
 ---
 
 You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.

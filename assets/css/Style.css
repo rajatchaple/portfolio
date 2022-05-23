@@ -78,7 +78,7 @@ html {
     grid-template-columns: repeat(auto-fill, 235px);
     grid-gap: 30px;
     align-items: stretch;
-    justify-items: center;
+    justify-content: center;
     align-self: center;
 }
 

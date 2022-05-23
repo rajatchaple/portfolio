@@ -2,7 +2,7 @@
 layout: post
 title: "Goods sense device"
 permalink: goods-sense
-img: /assets/img/20220211_230629.jpg
+img: /assets/img/goods-sense-thumbnail.jpg
 desc: This battery operated device monitors goods under treansport
 ---
 

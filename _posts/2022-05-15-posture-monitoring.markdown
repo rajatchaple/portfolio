@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "Posture monitoring"
-permalink: posture-monitoring-8051
-img: /assets/img/20220211_230629.jpg
+permalink: posture-monitoring
+img: /assets/img/posture-monitoring-thumbnail.jpg
 desc: BLE client monitors posture of a person using data from BLE server
 ---
 

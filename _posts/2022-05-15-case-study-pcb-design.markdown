@@ -2,7 +2,7 @@
 layout: post
 title: "PCB design practices"
 permalink: case-study-pcb-design
-img: /assets/img/20220211_230629.jpg
+img: /assets/img/pcb-design-practices.jpg
 desc: PCB design techniques to eliminate noises such as crosstalk, ground bounce
 ---
 

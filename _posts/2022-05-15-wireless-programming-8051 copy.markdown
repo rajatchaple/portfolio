@@ -2,7 +2,7 @@
 layout: post
 title: "GPS based Taximeter"
 permalink: gnss-based-taximeter
-img: /assets/img/20220211_230629.jpg
+img: /assets/img/remote-8051-thumbnail2.jpg
 desc: Smartmeter consisting to record trip and send data to the customer
 ---
 

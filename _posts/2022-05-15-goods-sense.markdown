@@ -6,19 +6,41 @@ img: /assets/img/goods-sense-thumbnail.jpg
 desc: This battery operated device monitors goods under treansport
 ---
 
+{:.gsd-title}
+
 # Goods Sense device
+
+<!--
+<h1 id="identifier" >
+    Markdown h1 styles
+</h1> -->
 
 There are losses due to mishandling of goods during transportation. In this project, the developed device is targeted to sense condition of goods while transporting, which is its orientation. Also, Since this device needs to be standalone product and portable, it is required to be battery operated. This requires low power operation of a device.
 
-<p align="center">  <img src="/assets/img/project_overview3.png"/> </p>
+<p align="center">  <img src="/assets/img/project_overview.png" style="max-height:220px;"/> </p>
 
 This project contains following implementations:
 
-{:.gsd-table}
+<!-- {:.gsd-table}
 | Sr. No. | Features |
 | --------- | ------------------------------------ |
 | Feature 1 | Orientation detection and indication |
-| Feature 2 | Low power operation |
+| Feature 2 | Low power operation | -->
+
+<table class="gsd-table">
+    <tr>
+        <th>Sr. No.</th>
+        <th>Features</th>
+    </tr>
+    <tr>
+        <td>Feature 1</td>
+        <td>Orientation detection and indication</td>
+    </tr>
+    <tr>
+        <td>Feature 2</td>
+        <td>Low power operation</td>
+    </tr>
+</table>
 
 These require,
 

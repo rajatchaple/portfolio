@@ -2,7 +2,7 @@
 layout: post
 title: "Remotely prog 8051"
 permalink: wireless-programming-8051
-img: /assets/img/remote-8051-thumbnail.jpg
+img: /assets/img/remote-8051-thumbnail.png
 desc: Remotely program 8051 over Wifi using ESP32 and MSP432
 ---
 

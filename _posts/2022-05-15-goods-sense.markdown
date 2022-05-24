@@ -18,7 +18,7 @@ desc: This battery operated device monitors goods under treansport
 There are losses due to mishandling of goods during transportation. In this project, the developed device is targeted to sense condition of goods while transporting, which is its orientation. Also, Since this device needs to be standalone product and portable, it is required to be battery operated. This requires low power operation of a device.
 KL25z evaluaion module was used to develop above project. Bare metal coding was used for development of this project.
 
-<p align="center">  <img src="/assets/img/project_overview.png" style="max-height:220px;"/> </p>
+<p align="center">  <img src="/assets/img/project_overview.png" style="max-width:70%; height: auto;  object-fit:cover;"/> </p>
 
 This project contains following implementations:
 
@@ -65,7 +65,7 @@ MCUXpresso 11.2 is used for this project. Import this project in MCUXpresso by c
 
 ### Hardware changes
 
-<p align="center">  <img src="/assets/img/hardware_changes.png" style="max-height:220px; border-radius:30px"/> </p>
+<p align="center">  <img src="/assets/img/hardware_changes.png" style="max-width:70%; height: auto; border-radius:30px; object-fit:cover;"/> </p>
 
 1. Connect switches and an LED to test.
 2. R74, J3 and J12 changes are required for operation in low power mode.
@@ -85,7 +85,7 @@ This device runs in two modes:
 
 # App mode:
 
-<p align="center">  <img src="/assets/img/app_mode.gif" style="max-height:350px; border:2px solid black; border-radius:5px"/> </p>
+<p align="center">  <img src="/assets/img/app_mode.gif" style="max-width:47%; height: auto; border:2px solid black; border-radius:5px; object-fit:cover;"/> </p>
 
 Device operates in low power mode:
 
@@ -99,7 +99,7 @@ When device is powered, it enters low power mode and remains there unless calibr
 
 # Test mode:
 
-<p align="center">  <img src="/assets/img/test_mode.gif" style="max-height:350px; border:2px solid black; border-radius:5px"/> </p>
+<p align="center">  <img src="/assets/img/test_mode.gif" style="max-width:70%; height: auto; border:2px solid black; border-radius:5px; object-fit:cover;"/> </p>
 
 Tests are manual as almost every function call is someway or the other connected to external hardware.
 

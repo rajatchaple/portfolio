@@ -16,6 +16,7 @@ desc: This battery operated device monitors goods under treansport
 </h1> -->
 
 There are losses due to mishandling of goods during transportation. In this project, the developed device is targeted to sense condition of goods while transporting, which is its orientation. Also, Since this device needs to be standalone product and portable, it is required to be battery operated. This requires low power operation of a device.
+KL25z evaluaion module was used to develop above project. Bare metal coding was used for development of this project.
 
 <p align="center">  <img src="/assets/img/project_overview.png" style="max-height:220px;"/> </p>
 
@@ -64,18 +65,18 @@ MCUXpresso 11.2 is used for this project. Import this project in MCUXpresso by c
 
 ### Hardware changes
 
-<p align="center">  <img src="/assets/img/hardware_changes.png"/> </p>
+<p align="center">  <img src="/assets/img/hardware_changes.png" style="max-height:220px; border-radius:30px"/> </p>
 
-      1)	Connect switches and an LED to test.
-      2)	R74, J3 and J12 changes are required for operation in low power mode.
+1. Connect switches and an LED to test.
+2. R74, J3 and J12 changes are required for operation in low power mode.
+   Note: This 2nd change is not required if device does not require low power operation
 
-         Note: This 2nd change is not required if device does not require low power operation
-
-      3)	Additional change is required to operate this device using coin cell. It requires populating D7 and coin cell holder BT1. I removed D8 and populated D7 since I hardly use USB KL25Z port.
+3. Additional change is required to operate this device using coin cell. It requires populating D7 and coin cell holder BT1.
+   I removed D8 and populated D7 since I hardly use USB KL25Z port.
 
 # Working
 
-[Project : Goods Sense Device](https://drive.google.com/drive/u/1/folders/1d4eFzu7haaYxXG7Dq25bmqxyeXCQLaHN)
+[Link to a Project demo: Goods Sense Device](https://drive.google.com/drive/u/1/folders/1d4eFzu7haaYxXG7Dq25bmqxyeXCQLaHN)
 
 This device runs in two modes:
 
@@ -84,7 +85,7 @@ This device runs in two modes:
 
 # App mode:
 
-<p align="center">  <img src="/assets/img/app_mode.gif"/> </p>
+<p align="center">  <img src="/assets/img/app_mode.gif" style="max-height:350px; border:2px solid black; border-radius:5px"/> </p>
 
 Device operates in low power mode:
 
@@ -97,6 +98,8 @@ Device operates in low power mode:
 When device is powered, it enters low power mode and remains there unless calibration switch is pressed. Once calibration switch is pressed, device wakes up and performs calibration and also indicates that calibration is done with blue-cyan color LED pattern.
 
 # Test mode:
+
+<p align="center">  <img src="/assets/img/test_mode.gif" style="max-height:350px; border:2px solid black; border-radius:5px"/> </p>
 
 Tests are manual as almost every function call is someway or the other connected to external hardware.
 
@@ -129,9 +132,3 @@ arm-none-eabi-gcc compiler
 ## Authors
 
 - Rajat Chaple
-
-## Acknowledgments
-
-Code development was done with the help of Dean's book and KL25 reference manual.
-Readme.md was written using template at
-https://gist.github.com/PurpleBooth/109311bb0361f32d87a2

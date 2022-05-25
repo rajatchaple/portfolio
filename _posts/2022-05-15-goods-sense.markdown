@@ -6,8 +6,6 @@ img: /assets/img/goods-sense-thumbnail.jpg
 desc: This battery operated device monitors goods under treansport
 ---
 
-{:.gsd-title}
-
 # Goods Sense device
 
 <!--
@@ -28,27 +26,12 @@ This project contains following implementations:
 | Feature 1 | Orientation detection and indication |
 | Feature 2 | Low power operation | -->
 
-<table class="gsd-table">
-    <tr>
-        <th>Sr. No.</th>
-        <th>Features</th>
-    </tr>
-    <tr>
-        <td>Feature 1</td>
-        <td>Orientation detection and indication</td>
-    </tr>
-    <tr>
-        <td>Feature 2</td>
-        <td>Low power operation</td>
-    </tr>
-</table>
+These features required,
 
-These require,
-
-1. Accelerometer interface over I2C
-2. LPTIMER (low power timer)
-3. Deep sleep into low leakage stop
-4. Interrupt bases switch input
+1. IMU interface over I2C
+2. LCD interface over SPI
+3. Mangetic encoder interface over ABI
+4. Low energy mode software development
 5. State machine's implementation
 
 ## Getting Started
@@ -91,7 +74,7 @@ Device operates in low power mode:
 
 1. Indications in the form of LED blink are shown every 3 seconds.
 2. Tilt measurement is done every 12th second
-   - If here is no tilt GREEN LED blinks every 3 seconds.
+   - If there is no tilt GREEN LED blinks every 3 seconds.
    - If there is tilt up-to two tilt measurements YELLOW LED blinks.
    - In case of tilt more than 2 tilt measurements RED LED blinks.
 
@@ -132,3 +115,4 @@ arm-none-eabi-gcc compiler
 ## Authors
 
 - Rajat Chaple
+- Saloni Shah

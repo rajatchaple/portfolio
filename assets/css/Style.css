@@ -189,6 +189,9 @@ a {
     align-items: left;
     justify-content: center;
     width: 80%;
+
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 .gsd-title {

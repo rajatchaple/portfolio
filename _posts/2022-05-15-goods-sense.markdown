@@ -16,22 +16,29 @@ desc: This battery operated device monitors goods under treansport
 There are losses due to mishandling of goods during transportation. In this project, the developed device is targeted to sense condition of goods while transporting, which is its orientation. Also, Since this device needs to be standalone product and portable, it is required to be battery operated. This requires low power operation of a device.
 KL25z evaluaion module was used to develop above project. Bare metal coding was used for development of this project.
 
-<p align="center">  <img src="/assets/img/project_overview.png" style="max-width:70%; height: auto;  object-fit:cover;"/> </p>
+<p align="center">  <img src="/assets/img/project_overview.png" style="width:70%; height: auto;  max-width: 600px;object-fit:cover;"/> </p>
 
-This project contains following implementations:
+<table class="gsd-table">
+    <tr>
+        <th>Sr. No.</th>
+        <th>Features</th>
+    </tr>
+    <tr>
+        <td>Feature 1</td>
+        <td>Orientation detection and indication</td>
+    </tr>
+    <tr>
+        <td>Feature 2</td>
+        <td>Low power operation</td>
+    </tr>
+</table>
 
-<!-- {:.gsd-table}
-| Sr. No. | Features |
-| --------- | ------------------------------------ |
-| Feature 1 | Orientation detection and indication |
-| Feature 2 | Low power operation | -->
+These require,
 
-These features required,
-
-1. IMU interface over I2C
-2. LCD interface over SPI
-3. Mangetic encoder interface over ABI
-4. Low energy mode software development
+1. Accelerometer interface over I2C
+2. LPTIMER (low power timer)
+3. Deep sleep into low leakage stop
+4. Interrupt based switch input
 5. State machine's implementation
 
 ## Getting Started
@@ -48,7 +55,7 @@ MCUXpresso 11.2 is used for this project. Import this project in MCUXpresso by c
 
 ### Hardware changes
 
-<p align="center">  <img src="/assets/img/hardware_changes.png" style="max-width:70%; height: auto; border-radius:30px; object-fit:cover;"/> </p>
+<p align="center">  <img src="/assets/img/hardware_changes.png" style="width:70%; height: auto; max-width: 600px;border-radius:10px; object-fit:cover;"/> </p>
 
 1. Connect switches and an LED to test.
 2. R74, J3 and J12 changes are required for operation in low power mode.
@@ -68,7 +75,7 @@ This device runs in two modes:
 
 # App mode:
 
-<p align="center">  <img src="/assets/img/app_mode.gif" style="max-width:47%; height: auto; border:2px solid black; border-radius:5px; object-fit:cover;"/> </p>
+<p align="center">  <img src="/assets/img/app_mode.gif" style="width:47%; height: auto; max-width: 500px; border:2px solid black; border-radius:5px; object-fit:cover;"/> </p>
 
 Device operates in low power mode:
 
@@ -82,7 +89,7 @@ When device is powered, it enters low power mode and remains there unless calibr
 
 # Test mode:
 
-<p align="center">  <img src="/assets/img/test_mode.gif" style="max-width:70%; height: auto; border:2px solid black; border-radius:5px; object-fit:cover;"/> </p>
+<p align="center">  <img src="/assets/img/test_mode.gif" style="width:70%; height: auto; max-width: 500px; border:2px solid black; border-radius:5px; object-fit:cover;"/> </p>
 
 Tests are manual as almost every function call is someway or the other connected to external hardware.
 
@@ -115,4 +122,3 @@ arm-none-eabi-gcc compiler
 ## Authors
 
 - Rajat Chaple
-- Saloni Shah

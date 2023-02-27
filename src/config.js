@@ -1,27 +1,27 @@
 module.exports = {
-  email: 'chaple.rajat@gmail.com',
+  email: 'brittany.chiang@gmail.com',
 
   socialMedia: [
     {
       name: 'GitHub',
-      url: 'https://github.com/rajatchaple',
+      url: 'https://github.com/bchiang7',
     },
     {
       name: 'Instagram',
-      url: 'https://www.instagram.com/rajatchaple',
+      url: 'https://www.instagram.com/bchiang7',
     },
-    // {
-    //   name: 'Twitter',
-    //   url: 'https://twitter.com/bchiang7',
-    // },
+    {
+      name: 'Twitter',
+      url: 'https://twitter.com/bchiang7',
+    },
     {
       name: 'Linkedin',
-      url: 'https://www.linkedin.com/in/rajatchaple',
+      url: 'https://www.linkedin.com/in/bchiang7',
     },
-    // {
-    //   name: 'Codepen',
-    //   url: 'https://codepen.io/bchiang7',
-    // },
+    {
+      name: 'Codepen',
+      url: 'https://codepen.io/bchiang7',
+    },
   ],
 
   navLinks: [
@@ -43,16 +43,10 @@ module.exports = {
     },
   ],
 
-  // colors: {
-  //   green: '#64ffda',
-  //   navy: '#0a192f',
-  //   darkNavy: '#020c1b',
-  // },
-
   colors: {
-    green: '#f44336',
-    navy: '#330b0b',
-    darkNavy: '##1b0202',
+    green: '#64ffda',
+    navy: '#0a192f',
+    darkNavy: '#020c1b',
   },
 
   srConfig: (delay = 200, viewFactor = 0.25) => ({

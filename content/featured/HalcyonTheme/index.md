@@ -1,15 +1,14 @@
 ---
 date: '1'
-title: 'Halcyon Theme'
-cover: './halcyon.png'
-github: 'https://github.com/bchiang7/halcyon-site'
-external: 'https://halcyon-theme.netlify.com/'
+title: 'Cubit (a measurement device)'
+cover: './cubit.jpg'
+# github: 'https://github.com/bchiang7/halcyon-site'
+external: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
 tech:
-  - VS Code
-  - Sublime Text
-  - Atom
-  - iTerm2
-  - Hyper
+  - BLE
+  - Energy Harvesting
+  - Altium
+  - Energy Management
 ---
 
-A minimal, dark blue theme for VS Code, Sublime Text, Atom, iTerm, and more. Available on [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=brittanychiang.halcyon-vscode), [Package Control](https://packagecontrol.io/packages/Halcyon%20Theme), [Atom Package Manager](https://atom.io/themes/halcyon-syntax), and [npm](https://www.npmjs.com/package/hyper-halcyon-theme).
+It's a solar panel and USB rechargeable, multi-mode operational smart measuring tape. For this battery-operated device, power supply was designed. microcontroller + BLE, LCD and sensors including magnetic encoder were interfaced using I2C, ABI, SPI & UART.

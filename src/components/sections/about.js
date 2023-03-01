@@ -147,7 +147,7 @@ const About = () => {
               I have gained a wealth of experience through my involvement in diverse and interesting projects including {' '}
               <a href="https://www.deere.co.in/en/tractors/">
                 JDLink
-              </a>{' '} a telematics solution for the automotive industry. I spend my free time playing table tennis, badminton, and bowling. I am a huge fan of the Marvel Cinematic Universe.
+              </a>{' '} a telematics solution for the automotive industry. I usually spend my free time playing table tennis, badminton, and bowling. I am a huge fan of the Marvel Cinematic Universe.
             </p>
 
             <p>Here are a few technologies I’ve been working with recently:</p>

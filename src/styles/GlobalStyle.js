@@ -325,7 +325,7 @@ const GlobalStyle = createGlobalStyle`
           content: '▹';
           position: absolute;
           left: 0;
-          color: var(--green);
+          color:var(--green);
         }
       }
     }

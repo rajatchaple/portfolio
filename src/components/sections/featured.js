@@ -256,7 +256,7 @@ const StyledProject = styled.li`
     a {
       width: 100%;
       height: 100%;
-      background-color: var(--green);
+      background-color: var(--grey);
       border-radius: var(--border-radius);
       vertical-align: middle;
 

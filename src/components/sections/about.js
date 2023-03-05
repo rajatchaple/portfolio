@@ -136,7 +136,7 @@ const About = () => {
         <StyledText>
           <div>
             <p>
-              As a highly  skilled electrical and computer engineering professional, I have a strong foundation in designing and developing embedded systems. With over 5 years of industry experience, I have consistently demonstrated a strong ability to deliver high-quality work. My success is the positive feedback I have received from clients, professors and colleagues.
+              As a highly skilled electrical engineering professional, I have a strong foundation in designing and developing embedded systems. With over 5 years of industry experience, I have consistently demonstrated a strong ability to deliver high-quality work. My success is the positive feedback I have received from clients, professors and colleagues.
             </p>
 
             <p>

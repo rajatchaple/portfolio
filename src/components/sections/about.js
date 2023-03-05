@@ -136,11 +136,11 @@ const About = () => {
         <StyledText>
           <div>
             <p>
-              As a highly  skilled electrical and computer engineering professional, I have a strong foundation in designing and developing embedded systems. With over 5 years of industry experience, I have a proven track record of success in this field.
+              As a highly  skilled electrical and computer engineering professional, I have a strong foundation in designing and developing embedded systems. With over 5 years of industry experience, I have consistently demonstrated a strong ability to deliver high-quality work. My success is the positive feedback I have received from clients, professors and colleagues.
             </p>
 
             <p>
-              My educational background includes a Master's degree from the University of Colorado, Boulder, which provided me with a solid foundation in electrical and computer engineering. I gained valuable hands-on experience through internships at Analog Devices Inc. and work as an embedded software engineer at John Deere India.
+              My educational background includes a Master's degree from the University of Colorado, Boulder, which provided me with a solid foundation in electrical and computer engineering. I gained valuable hands-on experience through internship at Analog Devices Inc. and work as an embedded software engineer at John Deere India.
             </p>
 
             <p>

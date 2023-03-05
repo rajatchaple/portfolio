@@ -1,5 +1,5 @@
 ---
-date: '2020-03-27'
+date: '2021-12-11'
 title: 'Remotely programming 8051'
 github: ''
 external: 'https://github.com/rajatchaple/ESD-final-project'

@@ -1,6 +1,6 @@
 ---
 date: '3'
-title: 'Build a Spotify Connected App'
+title: 'Arduino: the better one'
 cover: './demo.jpg'
 external: 'https://github.com/rajatchaple/pcb_golden_arduino'
 cta: ''

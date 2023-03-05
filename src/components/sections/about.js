@@ -136,18 +136,22 @@ const About = () => {
         <StyledText>
           <div>
             <p>
-              As a highly skilled electrical and computer engineering professional with over 5 years of industry experience, I have a proven track record of success in the design and development of embedded systems. My Master's degree from the University of Colorado, Boulder provided me with a strong foundation in this field, and my internships at Analog Devices Inc. and work as an embedded software engineer at John Deere India have given me valuable hands-on experience.
+              As a highly  skilled electrical and computer engineering professional, I have a strong foundation in designing and developing embedded systems. With over 5 years of industry experience, I have a proven track record of success in this field.
             </p>
 
             <p>
-              My expertise in programming languages such as C, Python, and MATLAB has enabled me to successfully deliver a number of projects at John Deere. In my free time, I enjoy staying up-to-date on the latest technologies and exploring outdoor activities.
+              My educational background includes a Master's degree from the University of Colorado, Boulder, which provided me with a solid foundation in electrical and computer engineering. I gained valuable hands-on experience through internships at Analog Devices Inc. and work as an embedded software engineer at John Deere India.
             </p>
 
             <p>
-              I have gained a wealth of experience through my involvement in diverse and interesting projects including {' '}
+              My expertise in programming languages such as C, Python, and MATLAB has been instrumental in delivering successful projects at John Deere. Additionally, I have worked on diverse and interesting projects such as
               <a href="https://www.deere.co.in/en/tractors/">
                 JDLink
-              </a>{' '} a telematics solution for the automotive industry. I usually spend my free time playing table tennis, badminton, and bowling. I am a huge fan of the Marvel Cinematic Universe.
+              </a>{' '} , a telematics solution for the automotive industry.
+            </p>
+
+            <p> In my free time, I enjoy staying up-to-date on the latest technologies and exploring outdoor activities. I frequently play table tennis, badminton, and bowling. I am also a huge fan of the Marvel Cinematic Universe.
+
             </p>
 
             <p>Here are a few technologies I’ve been working with recently:</p>

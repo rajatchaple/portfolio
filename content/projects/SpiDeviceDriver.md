@@ -1,5 +1,5 @@
 ---
-date: '2017-03-01'
+date: '2021-12-12'
 title: 'SPI device driver for Beaglebone black'
 github: 'https://github.com/cu-ecen-aeld/final-project-rajatchaple'
 external: ''

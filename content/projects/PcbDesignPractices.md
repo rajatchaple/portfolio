@@ -1,5 +1,5 @@
 ---
-date: '2016-04-01'
+date: '2022-03-03'
 title: 'PCB design practices'
 github: 'https://github.com/rajatchaple/pcb_practice1'
 external: ''

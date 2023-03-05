@@ -1,6 +1,6 @@
 ---
 date: '2'
-title: 'Posture monitoring and BLE'
+title: 'Posture monitoring using BLE'
 cover: './demo.jpg'
 # github: 'https://github.com/bchiang7/spotify-profile'
 external: 'https://github.com/CU-ECEN-5823/ecen5823-courseproject-rajatchaple'

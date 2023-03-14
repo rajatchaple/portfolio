@@ -107,8 +107,11 @@ const Footer = () => {
       <StyledCredit tabindex="-1">
         {/* <a href="https://github.com/rajatchaple/portfolio"> */}
         <font size="1" color>
-          <div>© 2018 - licensed</div>
-          <div>Designed &amp; Built by Brittany (visit my github) </div>
+          <font color="#505050">
+            <div>© 2018 - licensed</div>
+
+            <div>Designed &amp; Built by Brittany</div>
+          </font>
         </font>
 
         {/* </a> */}

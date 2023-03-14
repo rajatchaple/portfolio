@@ -144,10 +144,7 @@ const About = () => {
             </p>
 
             <p>
-              My expertise in programming languages such as C, Python, and MATLAB has been instrumental in delivering successful projects at John Deere. Additionally, I have worked on diverse and interesting projects such as
-              <a href="https://www.deere.co.in/en/tractors/">
-                JDLink
-              </a>{' '} , a telematics solution for the automotive industry.
+              My expertise in programming languages such as C, Python, and MATLAB has been instrumental in delivering successful projects at John Deere. Additionally, I have worked on diverse and interesting projects such as <a href="https://www.deere.co.in/en/tractors/">JDLink</a>{' '} , a telematics solution for the automotive industry.
             </p>
 
             <p> In my free time, I enjoy staying up-to-date on the latest technologies and exploring outdoor activities. I frequently play table tennis, badminton, and bowling. I am also a huge fan of the Marvel Cinematic Universe.

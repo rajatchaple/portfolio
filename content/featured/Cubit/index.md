@@ -4,6 +4,7 @@ title: 'Cubit (a measurement device)'
 cover: './cubit.jpg'
 # github: 'https://github.com/bchiang7/halcyon-site'
 external: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
+
 tech:
   - BLE
   - Energy Harvesting

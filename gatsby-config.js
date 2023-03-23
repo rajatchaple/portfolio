@@ -6,7 +6,7 @@ module.exports = {
     description:
       'Rajat Chaple is an electrical engineer who specializes in building embedded systems.',
     siteUrl: 'https://rajatchaple.com', // No trailing slash allowed!
-    image: '/og.png', // Path to your image you placed in the 'static' folder
+    image: '/ogr.png', // Path to your image you placed in the 'static' folder
     twitterUsername: '@rajatchaple',
   },
   plugins: [

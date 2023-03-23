@@ -1,7 +1,7 @@
 ---
 date: '2020-12-01'
 title: 'Embedded Software Engineer'
-company: 'John Deere India'
+company: 'John Deere'
 location: 'Pune, India'
 range: 'July 2015 - Dec 2020'
 url: 'https://www.deere.co.in/en/index.html'

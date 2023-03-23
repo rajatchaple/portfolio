@@ -1,7 +1,7 @@
 ---
 date: '2014-07-01'
 title: 'Embedded Systems Intern'
-company: 'Logicare Systems'
+company: 'Logicare Sys'
 location: 'Pune, India'
 range: 'July 2014'
 url: 'https://logicaresystems.com/'

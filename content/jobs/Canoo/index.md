@@ -1,10 +1,11 @@
 ---
-date: '2014-07-01'
-title: 'Embedded Systems Intern'
-company: 'Logicare Sys'
-location: 'Pune, India'
-range: 'July 2014'
-url: 'https://logicaresystems.com/'
+date: '2020-12-01'
+title: 'Embedded Software Engineer'
+company: 'Canoo Inc'
+location: 'Torrance, CA'
+range: 'Feb 2023 - present'
+url: 'https://www.canoo.com/'
 ---
 
-- Developed a GPS based Taxi Fare meter along with notification facility and safety to passengers onboard using GSM services
+* Responsible for implementing body control features including lighting, Door and mirror control and seat profiles
+* This includes working on AUTOSAR arxmls, implementing the features in C. Also, verifying the features using CANoe, CANalyzer and perform the integration testing. 

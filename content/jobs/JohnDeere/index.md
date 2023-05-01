@@ -1,11 +1,12 @@
 ---
 date: '2020-12-01'
 title: 'Embedded Software Engineer'
-company: 'John Deere'
-location: 'Pune, India'
-range: 'July 2015 - Dec 2020'
-url: 'https://www.deere.co.in/en/index.html'
+company: 'Canoo Inc'
+location: 'Torrance, CA'
+range: 'Feb 2023'
+url: 'https://www.canoo.com/'
 ---
 
-* Smart Spraying System - Implemented live spraying tracker with the help of GNSS to assist customers to monitor their spraying operations in Vineyards/orchards. 
-* Dashboard Digitization and Telematics - Collaborated with cross-functional teams to develop a low-cost, feature-rich product to help farmers/ contractors receive alerts, status, and activities of their vehicles.
+* Responsible for implementing body control features including lighting, Door and mirror control and seat profiles
+* This includes working on AUTOSAR arxmls, implementing the features in C. Verify the features using CANoe, CANalyzer and perform the integration testing. 
+

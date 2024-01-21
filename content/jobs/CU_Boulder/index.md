@@ -1,5 +1,5 @@
 ---
-date: '2022-12-21'
+date: '2021-01-21'
 title: 'Graduate Teaching Assistant'
 company: 'CU Boulder'
 location: 'Boulder, CO'

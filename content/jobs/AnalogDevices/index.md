@@ -1,5 +1,5 @@
 ---
-date: '2022-08-21'
+date: '2022-05-28'
 title: 'Embedded Software Intern'
 company: 'Analog Devices'
 location: 'Wilmington, MA'

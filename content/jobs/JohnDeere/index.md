@@ -1,5 +1,5 @@
 ---
-date: '2020-12-01'
+date: '2015-01-07'
 title: 'Embedded Software Engineer'
 company: 'John Deere'
 location: 'Pune, India'

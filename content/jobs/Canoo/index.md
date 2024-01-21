@@ -1,11 +1,11 @@
 ---
-date: '2020-12-01'
+date: '2023-02-13'
 title: 'Embedded Software Engineer'
 company: 'Canoo Inc'
 location: 'Torrance, CA'
-range: 'Feb 2023 - present'
+range: 'Feb 2023 - Sept 2023'
 url: 'https://www.canoo.com/'
 ---
 
-* Responsible for implementing body control features including lighting, Door and mirror control and seat profiles
-* This includes working on AUTOSAR arxmls, implementing the features in C. Also, verifying the features using CANoe, CANalyzer and perform the integration testing. 
+* Contributed team in implementing body control features including lighting, Door, and seat control.
+* Architected and developed state machine for mirror controls.

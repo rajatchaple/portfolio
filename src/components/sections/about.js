@@ -136,22 +136,18 @@ const About = () => {
         <StyledText>
           <div>
             <p>
-              As a highly skilled electrical engineering professional, I have a strong foundation in designing and developing embedded systems. With over 5 years of industry experience, I have consistently demonstrated a strong ability to deliver high-quality work. My success is the positive feedback I have received from clients, professors and colleagues.
+              I'm an electrical engineer with over 5 years of experience in designing and developing embedded systems. My journey includes a Master's degree from the University of Colorado, Boulder, and roles at Analog Devices Inc. and John Deere India.
             </p>
 
             <p>
-              My educational background includes a Master's degree from the University of Colorado, Boulder, which provided me with a solid foundation in electrical and computer engineering. I gained valuable hands-on experience through internship at Analog Devices Inc. and work as an embedded software engineer at John Deere India.
+              At John Deere, I worked on exciting projects like JDLink, a telematics solution for the automotive industry, leveraging my skills in C, Python, and MATLAB.
             </p>
 
             <p>
-              My expertise in programming languages such as C, Python, and MATLAB has been instrumental in delivering successful projects at John Deere. Additionally, I have worked on diverse and interesting projects such as <a href="https://www.deere.co.in/en/tractors/">JDLink</a>{' '} , a telematics solution for the automotive industry.
+              In my free time, I enjoy outdoor activities like table tennis, badminton, and bowling, and I'm a huge Marvel Cinematic Universe fan.
             </p>
 
-            <p> In my free time, I enjoy staying up-to-date on the latest technologies and exploring outdoor activities. I frequently play table tennis, badminton, and bowling. I am also a huge fan of the Marvel Cinematic Universe.
-
-            </p>
-
-            <p>Here are a few technologies I’ve been working with recently:</p>
+            <p>Technologies I've Been Working With Recently:</p>
           </div>
 
           <ul className="skills-list">

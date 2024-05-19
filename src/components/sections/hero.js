@@ -65,7 +65,7 @@ const Hero = () => {
   const four = (
     <>
       <p>
-        I’m an electrical engineer specializing in building embedded systems. I have a special intereset in embedded software development for consumer electronics and automotive applications...
+        An electrical engineer, specialized in designing and building embedded systems with specific interest in embedded software development for consumer electronics and automotive applications...
       </p>
     </>
   );

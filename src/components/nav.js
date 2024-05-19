@@ -17,7 +17,7 @@ const StyledHeader = styled.header`
   padding: 0px 50px;
   width: 100%;
   height: var(--nav-height);
-  background-color: rgba(17,17,23,0.85);//rgba(10, 25, 47, 0.85);
+  background-color: rgba(5,5,5,0.85); //rgba(17,17,23,0.85);//rgba(10, 25, 47, 0.85);
   filter: none !important;
   pointer-events: auto !important;
   user-select: auto !important;
@@ -58,7 +58,7 @@ const StyledNav = styled.nav`
   position: relative;
   width: 100%;
   color: var(--lightest-slate);
-  font-family: var(--font-mono);
+  font-family: 'Fira Code'#var(--font-mono);
   counter-reset: item 0;
   z-index: 12;
 

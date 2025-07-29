@@ -11,6 +11,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   const { createPage } = actions;
   const postTemplate = path.resolve(`src/templates/post.js`);
   const tagTemplate = path.resolve('src/templates/tag.js');
+  const pageTemplate = path.resolve(`src/templates/page.js`);
 
   const result = await graphql(`
     {
@@ -30,6 +31,18 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       tagsGroup: allMarkdownRemark(limit: 2000) {
         group(field: frontmatter___tags) {
           fieldValue
+        }
+      }
+      pagesRemark: allMarkdownRemark(
+        filter: { fileAbsolutePath: { regex: "/content/learn-embedded/" } }
+      ) {
+        edges {
+          node {
+            id
+            frontmatter {
+              title
+            }
+          }
         }
       }
     }
@@ -62,6 +75,14 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       context: {
         tag: tag.fieldValue,
       },
+    });
+  });
+
+  result.data.pagesRemark.edges.forEach(({ node }) => {
+    createPage({
+      path: '/learn-embedded',
+      component: pageTemplate,
+      context: { id: node.id },
     });
   });
 };

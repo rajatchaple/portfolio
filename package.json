@@ -51,6 +51,8 @@
     "gatsby-transformer-remark": "^4.1.0",
     "gatsby-transformer-sharp": "^3.4.0",
     "lodash": "^4.17.19",
+    "postcss": "^8.5.6",
+    "postcss-loader": "^8.1.1",
     "prismjs": "^1.27.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
@@ -75,5 +77,8 @@
     "husky": "^6.0.0",
     "lint-staged": "^10.1.2",
     "prettier": "^2.2.1"
+  },
+  "resolutions": {
+    "graphql": "^15.8.0"
   }
 }

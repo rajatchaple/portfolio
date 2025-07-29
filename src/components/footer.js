@@ -110,7 +110,7 @@ const Footer = () => {
           <font color="#505050">
             <div>© 2018 - licensed</div>
 
-            <div>Designed &amp; Built by Brittany</div>
+            {/* <div>Designed &amp; Built by Brittany</div> */}
           </font>
         </font>
 

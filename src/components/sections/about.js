@@ -136,24 +136,25 @@ const About = () => {
         <StyledText>
           <div>
             <p>
-              I'm an electrical engineer with over 5 years of experience in designing and developing embedded systems. My journey includes a Master's degree from the University of Colorado, Boulder, and roles at Analog Devices Inc. and John Deere India.
+              I'm Rajat Chaple, an embedded systems engineer with 7+ years of experience developing robust firmware and real-time software for automotive and consumer electronics. I hold a Master’s in Embedded Systems from the University of Colorado Boulder and have contributed to innovative projects at Lucid Motors, Canoo, Analog Devices, and John Deere.
             </p>
 
             <p>
-              At John Deere, I worked on exciting projects like JDLink, a telematics solution for the automotive industry, leveraging my skills in C, Python, and MATLAB.
+              My expertise spans bare-metal development, C programming, MATLAB/Simulink modeling, and device driver design. I’ve worked extensively with CAN, UART, SPI, and I2C protocols, and have hands-on experience with battery management, telematics (JDLink), and system-level debugging.
             </p>
 
             <p>
-              In my free time, I enjoy outdoor activities like table tennis, badminton, and bowling, and I'm a huge Marvel Cinematic Universe fan.
+              I enjoy bridging hardware and software to solve complex problems and create efficient embedded solutions. Outside work, I’m passionate about table tennis, badminton, bowling, and the Marvel Cinematic Universe.
             </p>
 
-            <p>Technologies I've Been Working With Recently:</p>
+            <p><strong>Technologies I’ve Been Working With Recently:</strong></p>
           </div>
 
           <ul className="skills-list">
             {skills && skills.map((skill, i) => <li key={i}>{skill}</li>)}
           </ul>
         </StyledText>
+
 
         <StyledPic>
           <div className="wrapper">

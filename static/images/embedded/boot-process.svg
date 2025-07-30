@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: Arial, sans-serif; }
+    .title { font-size: 22px; font-weight: bold; fill: #64ffda; }
+    .subtitle { font-size: 18px; font-weight: bold; fill: #bd93f9; }
+    .label { font-size: 14px; fill: #ccd6f6; }
+    .small-label { font-size: 12px; fill: #ccd6f6; }
+    .box { fill: #282a36; stroke: #44475a; stroke-width: 2; rx: 5; ry: 5; }
+    .arrow { fill: none; stroke: #f8f8f2; stroke-width: 2; marker-end: url(#arrowhead); }
+    .step { fill: #50fa7b; stroke: #44475a; stroke-width: 1; rx: 5; ry: 5; }
+    .bootloader { fill: #ff5555; stroke: #44475a; stroke-width: 1; rx: 5; ry: 5; }
+    .kernel { fill: #8be9fd; stroke: #44475a; stroke-width: 1; rx: 5; ry: 5; }
+    .app { fill: #ffb86c; stroke: #44475a; stroke-width: 1; rx: 5; ry: 5; }
+    .memory { fill: #bd93f9; stroke: #44475a; stroke-width: 1; }
+  </style>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f8f8f2" />
+    </marker>
+  </defs>
+  
+  <rect width="600" height="400" fill="none" />
+  
+  <text x="300" y="30" text-anchor="middle" class="title">Boot Process in Embedded Systems</text>
+  
+  <!-- Boot Sequence Flow -->
+  <rect x="50" y="60" width="500" height="180" class="box" />
+  <text x="300" y="80" text-anchor="middle" class="subtitle">Boot Sequence</text>
+  
+  <!-- Power On/Reset -->
+  <rect x="70" y="100" width="100" height="40" class="step" />
+  <text x="120" y="125" text-anchor="middle" class="label">Power On/Reset</text>
+  
+  <!-- Arrow Right -->
+  <line x1="170" y1="120" x2="190" y2="120" class="arrow" />
+  
+  <!-- ROM Boot Code -->
+  <rect x="190" y="100" width="100" height="40" class="bootloader" />
+  <text x="240" y="125" text-anchor="middle" class="label">ROM Boot Code</text>
+  
+  <!-- Arrow Right -->
+  <line x1="290" y1="120" x2="310" y2="120" class="arrow" />
+  
+  <!-- Bootloader -->
+  <rect x="310" y="100" width="100" height="40" class="bootloader" />
+  <text x="360" y="125" text-anchor="middle" class="label">Bootloader</text>
+  
+  <!-- Arrow Right -->
+  <line x1="410" y1="120" x2="430" y2="120" class="arrow" />
+  
+  <!-- Application -->
+  <rect x="430" y="100" width="100" height="40" class="app" />
+  <text x="480" y="125" text-anchor="middle" class="label">Application</text>
+  
+  <!-- Boot Stages Details -->
+  <text x="70" y="160" class="small-label">• CPU Reset Vector</text>
+  <text x="70" y="180" class="small-label">• Initialize CPU</text>
+  <text x="70" y="200" class="small-label">• Basic Hardware Check</text>
+  
+  <text x="190" y="160" class="small-label">• Located in ROM</text>
+  <text x="190" y="180" class="small-label">• Minimal Setup</text>
+  <text x="190" y="200" class="small-label">• Loads Bootloader</text>
+  
+  <text x="310" y="160" class="small-label">• Memory Initialization</text>
+  <text x="310" y="180" class="small-label">• Hardware Configuration</text>
+  <text x="310" y="200" class="small-label">• Loads Application</text>
+  
+  <text x="430" y="160" class="small-label">• Initialize Stack</text>
+  <text x="430" y="180" class="small-label">• Setup C Environment</text>
+  <text x="430" y="200" class="small-label">• Execute main()</text>
+  
+  <!-- Boot Configurations -->
+  <rect x="50" y="250" width="240" height="130" class="box" />
+  <text x="170" y="270" text-anchor="middle" class="subtitle">Boot Types</text>
+  
+  <text x="70" y="290" class="small-label">• Secure Boot</text>
+  <text x="90" y="310" class="small-label">- Verifies Code Signatures</text>
+  <text x="90" y="330" class="small-label">- Prevents Unauthorized Code</text>
+  
+  <text x="70" y="350" class="small-label">• Fast Boot</text>
+  <text x="90" y="370" class="small-label">- Optimized for Startup Time</text>
+  
+  <!-- Memory Regions -->
+  <rect x="310" y="250" width="240" height="130" class="box" />
+  <text x="430" y="270" text-anchor="middle" class="subtitle">Memory Regions</text>
+  
+  <rect x="340" y="290" width="180" height="20" class="memory" />
+  <text x="430" y="305" text-anchor="middle" class="small-label">ROM (Boot Code)</text>
+  
+  <rect x="340" y="315" width="180" height="20" class="memory" fill="#ff5555" />
+  <text x="430" y="330" text-anchor="middle" class="small-label">Flash (Bootloader, Application)</text>
+  
+  <rect x="340" y="340" width="180" height="20" class="memory" fill="#50fa7b" />
+  <text x="430" y="355" text-anchor="middle" class="small-label">RAM (Execution, Data)</text>
+</svg>

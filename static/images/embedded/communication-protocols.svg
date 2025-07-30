@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: Arial, sans-serif; }
+    .title { font-size: 22px; font-weight: bold; fill: #64ffda; }
+    .subtitle { font-size: 18px; font-weight: bold; fill: #bd93f9; }
+    .label { font-size: 14px; fill: #ccd6f6; }
+    .small-label { font-size: 12px; fill: #ccd6f6; }
+    .box { fill: #282a36; stroke: #44475a; stroke-width: 2; rx: 5; ry: 5; }
+    .arrow { fill: none; stroke: #f8f8f2; stroke-width: 2; marker-end: url(#arrowhead); }
+    .bidirectional { fill: none; stroke: #f8f8f2; stroke-width: 2; marker-end: url(#arrowhead); marker-start: url(#arrowhead-start); }
+    .protocol { fill: #50fa7b; stroke: #44475a; stroke-width: 1; rx: 5; ry: 5; }
+    .device { fill: #ff5555; stroke: #44475a; stroke-width: 1; rx: 5; ry: 5; }
+    .signal { fill: none; stroke: #8be9fd; stroke-width: 2; }
+    .pulse { fill: none; stroke: #ffb86c; stroke-width: 2; }
+  </style>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f8f8f2" />
+    </marker>
+    <marker id="arrowhead-start" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="10 0, 0 3.5, 10 7" fill="#f8f8f2" />
+    </marker>
+  </defs>
+  
+  <rect width="600" height="400" fill="none" />
+  
+  <text x="300" y="30" text-anchor="middle" class="title">Communication Protocols in Embedded Systems</text>
+  
+  <!-- Protocol Types -->
+  <rect x="50" y="60" width="240" height="120" class="box" />
+  <text x="170" y="80" text-anchor="middle" class="subtitle">Serial Protocols</text>
+  
+  <rect x="70" y="100" width="90" height="30" class="protocol" />
+  <text x="115" y="120" text-anchor="middle" class="label">UART/USART</text>
+  
+  <rect x="70" y="140" width="90" height="30" class="protocol" />
+  <text x="115" y="160" text-anchor="middle" class="label">SPI</text>
+  
+  <rect x="180" y="100" width="90" height="30" class="protocol" />
+  <text x="225" y="120" text-anchor="middle" class="label">I2C</text>
+  
+  <rect x="180" y="140" width="90" height="30" class="protocol" />
+  <text x="225" y="160" text-anchor="middle" class="label">CAN</text>
+  
+  <rect x="310" y="60" width="240" height="120" class="box" />
+  <text x="430" y="80" text-anchor="middle" class="subtitle">Network Protocols</text>
+  
+  <rect x="330" y="100" width="90" height="30" class="protocol" />
+  <text x="375" y="120" text-anchor="middle" class="label">Ethernet</text>
+  
+  <rect x="330" y="140" width="90" height="30" class="protocol" />
+  <text x="375" y="160" text-anchor="middle" class="label">USB</text>
+  
+  <rect x="440" y="100" width="90" height="30" class="protocol" />
+  <text x="485" y="120" text-anchor="middle" class="label">Bluetooth</text>
+  
+  <rect x="440" y="140" width="90" height="30" class="protocol" />
+  <text x="485" y="160" text-anchor="middle" class="label">Wi-Fi</text>
+  
+  <!-- Protocol Diagrams -->
+  <rect x="50" y="190" width="240" height="190" class="box" />
+  <text x="170" y="210" text-anchor="middle" class="subtitle">SPI Protocol</text>
+  
+  <!-- SPI Master -->
+  <rect x="70" y="230" width="60" height="40" class="device" />
+  <text x="100" y="255" text-anchor="middle" class="label">Master</text>
+  
+  <!-- SPI Slave -->
+  <rect x="210" y="230" width="60" height="40" class="device" />
+  <text x="240" y="255" text-anchor="middle" class="label">Slave</text>
+  
+  <!-- MOSI Line -->
+  <line x1="130" y1="240" x2="210" y2="240" class="arrow" />
+  <text x="170" y="235" text-anchor="middle" class="small-label">MOSI</text>
+  
+  <!-- MISO Line -->
+  <line x1="210" y1="250" x2="130" y2="250" class="arrow" />
+  <text x="170" y="265" text-anchor="middle" class="small-label">MISO</text>
+  
+  <!-- SCLK Line -->
+  <line x1="100" y1="270" x2="100" y2="300" class="arrow" />
+  <line x1="100" y1="300" x2="240" y2="300" class="arrow" />
+  <line x1="240" y1="300" x2="240" y2="270" class="arrow" />
+  <text x="170" y="295" text-anchor="middle" class="small-label">SCLK</text>
+  
+  <!-- CS Line -->
+  <line x1="90" y1="270" x2="90" y2="320" class="arrow" />
+  <line x1="90" y1="320" x2="230" y2="320" class="arrow" />
+  <line x1="230" y1="320" x2="230" y2="270" class="arrow" />
+  <text x="170" y="315" text-anchor="middle" class="small-label">CS</text>
+  
+  <!-- SPI Waveform -->
+  <line x1="70" y1="350" x2="290" y2="350" class="signal" />
+  <text x="65" y="350" text-anchor="end" class="small-label">SCLK</text>
+  
+  <path d="M 70,350 L 90,350 L 90,340 L 110,340 L 110,350 L 130,350 L 130,340 L 150,340 L 150,350 L 170,350 L 170,340 L 190,340 L 190,350 L 210,350 L 210,340 L 230,340 L 230,350 L 250,350 L 250,340 L 270,340 L 270,350 L 290,350" class="pulse" />
+  
+  <!-- I2C Protocol -->
+  <rect x="310" y="190" width="240" height="190" class="box" />
+  <text x="430" y="210" text-anchor="middle" class="subtitle">I2C Protocol</text>
+  
+  <!-- I2C Master -->
+  <rect x="330" y="230" width="60" height="40" class="device" />
+  <text x="360" y="255" text-anchor="middle" class="label">Master</text>
+  
+  <!-- I2C Slave -->
+  <rect x="470" y="230" width="60" height="40" class="device" />
+  <text x="500" y="255" text-anchor="middle" class="label">Slave</text>
+  
+  <!-- SDA Line -->
+  <line x1="390" y1="240" x2="470" y2="240" class="bidirectional" />
+  <text x="430" y="235" text-anchor="middle" class="small-label">SDA</text>
+  
+  <!-- SCL Line -->
+  <line x1="390" y1="260" x2="470" y2="260" class="arrow" />
+  <text x="430" y="275" text-anchor="middle" class="small-label">SCL</text>
+  
+  <!-- I2C Address + Data -->
+  <text x="360" y="300" text-anchor="middle" class="small-label">1. Start Condition</text>
+  <text x="360" y="320" text-anchor="middle" class="small-label">2. Address (7-bit)</text>
+  <text x="360" y="340" text-anchor="middle" class="small-label">3. R/W Bit</text>
+  <text x="360" y="360" text-anchor="middle" class="small-label">4. ACK/NACK</text>
+  
+  <text x="500" y="300" text-anchor="middle" class="small-label">5. Data Transfer</text>
+  <text x="500" y="320" text-anchor="middle" class="small-label">6. ACK/NACK</text>
+  <text x="500" y="340" text-anchor="middle" class="small-label">7. More Data or</text>
+  <text x="500" y="360" text-anchor="middle" class="small-label">8. Stop Condition</text>
+</svg>

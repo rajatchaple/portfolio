@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: Arial, sans-serif; }
+    .title { font-size: 22px; font-weight: bold; fill: #64ffda; }
+    .subtitle { font-size: 18px; font-weight: bold; fill: #bd93f9; }
+    .label { font-size: 14px; fill: #ccd6f6; }
+    .small-label { font-size: 12px; fill: #ccd6f6; }
+    .box { fill: #282a36; stroke: #44475a; stroke-width: 2; rx: 5; ry: 5; }
+    .memory-section { stroke: #44475a; stroke-width: 1; }
+    .stack { fill: #ff5555; }
+    .heap { fill: #50fa7b; }
+    .bss { fill: #ffb86c; }
+    .data { fill: #8be9fd; }
+    .text { fill: #bd93f9; }
+    .arrow { fill: none; stroke: #f8f8f2; stroke-width: 2; marker-end: url(#arrowhead); }
+    .pointer { fill: none; stroke: #f8f8f2; stroke-width: 1; stroke-dasharray: 4; marker-end: url(#arrowhead); }
+  </style>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f8f8f2" />
+    </marker>
+  </defs>
+  
+  <rect width="600" height="400" fill="none" />
+  
+  <text x="300" y="30" text-anchor="middle" class="title">Memory Management in Embedded Systems</text>
+  
+  <!-- Memory Layout -->
+  <rect x="100" y="60" width="150" height="300" class="box" />
+  <text x="175" y="80" text-anchor="middle" class="subtitle">Memory Layout</text>
+  
+  <!-- Stack -->
+  <rect x="110" y="90" width="130" height="60" class="memory-section stack" />
+  <text x="175" y="120" text-anchor="middle" class="label">Stack</text>
+  <text x="175" y="140" text-anchor="middle" class="small-label">(Local Variables)</text>
+  
+  <!-- Free Memory -->
+  <rect x="110" y="150" width="130" height="40" class="memory-section" fill="#44475a" />
+  <text x="175" y="175" text-anchor="middle" class="small-label">Free Memory</text>
+  
+  <!-- Heap -->
+  <rect x="110" y="190" width="130" height="60" class="memory-section heap" />
+  <text x="175" y="220" text-anchor="middle" class="label">Heap</text>
+  <text x="175" y="240" text-anchor="middle" class="small-label">(Dynamic Memory)</text>
+  
+  <!-- BSS -->
+  <rect x="110" y="250" width="130" height="30" class="memory-section bss" />
+  <text x="175" y="270" text-anchor="middle" class="small-label">BSS (Uninitialized)</text>
+  
+  <!-- Data -->
+  <rect x="110" y="280" width="130" height="30" class="memory-section data" />
+  <text x="175" y="300" text-anchor="middle" class="small-label">Data (Initialized)</text>
+  
+  <!-- Text/Code -->
+  <rect x="110" y="310" width="130" height="40" class="memory-section text" />
+  <text x="175" y="335" text-anchor="middle" class="small-label">Text/Code</text>
+  
+  <!-- Memory Management Techniques -->
+  <rect x="300" y="60" width="250" height="190" class="box" />
+  <text x="425" y="80" text-anchor="middle" class="subtitle">Memory Management</text>
+  
+  <text x="320" y="110" class="small-label">• Static Allocation (compile-time)</text>
+  <text x="320" y="130" class="small-label">• Stack Allocation (function calls)</text>
+  <text x="320" y="150" class="small-label">• Dynamic Allocation (malloc/free)</text>
+  <text x="320" y="170" class="small-label">• Memory Pools (pre-allocated blocks)</text>
+  <text x="320" y="190" class="small-label">• Memory Protection Units (MPU)</text>
+  <text x="320" y="210" class="small-label">• Static Analysis Tools</text>
+  <text x="320" y="230" class="small-label">• Memory Fragmentation Prevention</text>
+  
+  <!-- Common Issues -->
+  <rect x="300" y="260" width="250" height="100" class="box" />
+  <text x="425" y="280" text-anchor="middle" class="subtitle">Common Issues</text>
+  
+  <text x="320" y="300" class="small-label">• Memory Leaks</text>
+  <text x="320" y="320" class="small-label">• Stack Overflow</text>
+  <text x="320" y="340" class="small-label">• Heap Fragmentation</text>
+  <text x="320" y="360" class="small-label">• Dangling Pointers</text>
+</svg>

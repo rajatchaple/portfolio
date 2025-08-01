@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: Arial, sans-serif; }
+    .title { font-size: 22px; font-weight: bold; fill: #64ffda; }
+    .subtitle { font-size: 18px; font-weight: bold; fill: #bd93f9; }
+    .label { font-size: 14px; fill: #ccd6f6; }
+    .small-label { font-size: 12px; fill: #ccd6f6; }
+    .micro-label { font-size: 10px; fill: #8b8fa8; }
+    .box { fill: #282a36; stroke: #44475a; stroke-width: 2; rx: 5; ry: 5; }
+    .memory-section { stroke: #44475a; stroke-width: 1; }
+    .stack { fill: #ff5555; }
+    .heap { fill: #50fa7b; }
+    .bss { fill: #ffb86c; }
+    .data { fill: #8be9fd; }
+    .text { fill: #bd93f9; }
+    .arrow { fill: none; stroke: #f8f8f2; stroke-width: 2; marker-end: url(#arrowhead); }
+    .pointer { fill: none; stroke: #f8f8f2; stroke-width: 1; stroke-dasharray: 4; marker-end: url(#arrowhead); }
+    .highlight { font-weight: bold; fill: #64ffda; }
+  </style>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f8f8f2" />
+    </marker>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <rect width="600" height="400" fill="none" />
+  
+  <text x="300" y="30" text-anchor="middle" class="title">Memory Layout</text>
+  
+  <!-- Memory Layout -->
+  <rect x="100" y="60" width="150" height="300" class="box" />
+  
+  <!-- Stack -->
+  <rect x="110" y="90" width="130" height="60" class="memory-section stack" />
+  <text x="175" y="115" text-anchor="middle" class="label">Stack</text>
+  <text x="175" y="135" text-anchor="middle" class="small-label">Functions, Local vars</text>
+  <text x="175" y="145" text-anchor="middle" class="micro-label">Grows downward ↓</text>
+  
+  <!-- Free Memory -->
+  <rect x="110" y="150" width="130" height="40" class="memory-section" fill="#44475a" />
+  <text x="175" y="175" text-anchor="middle" class="small-label">Free Memory</text>
+  
+  <!-- Heap -->
+  <rect x="110" y="190" width="130" height="60" class="memory-section heap" />
+  <text x="175" y="215" text-anchor="middle" class="label">Heap</text>
+  <text x="175" y="235" text-anchor="middle" class="small-label">Dynamic allocation</text>
+  <text x="175" y="245" text-anchor="middle" class="micro-label">Grows upward ↑</text>
+  
+  <!-- BSS -->
+  <rect x="110" y="250" width="130" height="30" class="memory-section bss" />
+  <text x="175" y="270" text-anchor="middle" class="small-label">BSS: Uninitialized data</text>
+  
+  <!-- Data -->
+  <rect x="110" y="280" width="130" height="30" class="memory-section data" />
+  <text x="175" y="300" text-anchor="middle" class="small-label">Data: Global vars</text>
+  
+  <!-- Text/Code -->
+  <rect x="110" y="310" width="130" height="40" class="memory-section text" />
+  <text x="175" y="335" text-anchor="middle" class="small-label">Text: Code/ROM</text>
+  
+  <!-- Memory Management Techniques -->
+  <rect x="300" y="60" width="250" height="150" class="box" />
+  <text x="425" y="80" text-anchor="middle" class="subtitle">Key Concepts</text>
+  
+  <text x="320" y="105" class="small-label"><tspan class="highlight">Static:</tspan> Fixed size, compile-time</text>
+  <text x="320" y="125" class="small-label"><tspan class="highlight">Dynamic:</tspan> Runtime (malloc/free)</text>
+  <text x="320" y="145" class="small-label"><tspan class="highlight">Pools:</tspan> Fixed blocks, no fragmentation</text>
+  <text x="320" y="165" class="small-label"><tspan class="highlight">MPU:</tspan> Region protection</text>
+  <text x="320" y="185" class="small-label"><tspan class="highlight">Fragmentation:</tspan> Memory waste prevention</text>
+  
+  <!-- Problems & Solutions -->
+  <rect x="300" y="220" width="250" height="140" class="box" />
+  <text x="425" y="240" text-anchor="middle" class="subtitle">Issues & Solutions</text>
+  
+  <text x="320" y="260" class="small-label"><tspan class="highlight">Stack Overflow:</tspan> Stack guards, sizing</text>
+  <text x="320" y="280" class="small-label"><tspan class="highlight">Memory Leaks:</tspan> Free all allocations</text>
+  <text x="320" y="300" class="small-label"><tspan class="highlight">Fragmentation:</tspan> Defragmentation, pools</text>
+  <text x="320" y="320" class="small-label"><tspan class="highlight">Dangling Pointers:</tspan> Null after free</text>
+  <text x="320" y="340" class="small-label"><tspan class="highlight">Limited RAM:</tspan> Optimize, share buffers</text>
+  
+  <!-- Arrows -->
+  <path d="M110,124 L105,124 L105,245 L110,245" class="arrow" />
+  <text x="85" y="185" text-anchor="middle" class="small-label" style="fill: #f8f8f2;">Runtime</text>
+  <text x="85" y="195" text-anchor="middle" class="small-label" style="fill: #f8f8f2;">Memory</text>
+
+  <path d="M110,290 L85,290 L85,320 L110,320" class="arrow" />
+  <text x="65" y="305" text-anchor="middle" class="small-label" style="fill: #f8f8f2;">Non-volatile</text>
+</svg>

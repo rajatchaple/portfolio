@@ -27,6 +27,41 @@ const StyledLearnEmbeddedSection = styled.section`
     }
   }
 
+  .coming-soon-banner {
+    background-color: rgba(100, 255, 218, 0.1);
+    border: 1px solid rgba(100, 255, 218, 0.3);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 25px;
+    text-align: center;
+    box-shadow: 0 10px 30px -15px var(--navy-shadow);
+    
+    h3 {
+      color: var(--green);
+      margin-bottom: 10px;
+      font-size: var(--fz-xl);
+      
+      @media (max-width: 768px) {
+        font-size: var(--fz-lg);
+      }
+    }
+    
+    p {
+      font-size: var(--fz-md);
+      color: var(--lightest-slate);
+      max-width: 700px;
+      margin: 0 auto;
+      
+      @media (max-width: 768px) {
+        font-size: var(--fz-sm);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      padding: 15px;
+    }
+  }
+
   .interactive-container {
     display: grid;
     grid-template-columns: 250px 1fr 1fr;
@@ -472,395 +507,405 @@ const spinAnimationStyle = `
 
 // Topic data - in a real app, this could come from an API or markdown files
 const topics = [
-  {
-    id: 'priority-inversion',
-    title: 'Priority Inversion',
-    description: 'A critical RTOS problem where a low-priority task indirectly blocks a high-priority task by holding a resource needed by a medium-priority task. This can lead to missed deadlines and unpredictable behavior in real-time systems.',
-    image: '/images/embedded/priority-inversion.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/priority_inversion'
-  },
-  {
-    id: 'mutex-semaphore',
-    title: 'Mutex vs Semaphore',
-    description: 'Understanding the fundamental differences between mutexes and semaphores. While mutexes provide exclusive access with ownership (only the locking task can unlock), semaphores can count resources and be signaled by any task, making them suitable for different synchronization scenarios.',
-    image: '/images/embedded/mutex-semaphore.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/mutex_semaphore'
-  },
-  {
-    id: 'memory-management',
-    title: 'Memory Management',
-    description: 'Explore memory organization in embedded systems, including stack, heap, BSS, data, and text/code sections. Learn about efficient memory allocation strategies, avoiding fragmentation, and memory protection techniques essential for reliable embedded applications.',
-    image: '/images/embedded/memory-management-improved.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Memory/management'
-  },
-  {
-    id: 'rtos',
-    title: 'RTOS Fundamentals',
-    description: 'Core concepts of Real-Time Operating Systems including task scheduling, priority-based execution, and deterministic timing. Understand how an RTOS differs from general-purpose operating systems and when to use one in your embedded projects.',
-    image: '/images/embedded/rtos.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/fundamentals'
-  },
-  {
-    id: 'interrupt-handling',
-    title: 'Interrupt Handling',
-    description: 'Master the critical concept of hardware and software interrupts in embedded systems. Learn about interrupt service routines (ISRs), interrupt controllers, priorities, and best practices for writing efficient interrupt handlers.',
-    image: '/images/embedded/interrupt-handling.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Interrupts'
-  },
-  {
-    id: 'device-drivers',
-    title: 'Device Drivers',
-    description: 'Understand how to develop robust device drivers for embedded systems. This covers driver architecture, types of drivers, hardware abstraction layers, and implementation strategies for various peripherals.',
-    image: '/images/embedded/device-drivers.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Drivers'
-  },
-  {
-    id: 'boot-process',
-    title: 'Boot Process',
-    description: 'Explore the embedded system boot sequence from power-on to application execution. Learn about boot ROM, bootloaders, memory initialization, secure boot, and how to optimize boot time for your applications.',
-    image: '/images/embedded/boot-process.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Firmware/boot_process'
-  },
-  {
-    id: 'communication-protocols',
-    title: 'Communication Protocols',
-    description: 'Compare and contrast common embedded communication protocols like SPI, I2C, UART, CAN, and more. Understand their electrical characteristics, timing diagrams, advantages, limitations, and ideal use cases.',
-    image: '/images/embedded/communication-protocols.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Communication'
-  },
-  {
-    id: 'debugging',
-    title: 'Debugging Techniques',
-    description: 'Master essential debugging tools and techniques for embedded systems, including JTAG/SWD debugging, logic analyzers, oscilloscopes, printf debugging, and strategies for troubleshooting common embedded issues.',
-    image: '/images/embedded/debugging.svg',
-    githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Debugging'
-  }
+    {
+        id: 'priority-inversion',
+        title: 'Priority Inversion',
+        description: 'A critical RTOS problem where a low-priority task indirectly blocks a high-priority task by holding a resource needed by a medium-priority task. This can lead to missed deadlines and unpredictable behavior in real-time systems.',
+        image: '/images/embedded/priority-inversion.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/priority_inversion'
+    },
+    {
+        id: 'mutex-semaphore',
+        title: 'Mutex vs Semaphore',
+        description: 'Understanding the fundamental differences between mutexes and semaphores. While mutexes provide exclusive access with ownership (only the locking task can unlock), semaphores can count resources and be signaled by any task, making them suitable for different synchronization scenarios.',
+        image: '/images/embedded/mutex-semaphore.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/mutex_semaphore'
+    },
+    {
+        id: 'memory-management',
+        title: 'Memory Management',
+        description: 'Explore memory organization in embedded systems, including stack, heap, BSS, data, and text/code sections. Learn about efficient memory allocation strategies, avoiding fragmentation, and memory protection techniques essential for reliable embedded applications.',
+        image: '/images/embedded/memory-management-improved.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Memory/management'
+    },
+    {
+        id: 'rtos',
+        title: 'RTOS Fundamentals',
+        description: 'Core concepts of Real-Time Operating Systems including task scheduling, priority-based execution, and deterministic timing. Understand how an RTOS differs from general-purpose operating systems and when to use one in your embedded projects.',
+        image: '/images/embedded/rtos.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/fundamentals'
+    },
+    {
+        id: 'interrupt-handling',
+        title: 'Interrupt Handling',
+        description: 'Master the critical concept of hardware and software interrupts in embedded systems. Learn about interrupt service routines (ISRs), interrupt controllers, priorities, and best practices for writing efficient interrupt handlers.',
+        image: '/images/embedded/interrupt-handling.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Interrupts'
+    },
+    {
+        id: 'device-drivers',
+        title: 'Device Drivers',
+        description: 'Understand how to develop robust device drivers for embedded systems. This covers driver architecture, types of drivers, hardware abstraction layers, and implementation strategies for various peripherals.',
+        image: '/images/embedded/device-drivers.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Drivers'
+    },
+    {
+        id: 'boot-process',
+        title: 'Boot Process',
+        description: 'Explore the embedded system boot sequence from power-on to application execution. Learn about boot ROM, bootloaders, memory initialization, secure boot, and how to optimize boot time for your applications.',
+        image: '/images/embedded/boot-process.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Firmware/boot_process'
+    },
+    {
+        id: 'communication-protocols',
+        title: 'Communication Protocols',
+        description: 'Compare and contrast common embedded communication protocols like SPI, I2C, UART, CAN, and more. Understand their electrical characteristics, timing diagrams, advantages, limitations, and ideal use cases.',
+        image: '/images/embedded/communication-protocols.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Communication'
+    },
+    {
+        id: 'debugging',
+        title: 'Debugging Techniques',
+        description: 'Master essential debugging tools and techniques for embedded systems, including JTAG/SWD debugging, logic analyzers, oscilloscopes, printf debugging, and strategies for troubleshooting common embedded issues.',
+        image: '/images/embedded/debugging.svg',
+        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Debugging'
+    }
 ];
 
 const LearnEmbedded = () => {
-  const [activeTopic, setActiveTopic] = useState(topics[0]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isImageLoading, setIsImageLoading] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const revealContainer = useRef(null);
-  const modalRef = useRef(null);
-  const imageRef = useRef(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
+    const [activeTopic, setActiveTopic] = useState(topics[0]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImageLoading, setIsImageLoading] = useState(false);
+    const [zoomLevel, setZoomLevel] = useState(1);
+    const revealContainer = useRef(null);
+    const modalRef = useRef(null);
+    const imageRef = useRef(null);
+    const prefersReducedMotion = usePrefersReducedMotion();
 
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      return;
-    }
+    useEffect(() => {
+        if (prefersReducedMotion) {
+            return;
+        }
 
-    sr.reveal(revealContainer.current, srConfig());
-  }, []);
-  
-  // Preload the active topic image when it changes
-  useEffect(() => {
-    if (activeTopic.image) {
-      const img = new Image();
-      img.src = activeTopic.image;
-    }
-  }, [activeTopic]);
+        sr.reveal(revealContainer.current, srConfig());
+    }, []);
 
-  // Handle modal open/close and body scroll lock
-  useEffect(() => {
-    const body = document.body;
-    
-    if (isModalOpen) {
-      // Prevent scrolling when modal is open
-      body.style.overflow = 'hidden';
-      
-      // Pre-load the image when modal is opened
-      if (activeTopic.image) {
-        const preloadImg = new Image();
-        preloadImg.src = activeTopic.image;
-        preloadImg.onload = handleModalImageLoad;
-        preloadImg.onerror = handleModalImageError;
-      } else {
+    // Preload the active topic image when it changes
+    useEffect(() => {
+        if (activeTopic.image) {
+            const img = new Image();
+            img.src = activeTopic.image;
+        }
+    }, [activeTopic]);
+
+    // Handle modal open/close and body scroll lock
+    useEffect(() => {
+        const body = document.body;
+
+        if (isModalOpen) {
+            // Prevent scrolling when modal is open
+            body.style.overflow = 'hidden';
+
+            // Pre-load the image when modal is opened
+            if (activeTopic.image) {
+                const preloadImg = new Image();
+                preloadImg.src = activeTopic.image;
+                preloadImg.onload = handleModalImageLoad;
+                preloadImg.onerror = handleModalImageError;
+            } else {
+                setIsImageLoading(false);
+            }
+
+            // Reset zoom level when opening modal
+            setZoomLevel(1);
+        } else {
+            // Re-enable scrolling when modal is closed
+            body.style.overflow = '';
+        }
+
+        return () => {
+            // Cleanup - ensure scrolling is re-enabled when component unmounts
+            body.style.overflow = '';
+        };
+    }, [isModalOpen, activeTopic.image]);
+
+    // Handle wheel events for zooming
+    useEffect(() => {
+        const modalContent = modalRef.current;
+
+        const handleWheel = (e) => {
+            if (isModalOpen && !isImageLoading) {
+                handleWheelZoom(e);
+            }
+        };
+
+        if (modalContent) {
+            modalContent.addEventListener('wheel', handleWheel, { passive: false });
+        }
+
+        return () => {
+            if (modalContent) {
+                modalContent.removeEventListener('wheel', handleWheel);
+            }
+        };
+    }, [isModalOpen, isImageLoading, zoomLevel]);
+
+    // Reset image position when zoom changes
+    useEffect(() => {
+        if (imageRef.current) {
+            // Ensure the image stays centered as it zooms
+            imageRef.current.style.transformOrigin = 'center center';
+        }
+    }, [zoomLevel]);
+
+    // Handle escape key press to close modal
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && isModalOpen) {
+                setIsModalOpen(false);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isModalOpen]);
+
+    // Handle click outside modal to close it
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (modalRef.current && !modalRef.current.contains(e.target) && isModalOpen) {
+                setIsModalOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isModalOpen]);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+        // Only set loading to true if we're showing the modal
+        if (activeTopic.image) {
+            setIsImageLoading(true);
+        }
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        // Reset loading state and zoom when closing
         setIsImageLoading(false);
-      }
-      
-      // Reset zoom level when opening modal
-      setZoomLevel(1);
-    } else {
-      // Re-enable scrolling when modal is closed
-      body.style.overflow = '';
-    }
-    
-    return () => {
-      // Cleanup - ensure scrolling is re-enabled when component unmounts
-      body.style.overflow = '';
-    };
-  }, [isModalOpen, activeTopic.image]);
-  
-  // Handle wheel events for zooming
-  useEffect(() => {
-    const modalContent = modalRef.current;
-    
-    const handleWheel = (e) => {
-      if (isModalOpen && !isImageLoading) {
-        handleWheelZoom(e);
-      }
-    };
-    
-    if (modalContent) {
-      modalContent.addEventListener('wheel', handleWheel, { passive: false });
-    }
-    
-    return () => {
-      if (modalContent) {
-        modalContent.removeEventListener('wheel', handleWheel);
-      }
-    };
-  }, [isModalOpen, isImageLoading, zoomLevel]);
-  
-  // Reset image position when zoom changes
-  useEffect(() => {
-    if (imageRef.current) {
-      // Ensure the image stays centered as it zooms
-      imageRef.current.style.transformOrigin = 'center center';
-    }
-  }, [zoomLevel]);
-
-  // Handle escape key press to close modal
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isModalOpen) {
-        setIsModalOpen(false);
-      }
+        setZoomLevel(1);
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen]);
-
-  // Handle click outside modal to close it
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (modalRef.current && !modalRef.current.contains(e.target) && isModalOpen) {
-        setIsModalOpen(false);
-      }
+    const handleModalImageLoad = () => {
+        // Ensure we only update state if component is still mounted
+        console.log("Image loaded successfully");
+        setIsImageLoading(false);
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isModalOpen]);
+    const handleModalImageError = (e) => {
+        console.error("Error loading image:", e);
+        setIsImageLoading(false);
+        // You could set an error state here if you want to display an error message
+    };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-    // Only set loading to true if we're showing the modal
-    if (activeTopic.image) {
-      setIsImageLoading(true);
-    }
-  };
+    const handleWheelZoom = (e) => {
+        // Prevent default scrolling behavior
+        e.preventDefault();
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    // Reset loading state and zoom when closing
-    setIsImageLoading(false);
-    setZoomLevel(1);
-  };
+        // Get current container dimensions
+        const container = modalRef.current;
+        if (!container) return;
 
-  const handleModalImageLoad = () => {
-    // Ensure we only update state if component is still mounted
-    console.log("Image loaded successfully");
-    setIsImageLoading(false);
-  };
+        // Determine zoom direction based on wheel delta
+        const zoomDirection = e.deltaY < 0 ? 1 : -1;
 
-  const handleModalImageError = (e) => {
-    console.error("Error loading image:", e);
-    setIsImageLoading(false);
-    // You could set an error state here if you want to display an error message
-  };
-  
-  const handleWheelZoom = (e) => {
-    // Prevent default scrolling behavior
-    e.preventDefault();
-    
-    // Get current container dimensions
-    const container = modalRef.current;
-    if (!container) return;
-    
-    // Determine zoom direction based on wheel delta
-    const zoomDirection = e.deltaY < 0 ? 1 : -1;
-    
-    // Get the image and container dimensions
-    const img = imageRef.current;
-    const imgRect = img.getBoundingClientRect();
-    const containerRect = container.querySelector('.image-container').getBoundingClientRect();
-    
-    // Calculate new zoom level with constraints (min: 0.5, max: 5)
-    const zoomSpeed = 0.1;
-    let newZoomLevel = Math.min(Math.max(zoomLevel + (zoomDirection * zoomSpeed), 0.5), 5);
-    
-    // Apply magnetic effect: if zooming would cause the image to be slightly larger than container,
-    // snap to the container bounds
-    if (zoomDirection < 0) { // Zooming out
-      // When zooming out and almost fitting container, snap to fit
-      const imgWidth = imgRect.width / zoomLevel * newZoomLevel;
-      const imgHeight = imgRect.height / zoomLevel * newZoomLevel;
-      
-      // If very close to fitting, snap to container dimensions
-      const snapThreshold = 0.05; // 5% threshold for snapping
-      
-      if (Math.abs(imgWidth - containerRect.width) / containerRect.width < snapThreshold &&
-          imgWidth < containerRect.width) {
-        // Calculate the exact zoom level that makes the image width match container width
-        newZoomLevel = (containerRect.width / (imgRect.width / zoomLevel)) * 0.98; // 98% of container to create slight margin
-      }
-      
-      if (Math.abs(imgHeight - containerRect.height) / containerRect.height < snapThreshold &&
-          imgHeight < containerRect.height) {
-        // Choose the smaller of width-based and height-based zoom to ensure image fits
-        const heightBasedZoom = (containerRect.height / (imgRect.height / zoomLevel)) * 0.98;
-        newZoomLevel = Math.min(newZoomLevel, heightBasedZoom);
-      }
-    }
-    
-    // Update zoom level state
-    setZoomLevel(newZoomLevel);
-    
-    // Update cursor based on zoom level
-    if (imageRef.current) {
-      imageRef.current.style.cursor = newZoomLevel > 1 ? 'zoom-out' : 'zoom-in';
-      
-      // Ensure image stays within modal bounds
-      const imageRect = imageRef.current.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      
-      // Check if image dimensions exceed container dimensions
-      if (imageRect.width > containerRect.width || imageRect.height > containerRect.height) {
-        // We're already constraining with CSS overflow: hidden
-        // This is just to update the UI feedback
-        imageRef.current.style.borderRadius = '0';
-      } else {
-        imageRef.current.style.borderRadius = '15px';
-      }
-    }
-  };
-  
-  const resetZoom = () => {
-    setZoomLevel(1);
-  };
+        // Get the image and container dimensions
+        const img = imageRef.current;
+        const imgRect = img.getBoundingClientRect();
+        const containerRect = container.querySelector('.image-container').getBoundingClientRect();
 
-  return (
-    <StyledLearnEmbeddedSection id="learn-embedded" ref={revealContainer}>
-      <h2 className="numbered-heading">Learn Embedded</h2>
+        // Calculate new zoom level with constraints (min: 0.5, max: 5)
+        const zoomSpeed = 0.1;
+        let newZoomLevel = Math.min(Math.max(zoomLevel + (zoomDirection * zoomSpeed), 0.5), 5);
 
-      <div className="inner">
-        <p>
-          Explore core embedded systems concepts explained with practical examples. 
-          Each topic includes explanations, diagrams, and working code samples on GitHub.
-        </p>
+        // Apply magnetic effect: if zooming would cause the image to be slightly larger than container,
+        // snap to the container bounds
+        if (zoomDirection < 0) { // Zooming out
+            // When zooming out and almost fitting container, snap to fit
+            const imgWidth = imgRect.width / zoomLevel * newZoomLevel;
+            const imgHeight = imgRect.height / zoomLevel * newZoomLevel;
 
-        <div className="interactive-container">
-          {/* Topics List - Left Column */}
-          <div className="topics-list">
-            <ul>
-              {topics.map(topic => (
-                <li 
-                  key={topic.id} 
-                  className={activeTopic.id === topic.id ? 'active' : ''}
-                  onClick={() => setActiveTopic(topic)}
-                >
-                  {topic.title}
-                </li>
-              ))}
-            </ul>
-          </div>
+            // If very close to fitting, snap to container dimensions
+            const snapThreshold = 0.05; // 5% threshold for snapping
 
-          {/* Image/Diagram - Middle Column */}
-          <div className="topic-image">
-            {activeTopic.image ? (
-              <>
-                <img
-                  key={activeTopic.id} // Add key to force re-render when topic changes
-                  src={activeTopic.image}
-                  alt={`${activeTopic.title} diagram`}
-                  className="svg-diagram"
-                  onClick={openModal}
-                  style={{ cursor: 'pointer' }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'block';
-                  }}
-                />
-                <span className="click-hint">Click to expand</span>
-              </>
-            ) : (
-              <p className="placeholder">Diagram coming soon</p>
-            )}
-            <p className="placeholder" style={{display: 'none'}}>Image not available</p>
-          </div>
+            if (Math.abs(imgWidth - containerRect.width) / containerRect.width < snapThreshold &&
+                imgWidth < containerRect.width) {
+                // Calculate the exact zoom level that makes the image width match container width
+                newZoomLevel = (containerRect.width / (imgRect.width / zoomLevel)) * 0.98; // 98% of container to create slight margin
+            }
 
-          {/* Description - Right Column */}
-          <div className="topic-description">
-            <h3>{activeTopic.title}</h3>
-            <p>{activeTopic.description}</p>
-            <a 
-              href={activeTopic.githubLink} 
-              className="github-link" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              <Icon name="GitHub" />
-              View Code on GitHub
-            </a>
-          </div>
-        </div>
-      </div>
+            if (Math.abs(imgHeight - containerRect.height) / containerRect.height < snapThreshold &&
+                imgHeight < containerRect.height) {
+                // Choose the smaller of width-based and height-based zoom to ensure image fits
+                const heightBasedZoom = (containerRect.height / (imgRect.height / zoomLevel)) * 0.98;
+                newZoomLevel = Math.min(newZoomLevel, heightBasedZoom);
+            }
+        }
 
-      {/* Modal for expanded image */}
-      <StyledModal className={isModalOpen ? 'show' : ''}>
-        <div className="modal-content" ref={modalRef}>
-          <button className="close-button" onClick={closeModal} aria-label="Close modal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          {isImageLoading && <div className="loading-spinner"></div>}
-          {activeTopic.image && (
-            <div className="image-container">
-              <img 
-                ref={imageRef}
-                key={activeTopic.id} // Add key to force re-render when topic changes
-                src={activeTopic.image} 
-                alt={`${activeTopic.title} diagram expanded`}
-                onLoad={handleModalImageLoad}
-                onError={handleModalImageError}
-                style={{
-                  opacity: isImageLoading ? 0 : 1,
-                  transition: 'opacity 0.3s ease, transform 0.2s ease',
-                  transform: `scale(${zoomLevel})`,
-                  transformOrigin: 'center center',
-                  cursor: zoomLevel > 1 ? 'zoom-out' : 'zoom-in',
-                  width: activeTopic.image.endsWith('.svg') ? '100%' : 'auto',
-                  height: 'auto',
-                  maxHeight: '85vh',
-                  maxWidth: '100%',
-                  objectFit: 'contain',
-                  background: 'transparent',
-                  boxShadow: 'none',
-                  borderRadius: '15px'
-                }}
-              />
-              {!isImageLoading && (
-                <div className="zoom-controls">
-                  <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
-                  {zoomLevel !== 1 && (
-                    <button className="reset-zoom" onClick={resetZoom}>Reset</button>
-                  )}
+        // Update zoom level state
+        setZoomLevel(newZoomLevel);
+
+        // Update cursor based on zoom level
+        if (imageRef.current) {
+            imageRef.current.style.cursor = newZoomLevel > 1 ? 'zoom-out' : 'zoom-in';
+
+            // Ensure image stays within modal bounds
+            const imageRect = imageRef.current.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            // Check if image dimensions exceed container dimensions
+            if (imageRect.width > containerRect.width || imageRect.height > containerRect.height) {
+                // We're already constraining with CSS overflow: hidden
+                // This is just to update the UI feedback
+                imageRef.current.style.borderRadius = '0';
+            } else {
+                imageRef.current.style.borderRadius = '15px';
+            }
+        }
+    };
+
+    const resetZoom = () => {
+        setZoomLevel(1);
+    };
+
+    return (
+        <StyledLearnEmbeddedSection id="learn-embedded" ref={revealContainer}>
+            <h2 className="numbered-heading">Learn Embedded</h2>
+
+            <div className="inner">
+                <p>
+                    Explore core embedded systems concepts explained with practical examples.
+                    Each topic includes explanations, diagrams, and working code samples on GitHub.
+                </p>
+
+                <div className="coming-soon-banner">
+                    <h3>
+                        🚧 Coming Soon: Enhanced Embedded Systems Learning 🚧
+                    </h3>
+                    <p>
+                        I'm currently enhancing this section with improved diagrams, more detailed explanations, and 
+                        additional embedded system topics. Please check back soon for the completed experience!
+                    </p>
                 </div>
-              )}
+
+                <div className="interactive-container">
+                    {/* Topics List - Left Column */}
+                    <div className="topics-list">
+                        <ul>
+                            {topics.map(topic => (
+                                <li
+                                    key={topic.id}
+                                    className={activeTopic.id === topic.id ? 'active' : ''}
+                                    onClick={() => setActiveTopic(topic)}
+                                >
+                                    {topic.title}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Image/Diagram - Middle Column */}
+                    <div className="topic-image">
+                        {activeTopic.image ? (
+                            <>
+                                <img
+                                    key={activeTopic.id} // Add key to force re-render when topic changes
+                                    src={activeTopic.image}
+                                    alt={`${activeTopic.title} diagram`}
+                                    className="svg-diagram"
+                                    onClick={openModal}
+                                    style={{ cursor: 'pointer' }}
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'block';
+                                    }}
+                                />
+                                <span className="click-hint">Click to expand</span>
+                            </>
+                        ) : (
+                            <p className="placeholder">Diagram coming soon</p>
+                        )}
+                        <p className="placeholder" style={{ display: 'none' }}>Image not available</p>
+                    </div>
+
+                    {/* Description - Right Column */}
+                    <div className="topic-description">
+                        <h3>{activeTopic.title}</h3>
+                        <p>{activeTopic.description}</p>
+                        <a
+                            href={activeTopic.githubLink}
+                            className="github-link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <Icon name="GitHub" />
+                            View Code on GitHub
+                        </a>
+                    </div>
+                </div>
             </div>
-          )}
-        </div>
-      </StyledModal>
-    </StyledLearnEmbeddedSection>
-  );
+
+            {/* Modal for expanded image */}
+            <StyledModal className={isModalOpen ? 'show' : ''}>
+                <div className="modal-content" ref={modalRef}>
+                    <button className="close-button" onClick={closeModal} aria-label="Close modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    {isImageLoading && <div className="loading-spinner"></div>}
+                    {activeTopic.image && (
+                        <div className="image-container">
+                            <img
+                                ref={imageRef}
+                                key={activeTopic.id} // Add key to force re-render when topic changes
+                                src={activeTopic.image}
+                                alt={`${activeTopic.title} diagram expanded`}
+                                onLoad={handleModalImageLoad}
+                                onError={handleModalImageError}
+                                style={{
+                                    opacity: isImageLoading ? 0 : 1,
+                                    transition: 'opacity 0.3s ease, transform 0.2s ease',
+                                    transform: `scale(${zoomLevel})`,
+                                    transformOrigin: 'center center',
+                                    cursor: zoomLevel > 1 ? 'zoom-out' : 'zoom-in',
+                                    width: activeTopic.image.endsWith('.svg') ? '100%' : 'auto',
+                                    height: 'auto',
+                                    maxHeight: '85vh',
+                                    maxWidth: '100%',
+                                    objectFit: 'contain',
+                                    background: 'transparent',
+                                    boxShadow: 'none',
+                                    borderRadius: '15px'
+                                }}
+                            />
+                            {!isImageLoading && (
+                                <div className="zoom-controls">
+                                    <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
+                                    {zoomLevel !== 1 && (
+                                        <button className="reset-zoom" onClick={resetZoom}>Reset</button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </StyledModal>
+        </StyledLearnEmbeddedSection>
+    );
 };
 
 export default LearnEmbedded;

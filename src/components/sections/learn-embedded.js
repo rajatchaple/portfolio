@@ -1,9 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useStaticQuery, graphql } from 'gatsby';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { srConfig } from '@config';
-import sr from '@utils/sr';
-import { usePrefersReducedMotion } from '@hooks';
 import { Icon } from '@components/icons';
 
 const StyledLearnEmbeddedSection = styled.section`
@@ -28,7 +24,61 @@ const StyledLearnEmbeddedSection = styled.section`
   }
 
   .coming-soon-banner {
-    background-color: rgba(100, 255, 218, 0.1);
+    background-color    power: {
+      title: 'power-management',
+      icon: '📁',
+      topics: [
+        {
+          id: 9,
+          title: 'low-power-modes',
+          filename: 'low-power-modes.md',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'Sleep modes, power optimization techniques, and battery-efficient embedded system design.',
+          prerequisites: 'Microcontroller Basics, Interrupt Handling',
+          status: 'not-started'
+        }
+      ]
+    },
+    images: {
+      title: 'images',
+      icon: '📁',
+      topics: [
+        {
+          id: 10,
+          title: 'circuit-diagrams',
+          filename: 'circuit-diagrams.md',
+          type: 'md',
+          difficulty: 'beginner',
+          description: 'Collection of circuit diagrams, schematics, and visual references for embedded systems projects.',
+          prerequisites: 'None',
+          status: 'completed',
+          githubLink: 'https://github.com/rajatchaple/embedded-circuits'
+        },
+        {
+          id: 11,
+          title: 'pcb-layouts',
+          filename: 'pcb-layouts.md',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'PCB design examples, layouts, and best practices for embedded hardware development.',
+          prerequisites: 'Circuit Diagrams',
+          status: 'completed',
+          githubLink: 'https://github.com/rajatchaple/pcb-designs'
+        },
+        {
+          id: 12,
+          title: 'project-photos',
+          filename: 'project-photos.md',
+          type: 'md',
+          difficulty: 'beginner',
+          description: 'Photo gallery of completed embedded systems projects and prototypes.',
+          prerequisites: 'None',
+          status: 'completed',
+          imageGallery: '/images/embedded/gallery'
+        }
+      ]
+    } 218, 0.1);
     border: 1px solid rgba(100, 255, 218, 0.3);
     border-radius: var(--border-radius);
     padding: 20px;
@@ -62,850 +112,865 @@ const StyledLearnEmbeddedSection = styled.section`
     }
   }
 
-  .interactive-container {
-    display: grid;
-    grid-template-columns: 250px 1fr 1fr;
-    gap: 25px;
-    margin-top: 30px;
-    min-height: 450px;
-    
-    @media (max-width: 1080px) {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto auto auto;
-      gap: 20px;
-    }
-    
-    @media (max-width: 768px) {
-      margin-top: 20px;
-      gap: 15px;
-    }
+  .learning-platform {
+    margin-top: 40px;
   }
 
-  .topics-list {
-    background-color: var(--light-navy);
-    border-radius: var(--border-radius);
-    padding: 20px;
-    max-height: 450px;
-    overflow-y: auto;
-    box-shadow: 0 10px 30px -15px var(--navy-shadow);
-
-    /* Scrollbar styling */
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
+  .search-bar {
+    margin-bottom: 25px;
     
-    &::-webkit-scrollbar-track {
-      background: var(--navy);
-      border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-      background: var(--green);
-      border-radius: 4px;
-    }
-
-    @media (max-width: 1080px) {
-      max-height: none;
-      padding: 15px;
-    }
-
-    @media (max-width: 768px) {
-      overflow-x: auto;
-      white-space: nowrap;
-      padding: 10px;
-      
-      ul {
-        display: flex;
-        flex-wrap: nowrap;
-        -webkit-overflow-scrolling: touch;
-      }
-      
-      li {
-        display: inline-block;
-        margin-right: 8px;
-        margin-bottom: 0;
-        white-space: nowrap;
-      }
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    li {
-      padding: 10px 15px;
-      margin-bottom: 8px;
-      border-radius: var(--border-radius);
-      transition: var(--transition);
-      cursor: pointer;
-      color: var(--light-slate);
-      
-      &:hover, &.active {
-        background-color: var(--navy);
-        color: var(--green);
-      }
-      
-      &.active {
-        border-left: 2px solid var(--green);
-        padding-left: 13px;
-        font-weight: 500;
-        
-        @media (max-width: 768px) {
-          border-left: none;
-          border-bottom: 2px solid var(--green);
-          padding-left: 15px;
-          padding-bottom: 8px;
-        }
-      }
-      
-      @media (max-width: 768px) {
-        padding: 10px 12px;
-        font-size: var(--fz-sm);
-        touch-action: manipulation;
-      }
-    }
-  }
-
-  .topic-image {
-    background-color: var(--light-navy);
-    border-radius: var(--border-radius);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px -15px var(--navy-shadow);
-    padding: 20px;
-    position: relative;
-    
-    @media (max-width: 768px) {
-      padding: 15px;
-      min-height: 250px;
-    }
-    
-    img, .svg-diagram {
-      max-width: 100%;
-      max-height: 400px;
-      object-fit: contain;
-      border-radius: 4px;
-      transition: transform 0.3s ease;
-      
-      &:hover {
-        transform: scale(1.02);
-      }
-      
-      @media (max-width: 768px) {
-        max-height: 250px;
-      }
-    }
-    
-    .placeholder {
-      color: var(--slate);
-      font-style: italic;
-    }
-    
-    .click-hint {
-      font-size: var(--fz-xs);
-      color: var(--green);
-      margin-top: 8px;
-      font-family: var(--font-mono);
-      opacity: 0.8;
-      transition: opacity 0.2s ease;
-      
-      @media (max-width: 768px) {
-        background-color: rgba(17, 34, 64, 0.7);
-        position: absolute;
-        bottom: 15px;
-        padding: 5px 10px;
-        border-radius: 4px;
-        opacity: 1;
-        font-size: var(--fz-xxs);
-      }
-    }
-    
-    &:hover .click-hint {
-      opacity: 1;
-    }
-    
-    @media (hover: none) {
-      .click-hint {
-        opacity: 1;
-      }
-    }
-  }
-
-  .topic-description {
-    background-color: var(--light-navy);
-    border-radius: var(--border-radius);
-    padding: 25px;
-    box-shadow: 0 10px 30px -15px var(--navy-shadow);
-    display: flex;
-    flex-direction: column;
-    
-    @media (max-width: 768px) {
-      padding: 20px 15px;
-    }
-    
-    h3 {
-      color: var(--lightest-slate);
-      font-size: var(--fz-xxl);
-      margin-bottom: 15px;
-      
-      @media (max-width: 768px) {
-        font-size: var(--fz-xl);
-        margin-bottom: 10px;
-      }
-    }
-    
-    p {
-      color: var(--light-slate);
-      font-size: var(--fz-lg);
-      line-height: 1.5;
-      margin-bottom: 20px;
-      flex: 1;
-      
-      @media (max-width: 768px) {
-        font-size: var(--fz-md);
-        margin-bottom: 15px;
-      }
-    }
-    
-    .github-link {
-      display: inline-flex;
+    .search-box {
+      position: relative;
+      display: flex;
       align-items: center;
-      margin-top: auto;
-      color: var(--green);
-      font-family: var(--font-mono);
-      font-size: var(--fz-sm);
-      padding: 8px 12px;
-      border-radius: var(--border-radius);
-      transition: var(--transition);
+      background: var(--light-navy);
+      border: 1px solid var(--dark-slate);
+      border-radius: 12px;
+      padding: 0 16px;
+      width: 100%;
+      max-width: none;
+      transition: all 0.3s ease;
       
       @media (max-width: 768px) {
-        align-self: center;
-        padding: 10px 15px;
-        background-color: rgba(100, 255, 218, 0.07);
+        max-width: 500px;
+      }
+      
+      &:focus-within {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
       }
       
       svg {
-        margin-right: 8px;
-        width: 20px;
-        height: 20px;
+        color: var(--slate);
+        width: 18px;
+        height: 18px;
+        margin-right: 12px;
+        flex-shrink: 0;
       }
       
-      &:hover {
-        text-decoration: underline;
-        background-color: rgba(100, 255, 218, 0.1);
-      }
-    }
-  }
-`;
-
-const StyledModal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(10, 10, 15, 0.6);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(15px) saturate(110%) brightness(0.9) contrast(1.1);
-  -webkit-backdrop-filter: blur(15px) saturate(110%) brightness(0.9) contrast(1.1);
-  
-  &.show {
-    opacity: 1;
-    visibility: visible;
-    
-    .modal-content {
-      transform: scale(1);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    backdrop-filter: blur(12px) saturate(110%) brightness(0.9);
-    -webkit-backdrop-filter: blur(12px) saturate(110%) brightness(0.9);
-  }
-  
-  .modal-content {
-    position: relative;
-    width: 100%;
-    max-width: 1200px;
-    height: auto;
-    max-height: 95vh;
-    transform: scale(0.9);
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    background-color: transparent;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 15px;
-    
-    @media (max-width: 1280px) {
-      max-width: 95%;
-    }
-    
-    @media (max-width: 768px) {
-      width: 95%;
-      height: 90vh;
-    }
-    
-    .image-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: zoom-in;
-      width: 100%;
-      height: 100%;
-      position: relative;
-      background-color: rgba(20, 20, 30, 0.2);
-      border-radius: 15px;
-      overflow: hidden;
-      max-width: 1200px;
-      max-height: 85vh;
-      margin: 0 auto;
-      box-sizing: border-box;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-      backdrop-filter: blur(10px) saturate(120%) brightness(1.05);
-      -webkit-backdrop-filter: blur(10px) saturate(120%) brightness(1.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    
-    img {
-      max-width: 100%;
-      max-height: 90vh;
-      object-fit: contain;
-      transition: all 0.25s ease;
-      border-radius: 15px;
-      
-      @media (max-width: 768px) {
-        max-height: 80vh;
-      }
-    }
-    
-    .close-button {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: rgba(20, 20, 30, 0.4);
-      backdrop-filter: blur(8px) saturate(120%);
-      -webkit-backdrop-filter: blur(8px) saturate(120%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--white);
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      padding: 0;
-      z-index: 20;
-      border-radius: 50%;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      
-      @media (max-width: 768px) {
-        top: 10px;
-        right: 10px;
+      input {
+        background: none;
+        border: none;
+        color: var(--lightest-slate);
+        font-size: var(--fz-md);
+        padding: 14px 0;
+        width: 100%;
+        outline: none;
+        
+        &::placeholder {
+          color: var(--slate);
+        }
       }
       
-      &:hover {
-        color: var(--green);
-        transform: rotate(90deg);
-        background: rgba(20, 20, 30, 0.7);
-        border: 1px solid var(--green);
-      }
-    }
-    
-    .zoom-controls {
-      position: absolute;
-      bottom: 15px;
-      right: 15px;
-      background: rgba(20, 20, 30, 0.4);
-      border-radius: var(--border-radius);
-      padding: 8px 15px;
-      display: flex;
-      align-items: center;
-      font-size: var(--fz-sm);
-      color: var(--lightest-slate);
-      font-family: var(--font-mono);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      backdrop-filter: blur(8px) saturate(120%);
-      -webkit-backdrop-filter: blur(8px) saturate(120%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      z-index: 10;
-      
-      .zoom-level {
-        margin-right: 15px;
-      }
-      
-      .reset-zoom {
-        background: rgba(100, 255, 218, 0.1);
-        border: 1px solid rgba(100, 255, 218, 0.3);
-        border-radius: 4px;
-        color: var(--green);
-        font-family: var(--font-mono);
-        font-size: var(--fz-xs);
+      .clear-search {
+        background: none;
+        border: none;
+        color: var(--slate);
         cursor: pointer;
-        padding: 3px 8px;
-        transition: all 0.2s ease;
+        padding: 6px;
+        border-radius: 6px;
+        transition: var(--transition);
         
         &:hover {
-          background: rgba(100, 255, 218, 0.2);
-          transform: translateY(-1px);
+          color: var(--green);
+          background: rgba(100, 255, 218, 0.1);
+        }
+        
+        svg {
+          width: 16px;
+          height: 16px;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .modern-container {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    @media (max-width: 768px) {
+      gap: 12px;
+    }
+  }
+
+  .navigation-sidebar {
+    background: linear-gradient(135deg, var(--light-navy) 0%, rgba(23, 42, 69, 0.8) 100%);
+    border: 1px solid var(--dark-slate);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+    
+    @media (max-width: 1024px) {
+      height: 400px;
+    }
+    
+    @media (max-width: 768px) {
+      height: 350px;
+      border-radius: 12px;
+    }
+    
+    @media (max-width: 480px) {
+      height: 300px;
+      border-radius: 8px;
+    }
+    
+    /* Completely hide any external link icons in sidebar */
+    .feather-external-link,
+    [class*="external"],
+    [aria-label*="External"] {
+      display: none !important;
+    }
+    
+    /* Hide pseudo-elements that might contain external link icons */
+    *::after,
+    *::before {
+      content: none !important;
+    }
+    
+    .nav-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+      background: rgba(0, 0, 0, 0.1);
+      flex-shrink: 0;
+      
+      @media (max-width: 768px) {
+        padding: 16px;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 12px;
+      }
+      
+      .header-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--green), #4fd6b3);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        font-size: 16px;
+      }
+      
+      .title {
+        color: var(--lightest-slate);
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        
+        @media (max-width: 768px) {
+          font-size: 16px;
+        }
+        
+        @media (max-width: 480px) {
+          font-size: 14px;
+        }
+      }
+      
+      .subtitle {
+        color: var(--slate);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        
+        .badge {
+          background: var(--green);
+          color: var(--navy);
+          font-size: 10px;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 500;
         }
       }
     }
     
-    &:hover .zoom-controls {
-      opacity: 1;
+    .category-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      
+      /* Custom scrollbar styling */
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(100, 255, 218, 0.05);
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: rgba(100, 255, 218, 0.3);
+        border-radius: 3px;
+        
+        &:hover {
+          background: rgba(100, 255, 218, 0.5);
+        }
+      }
+      
+      /* For Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(100, 255, 218, 0.3) rgba(100, 255, 218, 0.05);
+      
+      .category-item {
+        margin-bottom: 4px;
+        
+        .category-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 16px;
+          cursor: pointer;
+          border-radius: 12px;
+          transition: all 0.3s ease;
+          position: relative;
+          background: none;
+          border: none;
+          width: 100%;
+          text-align: left;
+          font-family: inherit;
+          
+          &:hover {
+            background: rgba(100, 255, 218, 0.08);
+            transform: translateX(2px);
+          }
+          
+          .category-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            
+            &.fundamentals { background: linear-gradient(135deg, #96CEB4, #7ab899); }
+            &.communication { background: linear-gradient(135deg, #4ECDC4, #3ab5ac); }
+            &.realtime { background: linear-gradient(135deg, #FF6B6B, #e55555); }
+            &.power { background: linear-gradient(135deg, #FFEAA7, #f7d794); }
+          }
+          
+          .category-info {
+            flex: 1;
+            
+            .category-name {
+              color: var(--lightest-slate);
+              font-size: 14px;
+              font-weight: 500;
+              margin-bottom: 2px;
+              text-transform: capitalize;
+            }
+            
+            .topic-count {
+              color: var(--slate);
+              font-size: 11px;
+            }
+          }
+          
+          .expand-icon {
+            color: var(--slate);
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+            
+            &.expanded {
+              transform: rotate(90deg);
+            }
+          }
+        }
+        
+        .topics-list {
+          overflow: hidden;
+          transition: max-height 0.3s ease;
+          max-height: 0;
+          
+          &.expanded {
+            max-height: none;
+          }
+          
+          .topic-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px 8px 56px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 2px 8px;
+            transition: all 0.2s ease;
+            
+            &:hover {
+              background: rgba(100, 255, 218, 0.06);
+            }
+            
+            &.active {
+              background: rgba(100, 255, 218, 0.12);
+              border-left: 3px solid var(--green);
+              
+              .topic-name {
+                color: var(--green);
+                font-weight: 500;
+              }
+            }
+            
+            .topic-indicator {
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              flex-shrink: 0;
+              
+              &.fundamentals { background: #96CEB4; }
+              &.communication { background: #4ECDC4; }
+              &.realtime { background: #FF6B6B; }
+              &.power { background: #FFEAA7; }
+            }
+            
+            .topic-name {
+              color: var(--light-slate);
+              font-size: 13px;
+              flex: 1;
+              font-weight: 400;
+            }
+            
+            .status-dot {
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              
+              &.completed { background: #4CAF50; }
+              &.in-progress { background: #FF9800; }
+              &.not-started { background: var(--dark-slate); }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .content-panel {
+    background: linear-gradient(135deg, var(--light-navy) 0%, rgba(23, 42, 69, 0.9) 100%);
+    border: 1px solid var(--dark-slate);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    
+    @media (max-width: 768px) {
+      padding: 24px;
+      border-radius: 12px;
+    }
+    
+    @media (max-width: 480px) {
+      padding: 16px;
+      border-radius: 8px;
+    }
+    
+    .content-header {
+      margin-bottom: 24px;
+      
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+        color: var(--slate);
+        font-size: 12px;
+        
+        .path-segment {
+          &.current {
+            color: var(--green);
+            font-weight: 500;
+          }
+        }
+        
+        .separator {
+          color: var(--dark-slate);
+          margin: 0 4px;
+        }
+      }
+      
+      .title {
+        color: var(--lightest-slate);
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 700;
+        margin-bottom: 12px;
+        line-height: 1.2;
+        background: linear-gradient(135deg, var(--lightest-slate), var(--green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        
+        .difficulty {
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 11px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          
+          &.beginner { 
+            background: linear-gradient(135deg, rgba(150, 206, 180, 0.2), rgba(150, 206, 180, 0.1));
+            color: #96CEB4;
+            border: 1px solid rgba(150, 206, 180, 0.3);
+          }
+          &.intermediate { 
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(78, 205, 196, 0.1));
+            color: #4ECDC4;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+          }
+          &.advanced { 
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 107, 107, 0.1));
+            color: #FF6B6B;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+          }
+        }
+        
+        .prerequisites {
+          color: var(--slate);
+          font-size: 12px;
+          padding: 4px 8px;
+          background: rgba(100, 255, 218, 0.05);
+          border-radius: 6px;
+        }
+      }
+    }
+    
+    .content-body {
+      .description {
+        color: var(--light-slate);
+        font-size: var(--fz-lg);
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+      
+        .action-buttons {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          
+          @media (max-width: 768px) {
+            gap: 8px;
+          }
+          
+          @media (max-width: 480px) {
+            flex-direction: column;
+            gap: 8px;
+          }
+          
+          .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--green), #4fd6b3);
+            color: var(--navy);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(100, 255, 218, 0.3);
+            
+            @media (max-width: 768px) {
+              padding: 10px 16px;
+              font-size: 13px;
+              border-radius: 10px;
+            }
+            
+            @media (max-width: 480px) {
+              padding: 12px 16px;
+              font-size: 14px;
+              justify-content: center;
+              width: 100%;
+            }
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(100, 255, 218, 0.4);
+          }
+          
+          &.secondary {
+            background: transparent;
+            color: var(--green);
+            border: 2px solid var(--green);
+            box-shadow: none;
+            
+            &:hover {
+              background: rgba(100, 255, 218, 0.1);
+              box-shadow: 0 4px 12px rgba(100, 255, 218, 0.2);
+            }
+          }
+          
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
     }
   }
   
-  .loading-spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(100, 255, 218, 0.1);
-    border-top: 3px solid var(--green);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 10;
-    background: transparent;
-    
-    @media (max-width: 768px) {
-      width: 40px;
-      height: 40px;
-    }
-  }
-
-  @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 `;
-
-// Define animation styles for larger components
-const spinAnimationStyle = `
-  @keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-`;
-
-// Topic data - in a real app, this could come from an API or markdown files
-const topics = [
-    {
-        id: 'priority-inversion',
-        title: 'Priority Inversion',
-        description: 'A critical RTOS problem where a low-priority task indirectly blocks a high-priority task by holding a resource needed by a medium-priority task. This can lead to missed deadlines and unpredictable behavior in real-time systems.',
-        image: '/images/embedded/priority-inversion.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/priority_inversion'
-    },
-    {
-        id: 'mutex-semaphore',
-        title: 'Mutex vs Semaphore',
-        description: 'Understanding the fundamental differences between mutexes and semaphores. While mutexes provide exclusive access with ownership (only the locking task can unlock), semaphores can count resources and be signaled by any task, making them suitable for different synchronization scenarios.',
-        image: '/images/embedded/mutex-semaphore.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/mutex_semaphore'
-    },
-    {
-        id: 'memory-management',
-        title: 'Memory Management',
-        description: 'Explore memory organization in embedded systems, including stack, heap, BSS, data, and text/code sections. Learn about efficient memory allocation strategies, avoiding fragmentation, and memory protection techniques essential for reliable embedded applications.',
-        image: '/images/embedded/memory-management-improved.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Memory/management'
-    },
-    {
-        id: 'rtos',
-        title: 'RTOS Fundamentals',
-        description: 'Core concepts of Real-Time Operating Systems including task scheduling, priority-based execution, and deterministic timing. Understand how an RTOS differs from general-purpose operating systems and when to use one in your embedded projects.',
-        image: '/images/embedded/rtos.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/RTOS/fundamentals'
-    },
-    {
-        id: 'interrupt-handling',
-        title: 'Interrupt Handling',
-        description: 'Master the critical concept of hardware and software interrupts in embedded systems. Learn about interrupt service routines (ISRs), interrupt controllers, priorities, and best practices for writing efficient interrupt handlers.',
-        image: '/images/embedded/interrupt-handling.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Interrupts'
-    },
-    {
-        id: 'device-drivers',
-        title: 'Device Drivers',
-        description: 'Understand how to develop robust device drivers for embedded systems. This covers driver architecture, types of drivers, hardware abstraction layers, and implementation strategies for various peripherals.',
-        image: '/images/embedded/device-drivers.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Drivers'
-    },
-    {
-        id: 'boot-process',
-        title: 'Boot Process',
-        description: 'Explore the embedded system boot sequence from power-on to application execution. Learn about boot ROM, bootloaders, memory initialization, secure boot, and how to optimize boot time for your applications.',
-        image: '/images/embedded/boot-process.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Firmware/boot_process'
-    },
-    {
-        id: 'communication-protocols',
-        title: 'Communication Protocols',
-        description: 'Compare and contrast common embedded communication protocols like SPI, I2C, UART, CAN, and more. Understand their electrical characteristics, timing diagrams, advantages, limitations, and ideal use cases.',
-        image: '/images/embedded/communication-protocols.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Communication'
-    },
-    {
-        id: 'debugging',
-        title: 'Debugging Techniques',
-        description: 'Master essential debugging tools and techniques for embedded systems, including JTAG/SWD debugging, logic analyzers, oscilloscopes, printf debugging, and strategies for troubleshooting common embedded issues.',
-        image: '/images/embedded/debugging.svg',
-        githubLink: 'https://github.com/rajatchaple/embedded-concepts/tree/main/Debugging'
-    }
-];
 
 const LearnEmbedded = () => {
-    const [activeTopic, setActiveTopic] = useState(topics[0]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isImageLoading, setIsImageLoading] = useState(false);
-    const [zoomLevel, setZoomLevel] = useState(1);
-    const revealContainer = useRef(null);
-    const modalRef = useRef(null);
-    const imageRef = useRef(null);
-    const prefersReducedMotion = usePrefersReducedMotion();
+  const [selectedCategory, setSelectedCategory] = useState('fundamentals');
+  const [selectedTopic, setSelectedTopic] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedFolders, setExpandedFolders] = useState(['fundamentals', 'communication', 'images']);
 
-    useEffect(() => {
-        if (prefersReducedMotion) {
-            return;
+  // Enhanced topic categories with VS Code file structure
+  const topicCategories = {
+    fundamentals: {
+      title: 'fundamentals',
+      icon: '�',
+      topics: [
+        {
+          id: 1,
+          title: 'microcontroller-basics',
+          filename: 'microcontroller-basics.md',
+          type: 'md',
+          difficulty: 'beginner',
+          description: 'Introduction to microcontroller architecture, GPIO, timers, and basic peripherals. Perfect starting point for embedded programming.',
+          prerequisites: 'Basic C programming',
+          status: 'completed'
+        },
+        {
+          id: 2,
+          title: 'memory-management',
+          filename: 'memory-management.c',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'Explore memory organization, stack, heap, BSS, data and text sections. Learn efficient allocation and usage patterns.',
+          prerequisites: 'Microcontroller Basics, C programming',
+          status: 'in-progress'
+        },
+        {
+          id: 3,
+          title: 'interrupt-handling',
+          filename: 'interrupt-handling.c',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'Master interrupt service routines, priority levels, and real-time event handling for responsive embedded systems.',
+          prerequisites: 'Microcontroller Basics',
+          status: 'not-started'
         }
-
-        sr.reveal(revealContainer.current, srConfig());
-    }, []);
-
-    // Preload the active topic image when it changes
-    useEffect(() => {
-        if (activeTopic.image) {
-            const img = new Image();
-            img.src = activeTopic.image;
+      ]
+    },
+    communication: {
+      title: 'communication',
+      icon: '�',
+      topics: [
+        {
+          id: 4,
+          title: 'uart-protocol',
+          filename: 'uart-protocol.c',
+          type: 'md',
+          difficulty: 'beginner',
+          description: 'Serial communication fundamentals, baud rates, frame structure, and error handling in UART systems.',
+          prerequisites: 'Microcontroller Basics',
+          status: 'completed'
+        },
+        {
+          id: 5,
+          title: 'spi-communication',
+          filename: 'spi-communication.c',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'Master-slave communication, clock polarity, phase settings, and multi-device SPI bus management.',
+          prerequisites: 'UART Protocol',
+          status: 'in-progress'
+        },
+        {
+          id: 6,
+          title: 'i2c-protocol',
+          filename: 'i2c-protocol.c',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'Two-wire communication, addressing modes, clock stretching, and multi-master I2C implementations.',
+          prerequisites: 'SPI Communication',
+          status: 'not-started'
         }
-    }, [activeTopic]);
-
-    // Handle modal open/close and body scroll lock
-    useEffect(() => {
-        const body = document.body;
-
-        if (isModalOpen) {
-            // Prevent scrolling when modal is open
-            body.style.overflow = 'hidden';
-
-            // Pre-load the image when modal is opened
-            if (activeTopic.image) {
-                const preloadImg = new Image();
-                preloadImg.src = activeTopic.image;
-                preloadImg.onload = handleModalImageLoad;
-                preloadImg.onerror = handleModalImageError;
-            } else {
-                setIsImageLoading(false);
-            }
-
-            // Reset zoom level when opening modal
-            setZoomLevel(1);
-        } else {
-            // Re-enable scrolling when modal is closed
-            body.style.overflow = '';
+      ]
+    },
+    realtime: {
+      title: 'real-time-systems',
+      icon: '📁',
+      topics: [
+        {
+          id: 7,
+          title: 'rtos-fundamentals',
+          filename: 'rtos-fundamentals.c',
+          type: 'md',
+          difficulty: 'advanced',
+          description: 'Task scheduling, priority management, and real-time operating system concepts for embedded applications.',
+          prerequisites: 'Interrupt Handling, Memory Management',
+          status: 'not-started'
+        },
+        {
+          id: 8,
+          title: 'timing-and-delays',
+          filename: 'timing-and-delays.c',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'Precise timing control, timer configurations, PWM generation, and time-critical applications.',
+          prerequisites: 'Microcontroller Basics',
+          status: 'not-started'
         }
-
-        return () => {
-            // Cleanup - ensure scrolling is re-enabled when component unmounts
-            body.style.overflow = '';
-        };
-    }, [isModalOpen, activeTopic.image]);
-
-    // Handle wheel events for zooming
-    useEffect(() => {
-        const modalContent = modalRef.current;
-
-        const handleWheel = (e) => {
-            if (isModalOpen && !isImageLoading) {
-                handleWheelZoom(e);
-            }
-        };
-
-        if (modalContent) {
-            modalContent.addEventListener('wheel', handleWheel, { passive: false });
+      ]
+    },
+    power: {
+      title: 'power-management',
+      icon: '�',
+      topics: [
+        {
+          id: 9,
+          title: 'low-power-modes',
+          filename: 'low-power-modes.c',
+          type: 'md',
+          difficulty: 'intermediate',
+          description: 'Sleep modes, power optimization techniques, and battery-efficient embedded system design.',
+          prerequisites: 'Microcontroller Basics, Interrupt Handling',
+          status: 'not-started'
         }
+      ]
+    }
+  };
 
-        return () => {
-            if (modalContent) {
-                modalContent.removeEventListener('wheel', handleWheel);
-            }
-        };
-    }, [isModalOpen, isImageLoading, zoomLevel]);
+  // Get current topic details
+  const getCurrentTopic = () => {
+    for (const category of Object.values(topicCategories)) {
+      const topic = category.topics.find(t => t.id === selectedTopic);
+      if (topic) return topic;
+    }
+    return topicCategories[selectedCategory].topics[0];
+  };
 
-    // Reset image position when zoom changes
-    useEffect(() => {
-        if (imageRef.current) {
-            // Ensure the image stays centered as it zooms
-            imageRef.current.style.transformOrigin = 'center center';
-        }
-    }, [zoomLevel]);
+  // Filter topics based on search
+  const getFilteredTopics = (categoryKey) => {
+    const category = topicCategories[categoryKey];
+    if (!searchTerm) return category.topics;
+    
+    return category.topics.filter(topic =>
+      topic.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      topic.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
 
-    // Handle escape key press to close modal
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.key === 'Escape' && isModalOpen) {
-                setIsModalOpen(false);
-            }
-        };
+  // Get total visible topics count
+  const getTotalTopicsCount = () => {
+    return Object.keys(topicCategories).reduce((total, categoryKey) => {
+      return total + getFilteredTopics(categoryKey).length;
+    }, 0);
+  };
 
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [isModalOpen]);
+  // Toggle folder expansion
+  const toggleFolder = (categoryKey) => {
+    setExpandedFolders(prev => 
+      prev.includes(categoryKey) 
+        ? prev.filter(key => key !== categoryKey)
+        : [...prev, categoryKey]
+    );
+  };
 
-    // Handle click outside modal to close it
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (modalRef.current && !modalRef.current.contains(e.target) && isModalOpen) {
-                setIsModalOpen(false);
-            }
-        };
+  // Select topic
+  const selectTopic = (topicId, categoryKey) => {
+    setSelectedTopic(topicId);
+    setSelectedCategory(categoryKey);
+  };
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isModalOpen]);
+  // Clear search
+  const clearSearch = () => {
+    setSearchTerm('');
+  };
 
-    const openModal = () => {
-        setIsModalOpen(true);
-        // Only set loading to true if we're showing the modal
-        if (activeTopic.image) {
-            setIsImageLoading(true);
-        }
-    };
+  // Get progress percentage based on difficulty
+  const getProgressPercentage = (difficulty) => {
+    switch(difficulty) {
+      case 'beginner': return 25;
+      case 'intermediate': return 65;
+      case 'advanced': return 90;
+      default: return 0;
+    }
+  };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-        // Reset loading state and zoom when closing
-        setIsImageLoading(false);
-        setZoomLevel(1);
-    };
+  const currentTopic = getCurrentTopic();
+  const totalTopics = getTotalTopicsCount();
 
-    const handleModalImageLoad = () => {
-        // Ensure we only update state if component is still mounted
-        console.log("Image loaded successfully");
-        setIsImageLoading(false);
-    };
+  return (
+    <StyledLearnEmbeddedSection id="learn-embedded">
+      <div className="inner">
+        <h2>Learn Embedded Systems</h2>
+        <p>
+          Master embedded systems through hands-on learning. Choose a learning path and progress at your own pace.
+        </p>
 
-    const handleModalImageError = (e) => {
-        console.error("Error loading image:", e);
-        setIsImageLoading(false);
-        // You could set an error state here if you want to display an error message
-    };
+        <div className="coming-soon-banner">
+          <h3>🚀 Interactive Learning Platform</h3>
+          <p>
+            Comprehensive embedded systems curriculum with practical projects, code examples, and 
+            progressive skill building. Currently implementing the final features.
+          </p>
+        </div>
 
-    const handleWheelZoom = (e) => {
-        // Prevent default scrolling behavior
-        e.preventDefault();
+        <div className="learning-platform">
+          <div className="search-bar">
+            <div className="search-box">
+              <Icon name="Search" />
+              <input
+                type="text"
+                placeholder="Search topics..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              {searchTerm && (
+                <button className="clear-search" onClick={clearSearch}>
+                  <Icon name="X" />
+                </button>
+              )}
+            </div>
+          </div>
 
-        // Get current container dimensions
-        const container = modalRef.current;
-        if (!container) return;
-
-        // Determine zoom direction based on wheel delta
-        const zoomDirection = e.deltaY < 0 ? 1 : -1;
-
-        // Get the image and container dimensions
-        const img = imageRef.current;
-        const imgRect = img.getBoundingClientRect();
-        const containerRect = container.querySelector('.image-container').getBoundingClientRect();
-
-        // Calculate new zoom level with constraints (min: 0.5, max: 5)
-        const zoomSpeed = 0.1;
-        let newZoomLevel = Math.min(Math.max(zoomLevel + (zoomDirection * zoomSpeed), 0.5), 5);
-
-        // Apply magnetic effect: if zooming would cause the image to be slightly larger than container,
-        // snap to the container bounds
-        if (zoomDirection < 0) { // Zooming out
-            // When zooming out and almost fitting container, snap to fit
-            const imgWidth = imgRect.width / zoomLevel * newZoomLevel;
-            const imgHeight = imgRect.height / zoomLevel * newZoomLevel;
-
-            // If very close to fitting, snap to container dimensions
-            const snapThreshold = 0.05; // 5% threshold for snapping
-
-            if (Math.abs(imgWidth - containerRect.width) / containerRect.width < snapThreshold &&
-                imgWidth < containerRect.width) {
-                // Calculate the exact zoom level that makes the image width match container width
-                newZoomLevel = (containerRect.width / (imgRect.width / zoomLevel)) * 0.98; // 98% of container to create slight margin
-            }
-
-            if (Math.abs(imgHeight - containerRect.height) / containerRect.height < snapThreshold &&
-                imgHeight < containerRect.height) {
-                // Choose the smaller of width-based and height-based zoom to ensure image fits
-                const heightBasedZoom = (containerRect.height / (imgRect.height / zoomLevel)) * 0.98;
-                newZoomLevel = Math.min(newZoomLevel, heightBasedZoom);
-            }
-        }
-
-        // Update zoom level state
-        setZoomLevel(newZoomLevel);
-
-        // Update cursor based on zoom level
-        if (imageRef.current) {
-            imageRef.current.style.cursor = newZoomLevel > 1 ? 'zoom-out' : 'zoom-in';
-
-            // Ensure image stays within modal bounds
-            const imageRect = imageRef.current.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-
-            // Check if image dimensions exceed container dimensions
-            if (imageRect.width > containerRect.width || imageRect.height > containerRect.height) {
-                // We're already constraining with CSS overflow: hidden
-                // This is just to update the UI feedback
-                imageRef.current.style.borderRadius = '0';
-            } else {
-                imageRef.current.style.borderRadius = '15px';
-            }
-        }
-    };
-
-    const resetZoom = () => {
-        setZoomLevel(1);
-    };
-
-    return (
-        <StyledLearnEmbeddedSection id="learn-embedded" ref={revealContainer}>
-            <h2 className="numbered-heading">Learn Embedded</h2>
-
-            <div className="inner">
-                <p>
-                    Explore core embedded systems concepts explained with practical examples.
-                    Each topic includes explanations, diagrams, and working code samples on GitHub.
-                </p>
-
-                <div className="coming-soon-banner">
-                    <h3>
-                        🚧 Coming Soon: Enhanced Embedded Systems Learning 🚧
-                    </h3>
-                    <p>
-                        I'm currently enhancing this section with improved diagrams, more detailed explanations, and 
-                        additional embedded system topics. Please check back soon for the completed experience!
-                    </p>
+          <div className="modern-container">
+            <div className="navigation-sidebar" data-no-external-links="true">
+              <div className="nav-header">
+                <div className="header-icon">📚</div>
+                <div className="title">EmbedLab</div>
+                <div className="subtitle">
+                  Interactive Learning
+                  <span className="badge">{totalTopics}</span>
                 </div>
+              </div>
 
-                <div className="interactive-container">
-                    {/* Topics List - Left Column */}
-                    <div className="topics-list">
-                        <ul>
-                            {topics.map(topic => (
-                                <li
-                                    key={topic.id}
-                                    className={activeTopic.id === topic.id ? 'active' : ''}
-                                    onClick={() => setActiveTopic(topic)}
-                                >
-                                    {topic.title}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+              <div className="category-list">
+                {Object.entries(topicCategories).map(([categoryKey, category]) => {
+                  const filteredTopics = getFilteredTopics(categoryKey);
+                  const isExpanded = expandedFolders.includes(categoryKey);
 
-                    {/* Image/Diagram - Middle Column */}
-                    <div className="topic-image">
-                        {activeTopic.image ? (
-                            <>
-                                <img
-                                    key={activeTopic.id} // Add key to force re-render when topic changes
-                                    src={activeTopic.image}
-                                    alt={`${activeTopic.title} diagram`}
-                                    className="svg-diagram"
-                                    onClick={openModal}
-                                    style={{ cursor: 'pointer' }}
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.style.display = 'none';
-                                        e.target.nextSibling.style.display = 'block';
-                                    }}
-                                />
-                                <span className="click-hint">Click to expand</span>
-                            </>
-                        ) : (
-                            <p className="placeholder">Diagram coming soon</p>
-                        )}
-                        <p className="placeholder" style={{ display: 'none' }}>Image not available</p>
-                    </div>
+                  if (filteredTopics.length === 0 && searchTerm) return null;
 
-                    {/* Description - Right Column */}
-                    <div className="topic-description">
-                        <h3>{activeTopic.title}</h3>
-                        <p>{activeTopic.description}</p>
-                        <a
-                            href={activeTopic.githubLink}
-                            className="github-link"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <Icon name="GitHub" />
-                            View Code on GitHub
-                        </a>
+                  return (
+                    <div key={categoryKey} className="category-item">
+                      <button 
+                        className="category-header"
+                        onClick={() => toggleFolder(categoryKey)}
+                        type="button"
+                        data-no-external-icon="true"
+                      >
+                        <div className={`category-icon ${categoryKey}`}>
+                          {categoryKey === 'fundamentals' && '⚡'}
+                          {categoryKey === 'communication' && '📡'}
+                          {categoryKey === 'realtime' && '⏱️'}
+                          {categoryKey === 'power' && '🔋'}
+                        </div>
+                        <div className="category-info">
+                          <div className="category-name">{category.title.replace('-', ' ')}</div>
+                          <div className="topic-count">{filteredTopics.length} topics</div>
+                        </div>
+                        <Icon 
+                          name="ChevronRight" 
+                          className={`expand-icon ${isExpanded ? 'expanded' : ''}`} 
+                        />
+                      </button>
+                      
+                      <div className={`topics-list ${isExpanded ? 'expanded' : ''}`}>
+                        {filteredTopics.map((topic) => (
+                          <div
+                            key={topic.id}
+                            className={`topic-item ${selectedTopic === topic.id ? 'active' : ''}`}
+                            onClick={() => selectTopic(topic.id, categoryKey)}
+                          >
+                            <div className={`topic-indicator ${categoryKey}`}></div>
+                            <span className="topic-name">{topic.title.replace(/-/g, ' ')}</span>
+                            <div className={`status-dot ${topic.status}`}></div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Modal for expanded image */}
-            <StyledModal className={isModalOpen ? 'show' : ''}>
-                <div className="modal-content" ref={modalRef}>
-                    <button className="close-button" onClick={closeModal} aria-label="Close modal">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                    {isImageLoading && <div className="loading-spinner"></div>}
-                    {activeTopic.image && (
-                        <div className="image-container">
-                            <img
-                                ref={imageRef}
-                                key={activeTopic.id} // Add key to force re-render when topic changes
-                                src={activeTopic.image}
-                                alt={`${activeTopic.title} diagram expanded`}
-                                onLoad={handleModalImageLoad}
-                                onError={handleModalImageError}
-                                style={{
-                                    opacity: isImageLoading ? 0 : 1,
-                                    transition: 'opacity 0.3s ease, transform 0.2s ease',
-                                    transform: `scale(${zoomLevel})`,
-                                    transformOrigin: 'center center',
-                                    cursor: zoomLevel > 1 ? 'zoom-out' : 'zoom-in',
-                                    width: activeTopic.image.endsWith('.svg') ? '100%' : 'auto',
-                                    height: 'auto',
-                                    maxHeight: '85vh',
-                                    maxWidth: '100%',
-                                    objectFit: 'contain',
-                                    background: 'transparent',
-                                    boxShadow: 'none',
-                                    borderRadius: '15px'
-                                }}
-                            />
-                            {!isImageLoading && (
-                                <div className="zoom-controls">
-                                    <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
-                                    {zoomLevel !== 1 && (
-                                        <button className="reset-zoom" onClick={resetZoom}>Reset</button>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    )}
+            <div className="content-panel">
+              <div className="content-header">
+                <div className="breadcrumb">
+                  <span className="path-segment">{topicCategories[selectedCategory].title}</span>
+                  <span className="separator">/</span>
+                  <span className="path-segment current">{currentTopic.title}</span>
                 </div>
-            </StyledModal>
-        </StyledLearnEmbeddedSection>
-    );
+
+                <h1 className="title">{currentTopic.title.replace(/-/g, ' ')}</h1>
+                <div className="meta">
+                  <span className={`difficulty ${currentTopic.difficulty}`}>
+                    {currentTopic.difficulty}
+                  </span>
+                  {currentTopic.prerequisites && (
+                    <span className="prerequisites">
+                      Prerequisites: {currentTopic.prerequisites}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="content-body">
+                <div className="description">
+                  {currentTopic.description}
+                </div>
+
+                <div className="action-buttons">
+                  <a href="#" className="action-btn">
+                    <Icon name="Play" />
+                    Start Learning
+                  </a>
+                  {currentTopic.githubLink && (
+                    <a href={currentTopic.githubLink} target="_blank" rel="noopener noreferrer" className="action-btn secondary">
+                      <Icon name="Github" />
+                      View Code
+                    </a>
+                  )}
+                  {currentTopic.imageGallery && (
+                    <a href={currentTopic.imageGallery} className="action-btn secondary">
+                      <Icon name="Image" />
+                      Gallery
+                    </a>
+                  )}
+                  <a href="#" className="action-btn secondary">
+                    <Icon name="BookOpen" />
+                    Docs
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </StyledLearnEmbeddedSection>
+  );
 };
 
 export default LearnEmbedded;

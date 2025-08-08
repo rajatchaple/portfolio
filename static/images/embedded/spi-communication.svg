@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: bold 18px Arial; fill: #64ffda; }
+      .label { font: 12px Arial; fill: #ccd6f6; }
+      .spi-line { stroke: #64ffda; stroke-width: 2; }
+      .clock { stroke: #ffd700; stroke-width: 2; }
+      .data { stroke: #4ecdc4; stroke-width: 2; }
+      .cs { stroke: #ff6b6b; stroke-width: 2; }
+      .master { fill: #8892b0; stroke: #64ffda; }
+      .slave { fill: #112240; stroke: #64ffda; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="400" fill="#0a192f"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title">SPI Communication Protocol</text>
+  
+  <!-- Master Device -->
+  <rect x="50" y="80" width="120" height="60" class="master" rx="5"/>
+  <text x="110" y="105" text-anchor="middle" class="label">SPI Master</text>
+  <text x="110" y="125" text-anchor="middle" class="label">(Microcontroller)</text>
+  
+  <!-- Slave Device -->
+  <rect x="630" y="80" width="120" height="60" class="slave" rx="5"/>
+  <text x="690" y="105" text-anchor="middle" class="label">SPI Slave</text>
+  <text x="690" y="125" text-anchor="middle" class="label">(Sensor/Peripheral)</text>
+  
+  <!-- Signal Lines -->
+  <!-- SCLK -->
+  <line x1="170" y1="170" x2="630" y2="170" class="clock"/>
+  <text x="50" y="175" class="label">SCLK</text>
+  <text x="400" y="160" text-anchor="middle" class="label">Serial Clock (Master generated)</text>
+  
+  <!-- MOSI -->
+  <line x1="170" y1="200" x2="630" y2="200" class="data"/>
+  <text x="50" y="205" class="label">MOSI</text>
+  <text x="400" y="190" text-anchor="middle" class="label">Master Out Slave In</text>
+  
+  <!-- MISO -->
+  <line x1="630" y1="230" x2="170" y2="230" class="data"/>
+  <text x="50" y="235" class="label">MISO</text>
+  <text x="400" y="220" text-anchor="middle" class="label">Master In Slave Out</text>
+  
+  <!-- CS -->
+  <line x1="170" y1="260" x2="630" y2="260" class="cs"/>
+  <text x="50" y="265" class="label">CS</text>
+  <text x="400" y="250" text-anchor="middle" class="label">Chip Select (Active Low)</text>
+  
+  <!-- Timing Diagram -->
+  <text x="50" y="300" class="label">Timing Diagram:</text>
+  
+  <!-- Clock signal -->
+  <path d="M 150 320 L 170 320 L 170 310 L 190 310 L 190 320 L 210 320 L 210 310 L 230 310 L 230 320 L 250 320" class="clock" fill="none"/>
+  <text x="120" y="325" class="label">CLK</text>
+  
+  <!-- Data signal -->
+  <path d="M 150 340 L 165 340 L 175 350 L 185 350 L 195 340 L 205 340 L 215 350 L 225 350 L 235 340 L 250 340" class="data" fill="none"/>
+  <text x="120" y="345" class="label">DATA</text>
+  
+  <!-- Features -->
+  <text x="400" y="300" class="label">Key Features:</text>
+  <text x="400" y="320" class="label">• Full-duplex communication</text>
+  <text x="400" y="335" class="label">• Master-slave architecture</text>
+  <text x="400" y="350" class="label">• High-speed data transfer</text>
+  <text x="400" y="365" class="label">• Simple 4-wire interface</text>
+</svg>

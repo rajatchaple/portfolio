@@ -326,13 +326,13 @@ const StyledLearnEmbeddedSection = styled.section`
           }
           
           .category-icon {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: var(--fz-md);
             
             &.fundamentals { background: linear-gradient(135deg, #96CEB4, #7ab899); }
             &.communication { background: linear-gradient(135deg, #4ECDC4, #3ab5ac); }
@@ -345,7 +345,7 @@ const StyledLearnEmbeddedSection = styled.section`
             
             .category-name {
               color: var(--lightest-slate);
-              font-size: 14px;
+              font-size: var(--fz-md);
               font-weight: 500;
               margin-bottom: 2px;
               text-transform: capitalize;
@@ -416,7 +416,7 @@ const StyledLearnEmbeddedSection = styled.section`
             
             .topic-name {
               color: var(--light-slate);
-              font-size: 13px;
+              font-size: var(--fz-md);
               flex: 1;
               font-weight: 400;
             }

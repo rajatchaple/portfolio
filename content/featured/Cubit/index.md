@@ -3,7 +3,7 @@ date: '1'
 title: 'Cubit (a measurement device)'
 cover: './cubit.jpg'
 github: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
-external: '/projects/cubit'
+# external: '/projects/cubit'
 
 tech:
   - BLE

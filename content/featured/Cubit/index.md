@@ -2,10 +2,8 @@
 date: '1'
 title: 'Cubit (a measurement device)'
 cover: './cubit.jpg'
-# github: 'https://github.com/bchiang7/halcyon-site'
-# external: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
-# github: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
-# external: './project_page/cubit.html'
+github: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
+external: '/projects/cubit'
 
 tech:
   - BLE

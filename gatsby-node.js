@@ -10,6 +10,7 @@ const _ = require('lodash');
 exports.createPages = async ({ actions, graphql, reporter }) => {
   const { createPage } = actions;
   const postTemplate = path.resolve(`src/templates/post.js`);
+  const projectTemplate = path.resolve(`src/templates/project.js`);
   const tagTemplate = path.resolve('src/templates/tag.js');
   const pageTemplate = path.resolve(`src/templates/page.js`);
 
@@ -22,6 +23,20 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       ) {
         edges {
           node {
+            frontmatter {
+              slug
+            }
+          }
+        }
+      }
+      projectsRemark: allMarkdownRemark(
+        filter: { fileAbsolutePath: { regex: "/content/projects/" } }
+        sort: { order: DESC, fields: [frontmatter___date] }
+        limit: 1000
+      ) {
+        edges {
+          node {
+            id
             frontmatter {
               slug
             }
@@ -63,6 +78,27 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: postTemplate,
       context: {},
     });
+  });
+
+  // Create project detail pages
+  const projects = result.data.projectsRemark.edges;
+
+  console.log('Projects found:', projects.length);
+  projects.forEach(({ node }, index) => {
+    console.log(`Project ${index}:`, {
+      slug: node.frontmatter.slug,
+      frontmatter: node.frontmatter
+    });
+    
+    if (node.frontmatter.slug) {
+      createPage({
+        path: node.frontmatter.slug,
+        component: projectTemplate,
+        context: {},
+      });
+    } else {
+      console.log('Skipping project with no slug:', node);
+    }
   });
 
   // Extract tag data from query

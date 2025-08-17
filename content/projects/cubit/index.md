@@ -1,8 +1,10 @@
 ---
 title: 'Cubit: Smart Measuring Instrument'
 slug: '/projects/cubit'
-cover: '../../featured/Cubit/cubit.jpg'
+date: '2022-05-15'
+cover: './cubit.jpg'
 showInProjects: false
+tags: ['Hardware', 'IoT', 'BLE', 'Energy Harvesting']
 tech:
   - BLE
   - Energy Harvesting
@@ -14,6 +16,144 @@ tech:
   - React Native
 github: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
 ---
+
+<style>
+/* HIDE ONLY SPECIFIC TEMPLATE ELEMENTS */
+.breadcrumb,
+.project-links {
+  display: none !important;
+}
+
+/* Hide the default template header that appears at the top */
+.layout > main > header,
+.layout header:not(.project-header),
+main > header:not(.project-header),
+.layout > main > div:first-child:not(.project-header) {
+  display: none !important;
+}
+
+/* Hide default title and meta info that template renders */
+.layout > main > h1:first-child,
+.layout > main > p:first-child,
+.layout > main > .subtitle {
+  display: none !important;
+}
+
+/* Project Header Styling */
+.project-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.project-overline {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: #D60545;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.project-main-title {
+  font-size: 3.5rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #ffffff 0%, #ffffff 30%, #ff6b9d 70%, #e91e63 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.2;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.project-title-underline {
+  width: 100px;
+  height: 2px;
+  background: #D60545;
+  margin: 0 auto 1.5rem auto;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.project-tech-tags {
+  display: flex !important;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin: 0 0 2rem 0;
+  visibility: visible !important;
+}
+
+.project-image {
+  margin: 2rem auto 3rem auto;
+  max-width: 800px;
+  display: block !important;
+  visibility: visible !important;
+  text-align: center;
+}
+
+.project-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 25px rgba(214, 5, 69, 0.1);
+  display: block;
+  margin: 0 auto;
+  border: 2px solid rgba(214, 5, 69, 0.2);
+  transition: all 0.3s ease;
+}
+
+.project-image img:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 12px 35px rgba(214, 5, 69, 0.2);
+}
+
+.tech-tag {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: inline-block !important;
+  visibility: visible !important;
+}
+
+.tech-tag:hover {
+  background: rgba(214, 5, 69, 0.2);
+  border-color: #D60545;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(214, 5, 69, 0.3);
+}
+
+/* Override any parent container constraints */
+.project-layout {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  align-items: flex-start;
+  max-width: none !important;
+  width: 100vw !important;
+  margin-left: calc(-50vw + 50%) !important;
+  margin-right: 0;
+  padding: 0 2rem 0 5rem;
+  box-sizing: border-box;
+  padding-top: 4rem;
+}
 
 <style>
 /* NUCLEAR APPROACH - Hide entire project links section */
@@ -116,32 +256,44 @@ a[rel*="noreferrer"]:after {
 }
 
 .project-nav {
-  width: 300px;
-  min-width: 300px;
+  width: 280px;
+  min-width: 280px;
   flex-shrink: 0;
   position: sticky;
-  top: 140px;
+  position: -webkit-sticky;
+  top: 120px;
   height: fit-content;
-  max-height: calc(100vh - 160px);
+  max-height: calc(100vh - 140px);
   overflow-y: auto;
-  background: rgba(100, 255, 218, 0.08);
-  border-radius: 8px;
-  padding: 1.5rem;
-  border: 1px solid rgba(100, 255, 218, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: rgba(16, 24, 40, 0.98);
+  border-radius: 4px;
+  padding: 1.8rem 1.5rem;
+  border: 1px solid rgba(100, 255, 218, 0.15);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   z-index: 10;
+  margin-left: 2rem;
+  backdrop-filter: blur(8px);
 }
 
 .nav-title {
   font-family: var(--font-mono);
-  color: #ff6b6b !important;
+  color: #D60545 !important;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-align: center;
-  padding-bottom: 1rem;
+  text-align: left;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(214, 5, 69, 0.2);
+}
+
+.project-nav .nav-title {
+  color: #D60545 !important;
+}
+
+nav .nav-title {
+  color: #D60545 !important;
 }
 
 .nav-list {
@@ -151,73 +303,134 @@ a[rel*="noreferrer"]:after {
 }
 
 .nav-list li {
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.2rem;
   position: relative;
 }
 
 .nav-arrow {
-  color: #ff6b6b !important;
-  font-size: 1rem !important;
-  margin-right: 0.8rem !important;
+  color: #D60545 !important;
+  font-size: 0.6rem !important;
+  margin-right: 0.5rem !important;
   transition: all 0.3s ease !important;
   display: inline-block !important;
   visibility: visible !important;
   opacity: 1 !important;
   font-weight: bold !important;
   line-height: 1 !important;
-  background: rgba(255, 0, 0, 0.1) !important;
+  background: rgba(214, 5, 69, 0.1) !important;
   padding: 2px !important;
-  border: 1px solid red !important;
+  border: 1px solid #D60545 !important;
 }
 
 .nav-link {
-  color: #ccd6f6 !important;
-  text-decoration: none;
+  color: var(--light-slate) !important;
+  text-decoration: none !important;
   font-size: 0.85rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: 6px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 3px;
   display: block;
-  transition: none;
-  border-left: 3px solid transparent;
+  transition: color 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+  border-left: none !important;
   font-weight: 500;
   line-height: 1.3;
+  position: relative;
+  margin-bottom: 0.1rem;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
-.nav-link.active {
-  color: #ff6b6b !important;
-  background: rgba(255, 107, 107, 0.1);
-  border-left-color: #ff6b6b;
-  font-weight: 600;
+.nav-link::after {
+  display: none !important;
+  content: none !important;
+}
+
+.nav-link::before {
+  content: "▶";
+  color: #D60545;
+  font-size: 0.6rem;
+  margin-right: 0.5rem;
+  opacity: 1;
+  transition: color 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transform: none;
+  display: inline-block;
+}
+
+.nav-link:hover::before {
+  color: #D60545 !important;
 }
 
 .nav-link:hover {
-  color: #ff6b6b !important;
-  background: rgba(255, 107, 107, 0.05);
+  color: #D60545 !important;
+  background: transparent !important;
+  border-left: none !important;
+  transform: none !important;
+  text-decoration: none !important;
+  border: none !important;
+  outline: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
-.nav-link:hover .nav-arrow,
+.nav-link:hover::after {
+  display: none !important;
+  content: none !important;
+}
+
+.project-nav .nav-link:hover {
+  color: #D60545 !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+nav .nav-link:hover {
+  color: #D60545 !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+}
+
+.nav-link.active {
+  color: #D60545;
+  background: transparent;
+  border-left: none;
+  font-weight: 600;
+}
+
+.nav-link.active::before {
+  color: #D60545;
+}
+
 .nav-link.active .nav-arrow {
-  color: #ff4757 !important;
+  color: #D60545 !important;
   transform: translateX(3px);
 }
 
 .nav-footer {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  text-align: center;
+  margin-top: 1.8rem;
+  padding-top: 1.2rem;
+  text-align: left;
+  border-top: 1px solid rgba(100, 255, 218, 0.15);
 }
 
 .nav-footer small {
   color: var(--light-slate);
   font-style: italic;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  opacity: 0.7;
 }
 
 .project-content {
   flex: 1;
   min-width: 0;
   max-width: none !important;
+  width: calc(100vw - 350px) !important;
   overflow-x: auto;
+  padding-left: 2rem;
 }
 
 .content-section {
@@ -225,6 +438,22 @@ a[rel*="noreferrer"]:after {
   scroll-margin-top: 30vh;
   width: 100%;
   max-width: none !important;
+}
+
+.content-section h2 {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.content-section h2::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, #D60545 0%, #D60545 20%, transparent 70%);
+  width: 100%;
 }
 
 .content-section h2 {
@@ -391,20 +620,42 @@ a[href*="http"]::after {
 }
 </style>
 
+<!-- Project Header -->
+<div class="project-header">
+  <h1 class="project-main-title">Cubit: Smart Measuring Instrument</h1>
+  <div class="project-title-underline"></div>
+  
+  <div class="project-tech-tags">
+    <span class="tech-tag">BLE</span>
+    <span class="tech-tag">Energy Harvesting</span>
+    <span class="tech-tag">ARM Cortex-M4</span>
+    <span class="tech-tag">Sensor Fusion</span>
+    <span class="tech-tag">Embedded Systems</span>
+    <span class="tech-tag">PCB Design</span>
+    <span class="tech-tag">CAD Design</span>
+    <span class="tech-tag">React Native</span>
+  </div>
+  
+  <!-- Project Image -->
+  <div class="project-image">
+    <img src="../../featured/Cubit/cubit.jpg" alt="Cubit Smart Measuring Instrument" />
+  </div>
+</div>
+
 <div class="project-layout">
   <nav class="project-nav">
-    <div class="nav-title">📋 PROJECT SECTIONS</div>
+    <div class="nav-title" style="color: #D60545 !important;">📋 PROJECT SECTIONS</div>
     <ul class="nav-list">
-      <li><a href="#overview" class="nav-link" data-section="overview"><span class="nav-arrow">▶</span> 🎯 Overview</a></li>
-      <li><a href="#features" class="nav-link" data-section="features"><span class="nav-arrow">▶</span> ⭐ Key Features</a></li>
-      <li><a href="#architecture" class="nav-link" data-section="architecture"><span class="nav-arrow">▶</span> 🏗️ System Architecture</a></li>
-      <li><a href="#hardware" class="nav-link" data-section="hardware"><span class="nav-arrow">▶</span> 🔧 Hardware Design</a></li>
-      <li><a href="#firmware" class="nav-link" data-section="firmware"><span class="nav-arrow">▶</span> 💻 Firmware</a></li>
-      <li><a href="#mobile" class="nav-link" data-section="mobile"><span class="nav-arrow">▶</span> 📱 Mobile App</a></li>
-      <li><a href="#journey" class="nav-link" data-section="journey"><span class="nav-arrow">▶</span> 🚀 Development Journey</a></li>
-      <li><a href="#challenges" class="nav-link" data-section="challenges"><span class="nav-arrow">▶</span> ⚡ Engineering Challenges</a></li>
-      <li><a href="#results" class="nav-link" data-section="results"><span class="nav-arrow">▶</span> 🏆 Results & Recognition</a></li>
-      <li><a href="#resources" class="nav-link" data-section="resources"><span class="nav-arrow">▶</span> 📂 Open Source</a></li>
+      <li><a href="#overview" class="nav-link" data-section="overview">🎯 Overview</a></li>
+      <li><a href="#features" class="nav-link" data-section="features">⭐ Key Features</a></li>
+      <li><a href="#architecture" class="nav-link" data-section="architecture">🏗️ System Architecture</a></li>
+      <li><a href="#hardware" class="nav-link" data-section="hardware">🔧 Hardware Design</a></li>
+      <li><a href="#firmware" class="nav-link" data-section="firmware">💻 Firmware</a></li>
+      <li><a href="#mobile" class="nav-link" data-section="mobile">📱 Mobile App</a></li>
+      <li><a href="#journey" class="nav-link" data-section="journey">🚀 Development Journey</a></li>
+      <li><a href="#challenges" class="nav-link" data-section="challenges">⚡ Engineering Challenges</a></li>
+      <li><a href="#results" class="nav-link" data-section="results">🏆 Results & Recognition</a></li>
+      <li><a href="#resources" class="nav-link" data-section="resources">📂 Open Source</a></li>
     </ul>
     <div class="nav-footer">
       <small>Click any section to jump there instantly</small>

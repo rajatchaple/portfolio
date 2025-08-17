@@ -11,6 +11,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   const { createPage } = actions;
   const postTemplate = path.resolve(`src/templates/post.js`);
   const projectTemplate = path.resolve(`src/templates/project.js`);
+  const detailedProjectTemplate = path.resolve(`src/templates/detailed-project.js`);
   const tagTemplate = path.resolve('src/templates/tag.js');
   const pageTemplate = path.resolve(`src/templates/page.js`);
 
@@ -37,8 +38,10 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
         edges {
           node {
             id
+            fileAbsolutePath
             frontmatter {
               slug
+              showInProjects
             }
           }
         }
@@ -87,14 +90,25 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   projects.forEach(({ node }, index) => {
     console.log(`Project ${index}:`, {
       slug: node.frontmatter.slug,
-      frontmatter: node.frontmatter
+      frontmatter: node.frontmatter,
+      filePath: node.fileAbsolutePath
     });
     
     if (node.frontmatter.slug) {
+      // Determine if this should use the detailed project template
+      const isDetailedProject = node.fileAbsolutePath.includes('/cubit/') || 
+                               node.frontmatter.showInProjects === false;
+      
+      const templateToUse = isDetailedProject ? detailedProjectTemplate : projectTemplate;
+      
+      console.log(`Using ${isDetailedProject ? 'detailed' : 'standard'} template for:`, node.frontmatter.slug);
+      
       createPage({
         path: node.frontmatter.slug,
-        component: projectTemplate,
-        context: {},
+        component: templateToUse,
+        context: {
+          slug: node.frontmatter.slug,
+        },
       });
     } else {
       console.log('Skipping project with no slug:', node);

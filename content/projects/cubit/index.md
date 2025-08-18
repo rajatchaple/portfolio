@@ -39,14 +39,20 @@ main > header:not(.project-header),
   display: none !important;
 }
 
-/* Project Header Styling */
+/* Project Header Styling - Full Viewport Hero */
 .project-header {
+  min-height: 100vh;
+  height: 100vh;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
-  display: block !important;
+  margin-bottom: 0;
+  padding: 2rem 1rem;
   visibility: visible !important;
   opacity: 1 !important;
+  box-sizing: border-box;
 }
 
 .project-overline {
@@ -98,23 +104,28 @@ main > header:not(.project-header),
   display: block !important;
   visibility: visible !important;
   text-align: center;
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
 }
 
 .project-image img {
   width: 100%;
   height: auto;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 8px 25px rgba(214, 5, 69, 0.1);
+  border-radius: 24px;
   display: block;
   margin: 0 auto;
-  border: 2px solid rgba(214, 5, 69, 0.2);
-  transition: all 0.3s ease;
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
 }
 
-.project-image img:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 12px 35px rgba(214, 5, 69, 0.2);
-}
+/* Remove the extra pseudo-element and z-index complications */
 
 .tech-tag {
   background: rgba(255, 255, 255, 0.1);
@@ -201,24 +212,71 @@ a[rel*="noreferrer"]:after {
   display: none !important;
 }
 
-/* Make project header truly sticky and improve scrolling */
+/* Override any fixed header positioning that might interfere */
 .layout > main > header {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 1000 !important;
-  background: rgba(10, 25, 47, 0.98) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(100, 255, 218, 0.3) !important;
-  padding: 1rem 2rem !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+  display: none !important;
+}
+
+/* Override parent containers that might constrain the hero */
+.detailed-project__StyledprojectContainer-sc-1KVHi,
+.layout,
+.layout > main,
+main {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Hero section - full viewport, but not fixed so content can scroll */
+.project-header {
+  width: 100vw !important;
+  height: 100vh !important;
+  position: relative !important;
+  z-index: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: var(--navy) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+    /* Scroll indicator styling */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 1.2rem;
+      opacity: 0.7;
+      text-align: center;
+      animation: bounce 1.5s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(12px); }
+    }
+
+/* Ensure content sections appear after the hero */
+.project-layout {
+  position: relative !important;
+  z-index: 2 !important;
+  background: var(--navy) !important;
 }
 
 /* Add top padding to main content to account for fixed header */
 .layout > main {
-  padding-top: 120px !important;
+  padding-top: 0 !important;
 }
 
 /* Fix blank space issues - reduce margins and padding */
@@ -240,19 +298,19 @@ a[rel*="noreferrer"]:after {
   margin-top: 0 !important;
 }
 
-/* Better sidebar and content layout */
+/* Better sidebar and content layout - starts after hero */
 .project-layout {
   display: flex;
   gap: 2rem;
-  margin-top: 2rem;
+  margin-top: 0;
   align-items: flex-start;
   max-width: none !important;
   width: 100vw !important;
   margin-left: calc(-50vw + 50%) !important;
   margin-right: 0;
-  padding: 0 2rem 0 5rem;
+  padding: 2rem 2rem 0 5rem;
   box-sizing: border-box;
-  padding-top: 2rem;
+  min-height: 100vh;
 }
 
 .project-nav {
@@ -261,9 +319,9 @@ a[rel*="noreferrer"]:after {
   flex-shrink: 0;
   position: sticky;
   position: -webkit-sticky;
-  top: 120px;
+  top: 2rem;
   height: fit-content;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - 4rem);
   overflow-y: auto;
   background: rgba(16, 24, 40, 0.98);
   border-radius: 4px;
@@ -624,7 +682,6 @@ a[href*="http"]::after {
 <div class="project-header">
   <h1 class="project-main-title">Cubit: Smart Measuring Instrument</h1>
   <div class="project-title-underline"></div>
-  
   <div class="project-tech-tags">
     <span class="tech-tag">BLE</span>
     <span class="tech-tag">Energy Harvesting</span>
@@ -635,11 +692,16 @@ a[href*="http"]::after {
     <span class="tech-tag">CAD Design</span>
     <span class="tech-tag">React Native</span>
   </div>
+  <div class="scroll-indicator">
+    <span>&#8595;</span><br />
+    <small>Scroll to explore</small>
+  </div>
   
-  <!-- Project Image -->
+  <!-- Project Image - Temporarily Hidden
   <div class="project-image">
     <img src="../../featured/Cubit/cubit.jpg" alt="Cubit Smart Measuring Instrument" />
   </div>
+  -->
 </div>
 
 <div class="project-layout">

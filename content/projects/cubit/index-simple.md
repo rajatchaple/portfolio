@@ -9,12 +9,10 @@ tech:
   - BLE
   - Energy Harvesting
   - ARM Cortex-M4
-  - Sensor Fusion
   - Embedded Systems
   - PCB Design
   - CAD Design
-  - React Native
-github: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
+github: 'https://github.com/rajatchaple/cubit_3.0'
 ---
 
 <style>
@@ -622,7 +620,6 @@ html {
 }
 
 /* ULTIMATE NUCLEAR OPTION - COMPLETELY ELIMINATE ALL EXTERNAL LINK ICONS */
-/* Target every possible external link icon combination */
 a[href*="://"]::after,
 a[href*="://"]::before,
 a[target="_blank"]::after,
@@ -696,12 +693,6 @@ a[href*="http"]::after {
     <span>&#8595;</span><br />
     <small>Scroll to explore</small>
   </div>
-  
-  <!-- Project Image - Temporarily Hidden
-  <div class="project-image">
-    <img src="../../featured/Cubit/cubit.jpg" alt="Cubit Smart Measuring Instrument" />
-  </div>
-  -->
 </div>
 
 <div class="project-layout">
@@ -729,24 +720,24 @@ a[href*="http"]::after {
 
 > **Reimagining the measuring tape with low power and Bluetooth.**
 
-This project builds a small instrument that measures **length, angle, and distance**, shows the value on a **Sharp Memory LCD**, and can send it over **BLE** when needed. The idea is simple: keep the familiar actions (roll a wheel, pull a string, point an ultrasonic sensor) but make the readings repeatable and easy to save.
+This project builds a compact instrument for **length, angle, and distance**. Readings show up on a **2.7″ Sharp Memory LCD** and can be sent over **BLE** when a record is needed. The flow stays familiar—roll a wheel, pull a string, or use ultrasonic for longer spans—while the numbers don’t get lost.
 
-Conventional tapes work, but the numbers usually end up on paper and vanish. This project tries to keep the workflow lightweight while adding just enough electronics to store, share, and reuse measurements—without burning through a battery.
+Most quick measurements are still manual and one-time. Once written down, they’re hard to reuse or share. This project keeps the tool simple but adds enough electronics so values can be **captured, displayed, and logged** without burning the battery.
 
 <details>
 <summary><strong>🔍 The Problem We’re Solving</strong></summary>
 
-Most quick measurements are still manual and disposable. Data isn’t logged, there’s no history, and it’s hard to combine readings later. That’s fine for one-off tasks, but not great when accuracy and traceability matter.
+Tape measures work, but the readings usually vanish after the task. There’s no history, no easy way to combine multiple readings, and copying values by hand is error-prone. That’s fine for one-offs, not great when accuracy and traceability matter in construction, labs, or small shops.
 
-This project turns those “one-time” numbers into usable data: capture on device, view on the LCD, and push over BLE when a record is needed. The goal is to keep the tool small and quiet on power so it actually gets used in the field.
+This project keeps the normal workflow but turns those numbers into data. Measurements appear on the LCD and can be pushed over BLE, so the same reading can be reused later instead of re-measured.
 </details>
 
 <details>
 <summary><strong>💡 Our Solution</strong></summary>
 
-The device combines a **magnetic rotary encoder** (wheel and string modes), a **BNO055 IMU** (angles/orientation), and an **ultrasonic module** (longer ranges). An **EFR32BG13** handles the drivers, low-power states, and BLE. The **BQ25570** PMIC manages a **480 mAh Li-Po**, **solar input**, and a regulated rail around **3.2 V**. The UI is a **1.3″ Sharp Memory LCD** with four buttons for a simple menu.
+The device combines a **magnetic rotary encoder** (wheel + string modes), a **BNO055 IMU** for angles/orientation, and an **ultrasonic module** for longer ranges. An **EFR32BG13** (Cortex-M4 + BLE) runs the drivers and power states. The power path uses **BQ25570** to harvest solar, charge a **480 mAh Li-Po**, and regulate the ~**3.2 V** system rail. Four buttons drive a small menu on the Sharp LCD.
 
-Most of the time the system sits in **EM2**. Sensors power up only for the selected mode, report quickly, and drop back to sleep. That keeps average current low while still giving immediate feedback on the screen.
+Most of the time the MCU waits in **EM2**. Only the sensor for the selected mode is powered. After a reading, the system drops back to sleep. This keeps the average current low while staying responsive on the screen.
 </details>
 
 </div>
@@ -758,32 +749,35 @@ Most of the time the system sits in **EM2**. Sensors power up only for the selec
 <details>
 <summary><strong>📏 Triple Measurement System</strong></summary>
 
-- **Wheel assembly** for flat/curved surfaces (size accuracy **±0.2 cm** as scoped).  
-- **String–pulley** option for flexible materials and longer spans.  
-- **IMU (BNO055)** for angle/orientation (target **±1°** in this setup).  
-- **Ultrasonic sensor** verified **6–254 in** on bench.
+- **Wheel assembly** for flat/curved surfaces (design accuracy **±0.2 cm**).  
+- **String–pulley** for flexible materials and longer pulls.  
+- **IMU (BNO055)** for angle/orientation (target **±1°**).  
+- **Ultrasonic** verified **6–254 in** on bench.  
+- Final encoder setting **256 ppr** (direction preserved in firmware).
 </details>
 
 <details>
 <summary><strong>🔋 Self-Sustaining Power</strong></summary>
 
-- **Solar harvesting** through **BQ25570** (MPPT + cold start).  
-- **USB** input available for faster charging and bring-up.  
-- **480 mAh Li-Po**, regulated system rail ~**3.2 V**.
+- **BQ25570** PMIC with boost/MPPT + buck output; **VBAT_OV = 4.2 V**, **VBAT_OK ≈ 3.2 V**, **VOUT ≈ 3.2 V**.  
+- **480 mAh Li-Po**; **USB** path available for faster charging/bring-up.  
+- Solar panel board measured about **1.15 V** at the input during tests.  
+- **Bulk capacitance:** 220 µF MLCC chosen for ~**100 µF effective** at 3.2 V (DC-bias accounted).
 </details>
 
 <details>
 <summary><strong>📱 Wireless Integration</strong></summary>
 
-- **BLE** characteristics for linear, angular, and distance values.  
-- Open-area link around **100 m** using the on-board antenna in tests.
+- **BLE** characteristics for linear, angular, and distance data (EFR Connect used in tests).  
+- Open-area link around **100 m** observed with the on-board antenna.
 </details>
 
 <details>
 <summary><strong>🖥️ User Experience</strong></summary>
 
-- **1.3″ Sharp Memory LCD** (very low current) with clear menu pages.  
-- **Four navigation buttons**; live readout while moving the wheel/string.
+- **2.7″ Sharp Memory LCD**, ~**100 µA** measured delta from the dev setup.  
+- **Navigation button** control menu pages and live readout.  
+- Wheel/string readings stream as you move; angle and ultrasonic update on demand.
 </details>
 
 </div>
@@ -795,22 +789,31 @@ Most of the time the system sits in **EM2**. Sensors power up only for the selec
 <details>
 <summary><strong>🔧 Hardware Layer</strong></summary>
 
-- **MCU/Radio:** EFR32BG13 (ARM Cortex-M4 + BLE).  
-- **PMIC:** BQ25570 energy harvester/charger with buck output to system rail.  
-- **Linear:** AS5147P magnetic encoder (SPI; ABI used during early tests).  
-- **Angular:** BNO055 IMU (I²C; on-chip fusion).  
-- **Range:** UART ultrasonic module.  
-- **Display:** 1.3″ Sharp Memory LCD.  
-- **Energy:** Monocrystalline panel (measured ~**1.15 V** at the test board) + **480 mAh** Li-Po.
+- **MCU/Radio:** Silicon Labs **EFR32BG13** (Cortex-M4 + BLE).  
+- **PMIC:** **BQ25570** energy harvester/charger with regulated output.  
+- **Linear:** **AS5147P** magnetic encoder (ABI used; SPI for config).  
+- **Angular:** **BNO055** IMU over **I²C** (address **0x28** selected).  
+- **Range:** UART ultrasonic module (6–254 in verified).  
+- **Display:** **Sharp Memory LCD 2.7″** over **SPI**.  
+- **Energy:** Monocrystalline panel → PMIC; **Li-Po 480 mAh** storage.
 </details>
 
 <details>
 <summary><strong>💻 Firmware Layer</strong></summary>
 
-- Event-driven state machine (Idle → Measure → Report → Sleep).  
-- Drivers for **SPI** (encoder/LCD), **I²C** (IMU), **UART** (ultrasonic).  
-- BLE GATT with separate characteristics per measurement type.  
-- Power policy prefers **EM2**; sensors behind load switches.
+- Event-driven state machine: **Idle → Measure → Report → Sleep**.  
+- Drivers: **SPI** (encoder/LCD), **I²C** (IMU), **UART** (ultrasonic).  
+- BLE GATT: separate characteristics for each measurement type.  
+- Power policy: prefer **EM2**; sensors and LCD behind **load switches**.
+</details>
+
+<details>
+<summary><strong>⏱️ Buses & Clocks (from bring-up)</strong></summary>
+
+- **I²C** to BNO055 at ~**92 kHz** during early tests; read accel LSB at **reg 0x08**.  
+- **SPI** to Sharp LCD around **1.1 MHz** (per display timing).  
+- **Clocks:** HF crystal ~**38–40 MHz** for radio; **32.768 kHz** LF crystal for low-energy modes.  
+- Initial LF part was an oscillator footprint; swapped to a crystal to restore EM2 behavior.
 </details>
 
 </div>
@@ -822,23 +825,32 @@ Most of the time the system sits in **EM2**. Sensors power up only for the selec
 <details>
 <summary><strong>⚡ Power Management System</strong></summary>
 
-This project uses **BQ25570** to harvest from solar and charge a **480 mAh** Li-Po, then regulates a stable system rail near **3.2 V** for the MCU, sensors, and LCD. A **220 µF** MLCC (Murata GRM32ER60J227ME05L) sits at the bulk node; under **DC bias** at ~3.2 V its effective value is about **100 µF**, which was enough to keep the rail steady during radio bursts and LCD updates.
+This project uses **BQ25570** to harvest from solar, **charge the 480 mAh Li-Po**, and regulate a ~**3.2 V** rail for the MCU, sensors, and LCD. The PMIC thresholds were set around **VBAT_OV = 4.2 V**, **VBAT_OK ≈ 3.2 V**, with **VOUT ≈ 3.2 V** feeding the system.
 
-**Notes from bring-up:**
-- **Cold start** off harvester was required for first power-up if the battery was empty.  
-- The regulated rail simplified brown-out behavior across sensors with different input limits.  
-- Measured panel output around **1.15 V** on the prototype board matched the harvester path.
+A **220 µF** MLCC (Murata **GRM32ER60J227ME05L**) was placed at the bulk node. With DC-bias at ~3.2 V, its effective value is about **100 µF**, which kept VSTOR steady during LCD updates and BLE activity. The PMIC’s **cold-start** path was useful for first power-up when the battery was flat; USB input also powered and charged the board during bring-up.
+
+Design choice: a regulated rail was preferred over running unregulated from the cell. Earlier calculations showed a **~11%** gain in effective battery life for the usage pattern by avoiding LDO losses and keeping light-load efficiency reasonable.
 </details>
 
 <details>
 <summary><strong>🎯 Sensor Integration</strong></summary>
 
-- **AS5147P** provided pulses for linear distance. A divide-by-8 counter was tried to lower the pulse rate but it **broke direction** (phase lost). Final choice was to **configure the encoder to 256 PPR** and handle counts in firmware.  
-- **BNO055** ran on I²C for angles. Early **NACK** events were fixed with short retries and checking mode bits after power-cycle.  
-- **Ultrasonic** data landed over UART. Changing RX off the VCOM pin avoided port contention during logging.  
-- **Placement:** the encoder’s magnet was kept away from the IMU’s magnetometer, and the RF section stayed clear of the magnetic assembly.  
-- **ESD:** **SP1003** on USB/battery and **SP1001-04** on the button cluster kept leakage low in sleep.  
-- **Test points** on I²C, SPI, and ABI lines made logic-analyzer work straightforward.
+- **AS5147P (linear):** ABI pulses were counted for distance. A hardware divide-by-8 (**CD74HC4520**) reduced pulse rate but **lost A/B phase**, so direction became unreliable. Final setup **programmed 256 ppr** via SPI and handled direction in firmware.  
+- **BNO055 (angular):** I²C address **0x28**. Early **NACKs** after mode changes were handled with short retries and mode checks.  
+- **Ultrasonic (range):** UART RX originally overlapped VCOM; moving RX fixed serial contention.  
+- **Placement:** the encoder’s magnet was kept away from the IMU’s magnetometer, and the RF antenna region stayed clear of magnetic parts.  
+- **ESD:** **SP1003** on USB/battery (≈12 V clamp, low leakage); **SP1001-04** across the 4-button cluster.  
+- **Test Points:** added on **I²C**, **SPI**, and **ABI**; these made logic-analyzer work and SPI config of the encoder straightforward.
+</details>
+
+<details>
+<summary><strong>🔌 Programming & Test Access</strong></summary>
+
+- **10-pin debug header** (Silabs pinout): **SWD**, **AEM**, **PTI**, **VCOM**, **Virtual UART**.  
+- Tooling: **Simplicity Studio v5** + **Simplicity Commander** for erase/flash/verify/reset.  
+- **Clocks:** HF/LF crystals per datasheets; after swapping the LF part, EM2 current matched expectations.  
+- **Mode switch:** All-OFF / Partial-ON / All-ON selections during test.  
+- **Extra points:** through-holes on PMIC VOUT and solar input for scope current/voltage checks.
 </details>
 
 </div>
@@ -850,22 +862,27 @@ This project uses **BQ25570** to harvest from solar and charge a **480 mAh** Li-
 <details>
 <summary><strong>⚡ Power Management</strong></summary>
 
-The firmware leans on **EM2** whenever possible. Sensors and the LCD sit behind load switches and only power up for an active mode. Core clock pulls down toward the LF domain when the UI is idle, then returns to HF for sampling or BLE activity.
+The firmware targets **EM2** when idle. Sensors and LCD sit behind **load switches** and only power up inside a measurement mode. The core shifts down toward the LF domain for UI idle, then returns to HF for sampling or BLE work. A previous issue where **UART forced EM1** was resolved by gating the interface when not in use.
 </details>
 
 <details>
 <summary><strong>📊 Sensor Management</strong></summary>
 
-- **Encoder:** configurable PPR; simple debounce and timestamping to avoid missed steps.  
-- **IMU:** Euler angle readout with recovery from occasional NACKs after mode changes.  
-- **Ultrasonic:** framed parse with sanity checks so serial debug doesn’t corrupt packets.  
-- **LCD:** small page buffers for menu vs. live readout; quick partial refreshes.
+- **Encoder:** 256 ppr with direction from A/B phase; counts timestamped to avoid missed steps at higher speeds.  
+- **IMU:** Euler angle readout; short retry on NACK after power-cycling or mode changes.  
+- **Ultrasonic:** framed parsing; moved pins to keep debug serial separate from data serial.  
+- **LCD:** small page buffers for menu vs. live display; partial refreshes keep updates quick.
 </details>
 
 <details>
-<summary><strong>📡 Communication Stack</strong></summary>
+<summary><strong>📡 Communication Stack (BLE)</strong></summary>
 
-A compact GATT exposes length, angle, and range. Advertising starts on boot; on connection the device sends indications on change or at a slow heartbeat to keep radio duty cycle down.
+- On **boot:** start advertising (`sl_bt_advertiser_create_set`, timing, start).  
+- On **connect:** stop advertising, set connection parameters.  
+- On **disconnect:** restart advertising.  
+- **Soft timer:** periodic LCD updates.  
+- **Indications:** send when sensor data is ready (separate characteristics per type).  
+- Stack used: **EFR Connect** app during tests; link stable in open area to ~**100 m**.
 </details>
 
 </div>
@@ -875,27 +892,33 @@ A compact GATT exposes length, angle, and range. Advertising starts on boot; on 
 ## Engineering Challenges
 
 <details>
-<summary><strong>Clock Parts & Low Power</strong></summary>
+<summary><strong>LF timing part selection</strong></summary>
 
-An early board used an LF **oscillator** footprint instead of a **32.768 kHz crystal**, which blocked proper low-power modes. Swapping to the crystal fixed EM2 behavior and the sleep current.
+An LF **oscillator** footprint went on the first board where a **32.768 kHz crystal** was intended. EM2 didn’t behave until the part was swapped. After that, sleep current and clocking matched the datasheets.
 </details>
 
 <details>
-<summary><strong>Direction vs. Divider</strong></summary>
+<summary><strong>Direction vs. frequency divider</strong></summary>
 
-A hardware frequency divider reduced ABI pulse rate but **lost the A/B phase**, so direction couldn’t be trusted. Moving to **256 PPR** via encoder config kept counts manageable and preserved direction in firmware.
+Dropping ABI pulse rate with a dual counter (**CD74HC4520**) looked good on paper but **lost phase** information. The fix was to **configure the encoder to 256 ppr** and keep direction in firmware.
 </details>
 
 <details>
-<summary><strong>Magnet & RF Spacing</strong></summary>
+<summary><strong>Power rail dips</strong></summary>
 
-The encoder magnet disturbed the IMU’s magnetometer when placed too close. Spacing the parts and orienting the magnet path away from the IMU resolved it without shields.
+Radio + LCD bursts caused small dips on VSTOR. Accounting for **MLCC DC-bias** and sizing the bulk to ~**100 µF effective** at 3.2 V stabilized the rail.
 </details>
 
 <details>
-<summary><strong>Rail Dips on Activity</strong></summary>
+<summary><strong>Interfaces fighting each other</strong></summary>
 
-Radio activity plus LCD updates caused small dips on VSTOR. Accounting for **MLCC DC-bias** and sizing bulk to about **100 µF effective** stabilized the rail.
+The ultrasonic UART shared pins with VCOM at first, which corrupted logs. Moving RX solved it. I²C to the BNO055 occasionally NACKed after mode switches; short retries fixed that without adding delays everywhere.
+</details>
+
+<details>
+<summary><strong>Energy path bring-up</strong></summary>
+
+With a flat battery, **BQ25570** needed the harvester cold-start to get going. The **USB** input was useful for initial flashing and verifying that **VOUT ≈ 3.2 V** and **VBAT_OV = 4.2 V** behaved as set.
 </details>
 
 </div>
@@ -904,9 +927,16 @@ Radio activity plus LCD updates caused small dips on VSTOR. Accounting for **MLC
 
 ## Learnings
 
-This project showed how easy it is for peripherals to sip power through I/O even when “off”—load switches should be part of the plan from the first schematic. Footprint choices matter more than they seem (a crystal vs. oscillator mistake cost real time and current), and **test points** on I²C/SPI/ABI paid back every minute spent placing them.
+- **Phantom power is real:** peripherals can back-power through I/O even when VMCU is off—plan load switches early.  
+- **Parts vs. packages:** a crystal vs. oscillator mistake cost time and current; footprints matter.  
+- **Indicators help:** simple LEDs caught a part-number mismatch during early flashing.  
+- **Datasheets first:** e.g., BQ25570 behavior on cold-start and VBAT_OK thresholds.  
+- **Sleep takes planning:** too many or badly timed interrupts keep the MCU up; EM2 works when interfaces are gated.  
+- **Layout details:** pick bulk caps by **effective capacitance** at the operating voltage, not just the label. Keep magnets away from RF and from the IMU’s magnetometer.  
+- **Debug access:** test points on **I²C/SPI/ABI** and a proper **10-pin** header paid off every time something glitched.  
+- **Have an escape hatch:** being able to bypass the frequency divider and re-configure the encoder let the project keep moving.
 
-On the layout side, **DC-bias** derates big MLCCs a lot; picking by effective capacitance at the actual rail voltage is safer than reading the label. Keeping magnets away from RF and sensors solved interference more cleanly than filters. Finally, a small, event-driven state machine (Idle → Measure → Report → Sleep) was enough to keep the UI responsive while staying in **EM2** most of the time.
+<p style="margin-top: 1rem; opacity: .8;">Average current for a typical use-case cycle measured ~<strong>6.2 mA</strong>; with the chosen duty cycle and the <strong>480 mAh</strong> cell, this project targets multi-day use between charges, with solar extending runtime.</p>
 
 </div>
 

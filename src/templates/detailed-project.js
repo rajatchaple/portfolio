@@ -55,10 +55,10 @@ const StyledProjectContent = styled.div`
     margin-top: 2rem;
     align-items: flex-start;
     max-width: none !important;
-    width: 100vw !important;
-    margin-left: calc(-50vw + 50%) !important;
+    width: 100%;
+    margin-left: 0;
     margin-right: 0;
-    padding: 0 2rem 0 5rem;
+    padding: 0 2rem;
     box-sizing: border-box;
     padding-top: 2rem;
   }
@@ -157,6 +157,9 @@ const StyledProjectContent = styled.div`
       flex-direction: column;
       gap: 2rem;
       padding: 0 1rem;
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
     }
     
     .project-nav {
@@ -180,6 +183,60 @@ const StyledProjectContent = styled.div`
     
     .nav-list li {
       margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .project-layout {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      overflow-x: hidden;
+      box-sizing: border-box;
+    }
+    
+    .project-nav {
+      width: 100%;
+      max-width: 100%;
+      min-width: auto;
+      position: relative;
+      top: 0;
+      max-height: none;
+      margin: 0;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+    
+    .project-content {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    
+    .nav-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    .nav-list li {
+      margin-bottom: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .nav-link {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      word-wrap: break-word;
     }
   }
 

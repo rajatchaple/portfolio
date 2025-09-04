@@ -305,10 +305,10 @@ main {
   margin-top: 0;
   align-items: flex-start;
   max-width: none !important;
-  width: 100vw !important;
-  margin-left: calc(-50vw + 50%) !important;
+  width: 100%;
+  margin-left: 0;
   margin-right: 0;
-  padding: 2rem 2rem 0 5rem;
+  padding: 2rem 2rem 0 2rem;
   box-sizing: border-box;
   min-height: 100vh;
 }
@@ -450,7 +450,6 @@ nav .nav-link:hover {
   text-decoration: none !important;
   border-bottom: none !important;
 }
-}
 
 .nav-link.active {
   color: #D60545;
@@ -486,7 +485,7 @@ nav .nav-link:hover {
   flex: 1;
   min-width: 0;
   max-width: none !important;
-  width: calc(100vw - 350px) !important;
+  width: auto;
   overflow-x: auto;
   padding-left: 2rem;
 }
@@ -571,11 +570,52 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Global mobile overflow prevention */
+@media (max-width: 768px) {
+  html {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  
+  body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  
+  * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* MOBILE RESPONSIVENESS - Template overrides handled, clean up debug borders */
+@media (max-width: 768px) {
+  /* Force body and html to not overflow */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Additional safety overrides */
+  .layout,
+  .layout > main,
+  main {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
 @media (max-width: 1200px) {
   .project-layout {
     flex-direction: column;
     gap: 2rem;
     padding: 0 1rem;
+    width: 100% !important;
+    margin-left: 0 !important;
   }
   
   .project-nav {
@@ -585,10 +625,12 @@ html {
     top: 0;
     max-height: none;
     margin-bottom: 2rem;
+    margin-left: 0;
   }
   
   .project-content {
     width: 100% !important;
+    padding-left: 0 !important;
   }
   
   .nav-list {
@@ -603,12 +645,46 @@ html {
 }
 
 @media (max-width: 768px) {
+  /* Force overall layout to stay within viewport */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+  
+  .project-header {
+    padding: 1rem !important;
+  }
+  
+  .project-main-title {
+    font-size: 2.5rem !important;
+  }
+  
+  .project-tech-tags {
+    gap: 0.5rem;
+  }
+  
+  .tech-tag {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+  }
+  
   .nav-list {
     grid-template-columns: 1fr;
   }
   
   .project-nav {
-    padding: 1.5rem;
+    padding: 1rem !important;
+    width: 100% !important;
+    min-width: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    overflow: hidden !important;
   }
   
   .nav-title {
@@ -616,8 +692,46 @@ html {
   }
   
   .project-layout {
+    flex-direction: column !important;
     gap: 1.5rem;
-    padding: 0 1rem 0 2rem;
+    padding: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+  
+  .project-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  
+  .content-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Force all child elements to respect container bounds */
+  .project-layout *,
+  .project-nav *,
+  .project-content * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 

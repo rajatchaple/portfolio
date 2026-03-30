@@ -41,6 +41,10 @@ module.exports = {
       name: 'Learn Embedded',
       url: '/#learn-embedded',
     },
+    {
+      name: 'Interview Prep',
+      url: '/interview-prep',
+    },
   ],
 
   colors: {

@@ -67,7 +67,7 @@ const StyledContainer = styled.div`
   margin: 0 80px;
 
   @media (max-width: 768px) {
-    margin: 0 20px;
+    margin: 0;
   }
 `;
 
@@ -76,13 +76,13 @@ const StyledHeader = styled.div`
   border-bottom: 1px solid var(--lightest-navy);
 
   @media (max-width: 768px) {
-    padding: 20px 25px 15px;
+    padding: 16px 16px 12px;
   }
 
   h1 {
     color: var(--lightest-slate);
-    font-size: clamp(28px, 5vw, 42px);
-    margin: 0 0 8px;
+    font-size: clamp(24px, 5vw, 42px);
+    margin: 0 0 6px;
   }
 
   p {
@@ -90,6 +90,10 @@ const StyledHeader = styled.div`
     font-family: var(--font-mono);
     font-size: var(--fz-sm);
     margin: 0;
+
+    @media (max-width: 768px) {
+      font-size: 11px;
+    }
   }
 `;
 
@@ -102,7 +106,8 @@ const StyledToolbar = styled.div`
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
-    padding: 10px 25px;
+    padding: 10px 12px;
+    gap: 8px;
   }
 `;
 
@@ -128,6 +133,8 @@ const StyledSearchInput = styled.input`
 
   @media (max-width: 768px) {
     width: 100%;
+    font-size: 16px;
+    order: -1;
   }
 `;
 
@@ -146,6 +153,11 @@ const StyledToolbarButton = styled.button`
   &:hover {
     color: var(--green);
     border-color: var(--green);
+  }
+
+  @media (max-width: 768px) {
+    padding: 6px 10px;
+    font-size: 11px;
   }
 `;
 
@@ -166,6 +178,8 @@ const StyledStatsBar = styled.div`
     margin-left: 0;
     width: 100%;
     justify-content: space-between;
+    font-size: 11px;
+    gap: 12px;
   }
 `;
 
@@ -207,25 +221,44 @@ const StyledLeftPanel = styled.div`
   }
 
   @media (max-width: 768px) {
-    max-height: ${props => (props.$collapsed ? '50px' : '40vh')};
+    position: relative;
+    max-height: ${props => (props.$collapsed ? '48px' : '60vh')};
     border-right: none;
     border-bottom: 1px solid var(--lightest-navy);
     transition: max-height 0.3s ease;
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: auto;
+    scrollbar-color: var(--slate) rgba(35, 53, 84, 0.3);
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba(35, 53, 84, 0.3);
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--slate);
+      border-radius: 3px;
+    }
   }
 `;
 
 const StyledMobileToggle = styled.button`
   display: none;
   width: 100%;
-  padding: 12px 25px;
+  padding: 12px 16px;
   background: rgba(35, 53, 84, 0.3);
   border: none;
+  border-bottom: 1px solid rgba(35, 53, 84, 0.5);
   color: var(--green);
   font-family: var(--font-mono);
   font-size: 13px;
   cursor: pointer;
   text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 
   @media (max-width: 768px) {
     display: block;
@@ -362,7 +395,7 @@ const StyledRightPanel = styled.div`
   }
 
   @media (max-width: 768px) {
-    padding: 20px 25px;
+    padding: 16px 16px;
   }
 `;
 
@@ -512,12 +545,19 @@ const StyledTextarea = styled.textarea`
   &::placeholder {
     color: var(--dark-slate);
   }
+
+  @media (max-width: 768px) {
+    min-height: 180px;
+    font-size: 16px;
+    padding: 12px;
+  }
 `;
 
 const StyledAnswerActions = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  flex-wrap: wrap;
 `;
 
 const StyledActionButton = styled.button`
@@ -690,6 +730,7 @@ const StyledConfidenceSection = styled.div`
   align-items: center;
   gap: 8px;
   margin-top: 16px;
+  flex-wrap: wrap;
 
   .label {
     font-family: var(--font-mono);
@@ -727,6 +768,7 @@ const StyledTimerDisplay = styled.div`
   background: rgba(35, 53, 84, 0.25);
   border: 1px solid var(--lightest-navy);
   border-radius: var(--border-radius);
+  flex-wrap: wrap;
 
   .time {
     font-family: var(--font-mono);
@@ -742,6 +784,10 @@ const StyledTimerDisplay = styled.div`
     return 'var(--lightest-slate)';
   }};
     min-width: 80px;
+
+    @media (max-width: 768px) {
+      font-size: 22px;
+    }
   }
 
   .timer-controls {
@@ -791,6 +837,11 @@ const StyledReviewBtn = styled.button`
     color: #facc15;
     border-color: #facc15;
   }
+
+  @media (max-width: 768px) {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
 `;
 
 const StyledSketchSection = styled.div`
@@ -803,6 +854,10 @@ const StyledSketchSection = styled.div`
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     touch-action: none;
     cursor: crosshair;
+
+    @media (max-width: 768px) {
+      height: 220px;
+    }
   }
 `;
 

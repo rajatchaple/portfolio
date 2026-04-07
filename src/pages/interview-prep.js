@@ -503,6 +503,235 @@ const StyledReferenceToggle = styled.div`
   }
 `;
 
+const StyledNotesPanel = styled.div`
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--light-slate);
+
+  h2 {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 20px 0 8px;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.15);
+    padding-bottom: 5px;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 16px 0 6px;
+  }
+
+  p {
+    margin: 0 0 10px;
+    color: var(--light-slate);
+  }
+
+  strong {
+    color: var(--lightest-slate);
+    font-weight: 600;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px;
+  }
+
+  ul li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 5px;
+    &:before {
+      content: '▹';
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-size: 12px;
+      top: 1px;
+    }
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: rgba(100, 255, 218, 0.07);
+    border: 1px solid rgba(100, 255, 218, 0.15);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--green);
+  }
+
+  pre {
+    background: rgba(2, 12, 27, 0.7);
+    border: 1px solid var(--lightest-navy);
+    border-radius: var(--border-radius);
+    padding: 14px 16px;
+    margin: 10px 0;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--lightest-slate);
+
+    code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--lightest-slate);
+      font-size: 12px;
+    }
+  }
+
+  .diagram {
+    background: rgba(2, 12, 27, 0.7);
+    border: 1px solid var(--lightest-navy);
+    border-left: 3px solid rgba(100, 255, 218, 0.3);
+    border-radius: var(--border-radius);
+    padding: 14px 16px;
+    margin: 10px 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--lightest-slate);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .note-source {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--slate);
+    margin-bottom: 16px;
+    padding: 6px 10px;
+    background: rgba(35, 53, 84, 0.3);
+    border-radius: var(--border-radius);
+    display: inline-block;
+  }
+`;
+
+// Render inline markdown: **bold**, `code`, plain text
+const renderInline = text => {
+  const parts = [];
+  const re = /(`[^`]+`|\*\*[^*]+\*\*)/g;
+  let last = 0;
+  let match;
+  let k = 0;
+  while ((match = re.exec(text)) !== null) {
+    if (match.index > last) {parts.push(text.slice(last, match.index));}
+    const token = match[0];
+    if (token.startsWith('**')) {
+      parts.push(<strong key={k++}>{token.slice(2, -2)}</strong>);
+    } else {
+      parts.push(<code key={k++}>{token.slice(1, -1)}</code>);
+    }
+    last = match.index + token.length;
+  }
+  if (last < text.length) {parts.push(text.slice(last));}
+  return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts;
+};
+
+// Minimal markdown renderer — supports ##/###, **bold**, `code`, ```blocks```, - lists, blank lines
+const MarkdownBlock = ({ content }) => {
+  const lines = content.split('\n');
+  const elements = [];
+  let i = 0;
+  let key = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Code block (``` or diagram block marked with ```diagram)
+    if (line.trim().startsWith('```')) {
+      const isDiagram = line.trim().startsWith('```diagram');
+      const blockLines = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+        blockLines.push(lines[i]);
+        i++;
+      }
+      i++; // skip closing ```
+      const text = blockLines.join('\n');
+      if (isDiagram) {
+        elements.push(
+          <div key={key++} className="diagram">
+            {text}
+          </div>,
+        );
+      } else {
+        elements.push(
+          <pre key={key++}>
+            <code>{text}</code>
+          </pre>,
+        );
+      }
+      continue;
+    }
+
+    // H2
+    if (line.startsWith('## ')) {
+      elements.push(<h2 key={key++}>{renderInline(line.slice(3))}</h2>);
+      i++;
+      continue;
+    }
+
+    // H3
+    if (line.startsWith('### ')) {
+      elements.push(<h3 key={key++}>{renderInline(line.slice(4))}</h3>);
+      i++;
+      continue;
+    }
+
+    // Unordered list
+    if (line.trim().startsWith('- ')) {
+      const items = [];
+      while (i < lines.length && lines[i].trim().startsWith('- ')) {
+        items.push(<li key={items.length}>{renderInline(lines[i].trim().slice(2))}</li>);
+        i++;
+      }
+      elements.push(<ul key={key++}>{items}</ul>);
+      continue;
+    }
+
+    // Blank line
+    if (line.trim() === '') {
+      i++;
+      continue;
+    }
+
+    // Paragraph
+    const paraLines = [];
+    while (
+      i < lines.length &&
+      lines[i].trim() !== '' &&
+      !lines[i].startsWith('#') &&
+      !lines[i].trim().startsWith('- ') &&
+      !lines[i].trim().startsWith('```')
+    ) {
+      paraLines.push(lines[i]);
+      i++;
+    }
+    if (paraLines.length > 0) {
+      elements.push(<p key={key++}>{renderInline(paraLines.join(' '))}</p>);
+    }
+  }
+
+  return <>{elements}</>;
+};
+
+MarkdownBlock.propTypes = {
+  content: PropTypes.string.isRequired,
+};
+
 const StyledAnswerSection = styled.div`
   h3 {
     font-family: var(--font-mono);
@@ -1468,7 +1697,7 @@ const InterviewPrepPage = ({ location }) => {
         )}
 
         <StyledHeader>
-          <h1>Interview Prep</h1>
+          <h1>Cortex M4F</h1>
           <p>
             Apple Firmware — 60 Q&amp;As across 12 weeks &middot; Write answers from memory for
             retention
@@ -1643,52 +1872,22 @@ const InterviewPrepPage = ({ location }) => {
                 {activeQuestion.readingNotes && activeQuestion.readingNotes.length > 0 && (
                   <StyledReferenceToggle>
                     <button onClick={() => setShowReading(!showReading)}>
-                      {showReading ? '▾ Hide Reading Notes' : '▸ Show Reading Notes'}
+                      {showReading ? '▾ Hide Study Notes' : '▸ Show Study Notes'}
                     </button>
                     {showReading && (
-                      <div className="ref-answer">
-                        {activeQuestion.readingNotes.map((section, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              marginBottom: i < activeQuestion.readingNotes.length - 1 ? 20 : 0,
-                            }}>
+                      <div className="ref-answer" style={{ padding: '20px 20px 12px' }}>
+                        <StyledNotesPanel>
+                          {activeQuestion.readingNotes.map((section, i) => (
                             <div
+                              key={i}
                               style={{
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: 12,
-                                color: 'var(--green)',
-                                marginBottom: 8,
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px',
+                                marginBottom: i < activeQuestion.readingNotes.length - 1 ? 28 : 0,
                               }}>
-                              {section.source}
+                              <div className="note-source">{section.source}</div>
+                              <MarkdownBlock content={section.content} />
                             </div>
-                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                              {section.bullets.map((b, j) => (
-                                <li
-                                  key={j}
-                                  style={{
-                                    position: 'relative',
-                                    paddingLeft: 20,
-                                    marginBottom: 5,
-                                    fontSize: 13,
-                                    lineHeight: 1.6,
-                                  }}>
-                                  <span
-                                    style={{
-                                      position: 'absolute',
-                                      left: 0,
-                                      color: 'var(--green)',
-                                    }}>
-                                    ▹
-                                  </span>
-                                  {b}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
+                          ))}
+                        </StyledNotesPanel>
                       </div>
                     )}
                   </StyledReferenceToggle>

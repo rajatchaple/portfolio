@@ -42,7 +42,7 @@ module.exports = {
       url: '/#learn-embedded',
     },
     {
-      name: 'Interview Prep',
+      name: 'Cortex M4F',
       url: '/interview-prep',
     },
   ],

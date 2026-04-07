@@ -1099,6 +1099,7 @@ const InterviewPrepPage = ({ location }) => {
   const [expandedWeeks, setExpandedWeeks] = useState({});
   const [currentDraft, setCurrentDraft] = useState('');
   const [showReference, setShowReference] = useState(false);
+  const [showReading, setShowReading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [leftCollapsed, setLeftCollapsed] = useState(true);
@@ -1248,6 +1249,7 @@ const InterviewPrepPage = ({ location }) => {
   const handleSelectQuestion = useCallback(q => {
     setActiveQ(q.id);
     setShowReference(false);
+    setShowReading(false);
     setSaved(false);
     // Load existing answer or empty
     setCurrentDraft(() => {
@@ -1637,6 +1639,60 @@ const InterviewPrepPage = ({ location }) => {
                     ))}
                   </ul>
                 </StyledReadingSection>
+
+                {activeQuestion.readingNotes && activeQuestion.readingNotes.length > 0 && (
+                  <StyledReferenceToggle>
+                    <button onClick={() => setShowReading(!showReading)}>
+                      {showReading ? '▾ Hide Reading Notes' : '▸ Show Reading Notes'}
+                    </button>
+                    {showReading && (
+                      <div className="ref-answer">
+                        {activeQuestion.readingNotes.map((section, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              marginBottom: i < activeQuestion.readingNotes.length - 1 ? 20 : 0,
+                            }}>
+                            <div
+                              style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: 12,
+                                color: 'var(--green)',
+                                marginBottom: 8,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
+                              }}>
+                              {section.source}
+                            </div>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                              {section.bullets.map((b, j) => (
+                                <li
+                                  key={j}
+                                  style={{
+                                    position: 'relative',
+                                    paddingLeft: 20,
+                                    marginBottom: 5,
+                                    fontSize: 13,
+                                    lineHeight: 1.6,
+                                  }}>
+                                  <span
+                                    style={{
+                                      position: 'absolute',
+                                      left: 0,
+                                      color: 'var(--green)',
+                                    }}>
+                                    ▹
+                                  </span>
+                                  {b}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </StyledReferenceToggle>
+                )}
 
                 <StyledAnswerSection $saved={saved}>
                   <h3>

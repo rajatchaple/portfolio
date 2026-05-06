@@ -161,8 +161,18 @@ const StyledToolbarButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    padding: 6px 10px;
-    font-size: 11px;
+    padding: 10px 14px;
+    font-size: 12px;
+    min-height: 40px;
+  }
+`;
+
+// Hide power-user controls (Export/Import/Cloud) on mobile — desktop-only flows
+const StyledDesktopOnly = styled.span`
+  display: contents;
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -360,14 +370,14 @@ const StyledQuestionItem = styled.button`
     margin-right: 8px;
     flex-shrink: 0;
     background: ${props => {
-    if (props.$status === 'answered') {
-      return '#4ade80';
-    }
-    if (props.$status === 'partial') {
-      return '#facc15';
-    }
-    return 'var(--dark-slate)';
-  }};
+      if (props.$status === 'answered') {
+        return '#4ade80';
+      }
+      if (props.$status === 'partial') {
+        return '#facc15';
+      }
+      return 'var(--dark-slate)';
+    }};
   }
 
   .q-text {
@@ -813,7 +823,7 @@ const StyledActionButton = styled.button`
   &:hover {
     opacity: 0.85;
     ${props =>
-    !props.$primary &&
+      !props.$primary &&
       `
       border-color: var(--green);
       color: var(--green);
@@ -858,7 +868,7 @@ const StyledSyncStatus = styled.div`
     border-radius: 50%;
     background: currentColor;
     ${props =>
-    props.$status === 'syncing' &&
+      props.$status === 'syncing' &&
       `
       animation: pulse 1s infinite;
     `}
@@ -995,6 +1005,13 @@ const StyledConfidenceBtn = styled.button`
     background: ${props => props.$color};
     color: #000;
   }
+
+  @media (max-width: 768px) {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-height: 40px;
+    flex: 1;
+  }
 `;
 
 const StyledTimerDisplay = styled.div`
@@ -1013,14 +1030,14 @@ const StyledTimerDisplay = styled.div`
     font-size: 28px;
     font-weight: 600;
     color: ${props => {
-    if (props.$seconds <= 30) {
-      return '#f87171';
-    }
-    if (props.$seconds <= 60) {
-      return '#facc15';
-    }
-    return 'var(--lightest-slate)';
-  }};
+      if (props.$seconds <= 30) {
+        return '#f87171';
+      }
+      if (props.$seconds <= 60) {
+        return '#facc15';
+      }
+      return 'var(--lightest-slate)';
+    }};
     min-width: 80px;
 
     @media (max-width: 768px) {
@@ -1114,6 +1131,13 @@ const StyledTierBtn = styled.button`
   &:hover {
     background: ${props => props.$color || 'transparent'};
     color: ${props => (props.$color ? '#000' : 'var(--green)')};
+  }
+
+  @media (max-width: 768px) {
+    padding: 10px 14px;
+    font-size: 13px;
+    min-height: 40px;
+    min-width: 44px;
   }
 `;
 
@@ -1227,19 +1251,35 @@ const StyledPracticalSection = styled.div`
     background: transparent;
     border: 1px solid var(--lightest-navy);
     border-radius: 3px;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     margin-right: 8px;
     cursor: pointer;
     color: var(--green);
     font-family: var(--font-mono);
     font-size: 11px;
-    line-height: 14px;
+    line-height: 16px;
     padding: 0;
     vertical-align: middle;
+    flex-shrink: 0;
 
     &:hover {
       border-color: var(--green);
+    }
+
+    @media (max-width: 768px) {
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      line-height: 26px;
+    }
+  }
+
+  ol li {
+    @media (max-width: 768px) {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
     }
   }
 
@@ -1300,6 +1340,21 @@ const StyledQuickHeader = styled.div`
     align-items: center;
     flex-wrap: wrap;
   }
+
+  @media (max-width: 768px) {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+
+    .progress {
+      flex: 1 0 100%;
+      font-size: 11px;
+    }
+
+    .right {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
 `;
 
 const StyledQuickCard = styled.div`
@@ -1358,6 +1413,13 @@ const StyledQuickCard = styled.div`
     padding: 14px 32px;
     cursor: pointer;
     margin-bottom: 24px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 18px 24px;
+      font-size: 15px;
+      min-height: 52px;
+    }
   }
 
   .rate {
@@ -1365,6 +1427,12 @@ const StyledQuickCard = styled.div`
     gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
+    width: 100%;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 10px;
+    }
   }
 
   .rate button {
@@ -1374,10 +1442,17 @@ const StyledQuickCard = styled.div`
     color: var(--slate);
     font-family: var(--font-mono);
     font-size: 13px;
-    padding: 10px 20px;
+    padding: 12px 20px;
     cursor: pointer;
     transition: var(--transition);
     min-width: 110px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 15px;
+      min-height: 50px;
+    }
   }
 
   .rate .knew:hover {
@@ -1426,17 +1501,17 @@ const StyledMCQOption = styled.button`
   }};
   border: 1px solid
     ${props => {
-    if (props.$revealed && props.$isCorrect) {
-      return '#4ade80';
-    }
-    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
-      return '#f87171';
-    }
-    if (props.$isSelected) {
-      return 'var(--green)';
-    }
-    return 'var(--lightest-navy)';
-  }};
+      if (props.$revealed && props.$isCorrect) {
+        return '#4ade80';
+      }
+      if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+        return '#f87171';
+      }
+      if (props.$isSelected) {
+        return 'var(--green)';
+      }
+      return 'var(--lightest-navy)';
+    }};
   border-radius: var(--border-radius);
   color: var(--lightest-slate);
   font-family: var(--font-sans);
@@ -1450,7 +1525,7 @@ const StyledMCQOption = styled.button`
 
   &:hover {
     ${props =>
-    !props.$revealed &&
+      !props.$revealed &&
       `
       border-color: var(--green);
       background: rgba(100, 255, 218, 0.05);
@@ -1492,6 +1567,12 @@ const StyledModeToggle = styled.div`
 
     &:hover:not(.active) {
       color: var(--green);
+    }
+
+    @media (max-width: 768px) {
+      padding: 10px 18px;
+      font-size: 13px;
+      min-height: 40px;
     }
   }
 `;
@@ -2111,35 +2192,35 @@ const InterviewPrepPage = ({ location }) => {
   // Filtered data (review mode shows only stale/low-confidence questions)
   const baseData = reviewMode
     ? interviewPrepData
-      .map(week => ({
-        ...week,
-        questions: week.questions.filter(
-          q => isStale(q.id) || !confidence[q.id] || confidence[q.id] <= 1,
-        ),
-      }))
-      .filter(week => week.questions.length > 0)
+        .map(week => ({
+          ...week,
+          questions: week.questions.filter(
+            q => isStale(q.id) || !confidence[q.id] || confidence[q.id] <= 1,
+          ),
+        }))
+        .filter(week => week.questions.length > 0)
     : interviewPrepData;
 
   const tierFilteredData = tierFilter
     ? baseData
-      .map(week => ({
-        ...week,
-        questions: week.questions.filter(q => tiers[q.id] === tierFilter),
-      }))
-      .filter(week => week.questions.length > 0)
+        .map(week => ({
+          ...week,
+          questions: week.questions.filter(q => tiers[q.id] === tierFilter),
+        }))
+        .filter(week => week.questions.length > 0)
     : baseData;
 
   const filteredData = searchTerm
     ? tierFilteredData
-      .map(week => ({
-        ...week,
-        questions: week.questions.filter(
-          q =>
-            q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        .map(week => ({
+          ...week,
+          questions: week.questions.filter(
+            q =>
+              q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
               q.topic.toLowerCase().includes(searchTerm.toLowerCase()),
-        ),
-      }))
-      .filter(week => week.questions.length > 0)
+          ),
+        }))
+        .filter(week => week.questions.length > 0)
     : tierFilteredData;
 
   // Per-tier progress: # answered ≥ 80 chars / # in tier
@@ -2291,6 +2372,33 @@ const InterviewPrepPage = ({ location }) => {
     setMcqSelected(null);
     setSessionStats({ knew: 0, didnt: 0 });
   }, [buildDeck, quickFormat]);
+
+  // Wake Lock during Quick Mode — keeps screen on while flipping cards on a phone
+  useEffect(() => {
+    if (!quickMode || typeof navigator === 'undefined' || !('wakeLock' in navigator)) {
+      return undefined;
+    }
+    let lock = null;
+    let cancelled = false;
+    navigator.wakeLock
+      .request('screen')
+      .then(w => {
+        if (cancelled) {
+          w.release().catch(() => {});
+        } else {
+          lock = w;
+        }
+      })
+      .catch(() => {
+        /* User denied or unsupported — fall back silently */
+      });
+    return () => {
+      cancelled = true;
+      if (lock) {
+        lock.release().catch(() => {});
+      }
+    };
+  }, [quickMode]);
 
   // Timer countdown
   useEffect(() => {
@@ -2497,33 +2605,35 @@ const InterviewPrepPage = ({ location }) => {
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
-          <StyledToolbarButton onClick={handleExport}>Export</StyledToolbarButton>
-          <StyledToolbarButton onClick={() => fileInputRef.current?.click()}>
-            Import
-          </StyledToolbarButton>
-          <HiddenInput ref={fileInputRef} type="file" accept=".json" onChange={handleImport} />
-
-          {/* Cloud sync controls */}
-          {pin ? (
-            <>
-              <StyledToolbarButton onClick={handleManualSync}>Sync Now</StyledToolbarButton>
-              <StyledToolbarButton onClick={handleDisconnect}>Disconnect</StyledToolbarButton>
-              <StyledSyncStatus $status={syncStatus}>
-                <span className="sync-dot" />
-                {syncStatus === 'syncing' && 'Syncing...'}
-                {syncStatus === 'synced' && 'Synced'}
-                {syncStatus === 'error' && 'Sync failed'}
-                {syncStatus === 'idle' &&
-                  (lastSynced
-                    ? `Last: ${new Date(lastSynced).toLocaleTimeString()}`
-                    : 'Cloud connected')}
-              </StyledSyncStatus>
-            </>
-          ) : (
-            <StyledToolbarButton onClick={() => setShowPinModal(true)}>
-              ☁ Connect Cloud
+          <StyledDesktopOnly>
+            <StyledToolbarButton onClick={handleExport}>Export</StyledToolbarButton>
+            <StyledToolbarButton onClick={() => fileInputRef.current?.click()}>
+              Import
             </StyledToolbarButton>
-          )}
+            <HiddenInput ref={fileInputRef} type="file" accept=".json" onChange={handleImport} />
+
+            {/* Cloud sync controls — power-user, desktop only */}
+            {pin ? (
+              <>
+                <StyledToolbarButton onClick={handleManualSync}>Sync Now</StyledToolbarButton>
+                <StyledToolbarButton onClick={handleDisconnect}>Disconnect</StyledToolbarButton>
+                <StyledSyncStatus $status={syncStatus}>
+                  <span className="sync-dot" />
+                  {syncStatus === 'syncing' && 'Syncing...'}
+                  {syncStatus === 'synced' && 'Synced'}
+                  {syncStatus === 'error' && 'Sync failed'}
+                  {syncStatus === 'idle' &&
+                    (lastSynced
+                      ? `Last: ${new Date(lastSynced).toLocaleTimeString()}`
+                      : 'Cloud connected')}
+                </StyledSyncStatus>
+              </>
+            ) : (
+              <StyledToolbarButton onClick={() => setShowPinModal(true)}>
+                ☁ Connect Cloud
+              </StyledToolbarButton>
+            )}
+          </StyledDesktopOnly>
 
           <StyledToolbarButton
             onClick={() => {

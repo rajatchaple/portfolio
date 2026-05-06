@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Layout } from '@components';
 import interviewPrepData from '../data/interviewPrepData';
+import { tiers, tierMeta, practical } from '../data/interviewPrepTiers';
+import { mcq } from '../data/interviewPrepFlashcards';
 import { getSavedPin, savePin, clearPin, pushToCloud, pullFromCloud } from '@utils/firebase';
 
 // localStorage helpers
@@ -35,6 +37,9 @@ const saveAnswers = answers => {
 const CONFIDENCE_KEY = 'interview-prep-confidence';
 const REVIEWED_KEY = 'interview-prep-last-reviewed';
 const SKETCH_KEY = 'interview-prep-sketches';
+const PRACTICAL_KEY = 'interview-prep-practical-done';
+const SAVE_LOG_KEY = 'interview-prep-save-log';
+const FLASHCARD_KEY = 'interview-prep-flashcard-stats';
 
 const loadFromStorage = key => {
   if (typeof window === 'undefined') {
@@ -627,7 +632,9 @@ const renderInline = text => {
   let match;
   let k = 0;
   while ((match = re.exec(text)) !== null) {
-    if (match.index > last) {parts.push(text.slice(last, match.index));}
+    if (match.index > last) {
+      parts.push(text.slice(last, match.index));
+    }
     const token = match[0];
     if (token.startsWith('**')) {
       parts.push(<strong key={k++}>{token.slice(2, -2)}</strong>);
@@ -636,7 +643,9 @@ const renderInline = text => {
     }
     last = match.index + token.length;
   }
-  if (last < text.length) {parts.push(text.slice(last));}
+  if (last < text.length) {
+    parts.push(text.slice(last));
+  }
   return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts;
 };
 
@@ -1073,6 +1082,491 @@ const StyledReviewBtn = styled.button`
   }
 `;
 
+const StyledTierFilterBar = styled.div`
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+  }
+`;
+
+const StyledTierBtn = styled.button`
+  background: ${props => (props.$active ? props.$color : 'transparent')};
+  color: ${props => (props.$active ? '#000' : props.$color || 'var(--slate)')};
+  border: 1px solid ${props => props.$color || 'var(--lightest-navy)'};
+  border-radius: var(--border-radius);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: ${props => (props.$active ? 600 : 400)};
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+
+  &:hover {
+    background: ${props => props.$color || 'transparent'};
+    color: ${props => (props.$color ? '#000' : 'var(--green)')};
+  }
+`;
+
+const StyledTierBadge = styled.span`
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  margin-right: 6px;
+  border-radius: 3px;
+  background: ${props => props.$color};
+  color: #000;
+  vertical-align: middle;
+`;
+
+const StyledTierProgress = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: rgba(35, 53, 84, 0.2);
+  border: 1px solid var(--lightest-navy);
+  border-radius: var(--border-radius);
+
+  .heading {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--light-slate);
+  }
+
+  .tier-tag {
+    font-weight: 600;
+    min-width: 24px;
+  }
+
+  .name {
+    color: var(--slate);
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(35, 53, 84, 0.5);
+    border-radius: 3px;
+    overflow: hidden;
+    min-width: 80px;
+  }
+
+  .fill {
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+
+  .count {
+    min-width: 50px;
+    text-align: right;
+    color: var(--light-slate);
+  }
+`;
+
+const StyledPracticalSection = styled.div`
+  margin: 24px 0;
+  padding: 16px 18px;
+  background: rgba(100, 255, 218, 0.04);
+  border: 1px solid rgba(100, 255, 218, 0.2);
+  border-radius: var(--border-radius);
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 12px;
+  }
+
+  ol {
+    padding-left: 20px;
+    margin: 0 0 12px;
+    color: var(--light-slate);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  ol li {
+    margin-bottom: 8px;
+  }
+
+  ol li.done {
+    color: var(--dark-slate);
+    text-decoration: line-through;
+  }
+
+  .check {
+    background: transparent;
+    border: 1px solid var(--lightest-navy);
+    border-radius: 3px;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: var(--green);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 14px;
+    padding: 0;
+    vertical-align: middle;
+
+    &:hover {
+      border-color: var(--green);
+    }
+  }
+
+  .drill {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: rgba(250, 204, 21, 0.07);
+    border-left: 3px solid #facc15;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: 13px;
+    color: var(--light-slate);
+    line-height: 1.6;
+
+    .drill-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #facc15;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 6px;
+    }
+  }
+`;
+
+const StyledQuickOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 12, 27, 0.97);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+
+  @media (max-width: 768px) {
+    padding: 12px;
+  }
+`;
+
+const StyledQuickHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--lightest-navy);
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  .progress {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--slate);
+  }
+
+  .right {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+`;
+
+const StyledQuickCard = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 16px 4px;
+  }
+
+  .topic {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+
+  .question {
+    color: var(--lightest-slate);
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 600;
+    line-height: 1.45;
+    margin-bottom: 32px;
+  }
+
+  .answer {
+    color: var(--light-slate);
+    font-size: clamp(15px, 2.2vw, 18px);
+    line-height: 1.7;
+    padding: 20px 24px;
+    background: rgba(35, 53, 84, 0.3);
+    border-left: 3px solid var(--green);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .reveal {
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: var(--border-radius);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 14px 32px;
+    cursor: pointer;
+    margin-bottom: 24px;
+  }
+
+  .rate {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .rate button {
+    background: transparent;
+    border: 1px solid var(--lightest-navy);
+    border-radius: var(--border-radius);
+    color: var(--slate);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 110px;
+  }
+
+  .rate .knew:hover {
+    border-color: #4ade80;
+    color: #4ade80;
+  }
+
+  .rate .didnt:hover {
+    border-color: #f87171;
+    color: #f87171;
+  }
+
+  .explanation {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: rgba(100, 255, 218, 0.05);
+    border-left: 3px solid var(--green);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    text-align: left;
+    color: var(--light-slate);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+`;
+
+const StyledMCQOptions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+`;
+
+const StyledMCQOption = styled.button`
+  background: ${props => {
+    if (props.$revealed && props.$isCorrect) {
+      return 'rgba(74, 222, 128, 0.15)';
+    }
+    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+      return 'rgba(248, 113, 113, 0.15)';
+    }
+    if (props.$isSelected) {
+      return 'rgba(100, 255, 218, 0.08)';
+    }
+    return 'transparent';
+  }};
+  border: 1px solid
+    ${props => {
+    if (props.$revealed && props.$isCorrect) {
+      return '#4ade80';
+    }
+    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+      return '#f87171';
+    }
+    if (props.$isSelected) {
+      return 'var(--green)';
+    }
+    return 'var(--lightest-navy)';
+  }};
+  border-radius: var(--border-radius);
+  color: var(--lightest-slate);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: left;
+  padding: 14px 18px;
+  cursor: ${props => (props.$revealed ? 'default' : 'pointer')};
+  transition: var(--transition);
+  width: 100%;
+
+  &:hover {
+    ${props =>
+    !props.$revealed &&
+      `
+      border-color: var(--green);
+      background: rgba(100, 255, 218, 0.05);
+    `}
+  }
+
+  .letter {
+    display: inline-block;
+    width: 22px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green);
+    font-weight: 600;
+    margin-right: 8px;
+  }
+`;
+
+const StyledModeToggle = styled.div`
+  display: inline-flex;
+  border: 1px solid var(--lightest-navy);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 11px;
+
+  button {
+    background: transparent;
+    border: none;
+    color: var(--slate);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: var(--transition);
+
+    &.active {
+      background: var(--green);
+      color: #000;
+      font-weight: 600;
+    }
+
+    &:hover:not(.active) {
+      color: var(--green);
+    }
+  }
+`;
+
+const StyledHardwareGuide = styled.div`
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  background: rgba(35, 53, 84, 0.2);
+  border: 1px solid var(--lightest-navy);
+  border-radius: var(--border-radius);
+
+  > .title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  > .sub {
+    font-size: 12px;
+    color: var(--slate);
+    margin-bottom: 12px;
+  }
+
+  details {
+    margin-bottom: 8px;
+    border-left: 2px solid rgba(35, 53, 84, 0.6);
+    padding-left: 12px;
+  }
+
+  details[open] {
+    border-left-color: var(--green);
+  }
+
+  summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--light-slate);
+    padding: 4px 0;
+
+    &:hover {
+      color: var(--green);
+    }
+  }
+
+  details p {
+    font-size: 13px;
+    color: var(--light-slate);
+    line-height: 1.6;
+    margin: 6px 0;
+  }
+
+  details code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: rgba(100, 255, 218, 0.07);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--green);
+  }
+`;
+
+const StyledStreakChip = styled.div`
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: ${props => (props.$active ? '#4ade80' : 'var(--slate)')};
+  padding: 5px 10px;
+  border: 1px solid ${props => (props.$active ? '#4ade80' : 'var(--lightest-navy)')};
+  border-radius: var(--border-radius);
+  white-space: nowrap;
+`;
+
 const StyledSketchSection = styled.div`
   margin-top: 28px;
 
@@ -1341,6 +1835,21 @@ const InterviewPrepPage = ({ location }) => {
   const [timerVisible, setTimerVisible] = useState(false);
   const [reviewMode, setReviewMode] = useState(false);
 
+  // Tier filter & practical task tracking
+  const [tierFilter, setTierFilter] = useState(null);
+  const [practicalDone, setPracticalDone] = useState({});
+  const [saveLog, setSaveLog] = useState([]);
+
+  // Quick Mode (flashcards / MCQ)
+  const [quickMode, setQuickMode] = useState(false);
+  const [quickFormat, setQuickFormat] = useState('flip'); // 'flip' | 'mcq'
+  const [deck, setDeck] = useState([]);
+  const [cardIdx, setCardIdx] = useState(0);
+  const [cardFlipped, setCardFlipped] = useState(false);
+  const [mcqSelected, setMcqSelected] = useState(null);
+  const [sessionStats, setSessionStats] = useState({ knew: 0, didnt: 0 });
+  const [flashcardStats, setFlashcardStats] = useState({});
+
   // Cloud sync state
   const [pin, setPin] = useState(null);
   const [showPinModal, setShowPinModal] = useState(false);
@@ -1355,6 +1864,10 @@ const InterviewPrepPage = ({ location }) => {
     setAnswers(loaded);
     setConfidence(loadFromStorage(CONFIDENCE_KEY));
     setLastReviewed(loadFromStorage(REVIEWED_KEY));
+    setPracticalDone(loadFromStorage(PRACTICAL_KEY));
+    const log = loadFromStorage(SAVE_LOG_KEY);
+    setSaveLog(Array.isArray(log) ? log : []);
+    setFlashcardStats(loadFromStorage(FLASHCARD_KEY));
     setExpandedWeeks({ 1: true });
 
     const savedPin = getSavedPin();
@@ -1509,6 +2022,13 @@ const InterviewPrepPage = ({ location }) => {
     cloudPush(updated);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+
+    // Append to save log (keep last 60 entries — enough for streak/heatmap)
+    setSaveLog(prev => {
+      const next = [...prev, new Date().toISOString()].slice(-60);
+      saveToStorage(SAVE_LOG_KEY, next);
+      return next;
+    });
   }, [activeQ, currentDraft, answers, cloudPush]);
 
   const handleDelete = useCallback(() => {
@@ -1600,8 +2120,17 @@ const InterviewPrepPage = ({ location }) => {
       .filter(week => week.questions.length > 0)
     : interviewPrepData;
 
-  const filteredData = searchTerm
+  const tierFilteredData = tierFilter
     ? baseData
+      .map(week => ({
+        ...week,
+        questions: week.questions.filter(q => tiers[q.id] === tierFilter),
+      }))
+      .filter(week => week.questions.length > 0)
+    : baseData;
+
+  const filteredData = searchTerm
+    ? tierFilteredData
       .map(week => ({
         ...week,
         questions: week.questions.filter(
@@ -1611,7 +2140,47 @@ const InterviewPrepPage = ({ location }) => {
         ),
       }))
       .filter(week => week.questions.length > 0)
-    : baseData;
+    : tierFilteredData;
+
+  // Per-tier progress: # answered ≥ 80 chars / # in tier
+  const tierProgress = [1, 2, 3, 4].map(t => {
+    const inTier = allQuestions.filter(q => tiers[q.id] === t);
+    const done = inTier.filter(q => answers[q.id] && answers[q.id].length > 80).length;
+    return { tier: t, total: inTier.length, done };
+  });
+
+  // Flashcard "struggled": shown ≥ 2 with hit rate < 50%
+  const struggledCount = Object.values(flashcardStats).filter(
+    s => s && s.shown >= 2 && s.knew / s.shown < 0.5,
+  ).length;
+
+  // Study streak: count distinct calendar days with a save in the last 14
+  const streakDays = (() => {
+    const days = new Set();
+    saveLog.forEach(iso => {
+      days.add(new Date(iso).toISOString().slice(0, 10));
+    });
+    let streak = 0;
+    for (let i = 0; i < 30; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      if (days.has(d.toISOString().slice(0, 10))) {
+        streak++;
+      } else if (i > 0) {
+        break;
+      }
+    }
+    return streak;
+  })();
+
+  const togglePractical = (qid, idx) => {
+    setPracticalDone(prev => {
+      const key = `${qid}:${idx}`;
+      const updated = { ...prev, [key]: !prev[key] };
+      saveToStorage(PRACTICAL_KEY, updated);
+      return updated;
+    });
+  };
 
   // Keyboard shortcut: Ctrl+S to save
   useEffect(() => {
@@ -1633,6 +2202,95 @@ const InterviewPrepPage = ({ location }) => {
       return updated;
     });
   }, []);
+
+  // Quick Mode: build deck from current tier filter (or all if none) and shuffle
+  const buildDeck = useCallback(
+    format => {
+      let pool = interviewPrepData.flatMap(w => w.questions);
+      if (tierFilter) {
+        pool = pool.filter(q => tiers[q.id] === tierFilter);
+      }
+      if (format === 'mcq') {
+        pool = pool.filter(q => mcq[q.id]);
+      }
+      // Shuffle
+      const shuffled = [...pool];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    },
+    [tierFilter],
+  );
+
+  const startQuickMode = useCallback(
+    format => {
+      const newDeck = buildDeck(format);
+      if (newDeck.length === 0) {
+        alert(
+          format === 'mcq'
+            ? 'No MCQs available for this tier filter — try "All" or T1.'
+            : 'No questions match the current filter.',
+        );
+        return;
+      }
+      setDeck(newDeck);
+      setQuickFormat(format);
+      setCardIdx(0);
+      setCardFlipped(false);
+      setMcqSelected(null);
+      setSessionStats({ knew: 0, didnt: 0 });
+      setQuickMode(true);
+    },
+    [buildDeck],
+  );
+
+  const exitQuickMode = useCallback(() => {
+    setQuickMode(false);
+    setMcqSelected(null);
+    setCardFlipped(false);
+  }, []);
+
+  const rateCard = useCallback(
+    knew => {
+      const card = deck[cardIdx];
+      if (!card) {
+        return;
+      }
+      setFlashcardStats(prev => {
+        const cur = prev[card.id] || { shown: 0, knew: 0 };
+        const updated = {
+          ...prev,
+          [card.id]: { shown: cur.shown + 1, knew: cur.knew + (knew ? 1 : 0) },
+        };
+        saveToStorage(FLASHCARD_KEY, updated);
+        return updated;
+      });
+      setSessionStats(prev => ({
+        knew: prev.knew + (knew ? 1 : 0),
+        didnt: prev.didnt + (knew ? 0 : 1),
+      }));
+      // Auto-advance
+      if (cardIdx + 1 < deck.length) {
+        setCardIdx(cardIdx + 1);
+        setCardFlipped(false);
+        setMcqSelected(null);
+      } else {
+        setCardIdx(deck.length); // sentinel = session done
+      }
+    },
+    [deck, cardIdx],
+  );
+
+  const restartDeck = useCallback(() => {
+    const newDeck = buildDeck(quickFormat);
+    setDeck(newDeck);
+    setCardIdx(0);
+    setCardFlipped(false);
+    setMcqSelected(null);
+    setSessionStats({ knew: 0, didnt: 0 });
+  }, [buildDeck, quickFormat]);
 
   // Timer countdown
   useEffect(() => {
@@ -1696,11 +2354,140 @@ const InterviewPrepPage = ({ location }) => {
           </StyledPinOverlay>
         )}
 
+        {/* Quick Mode overlay (flashcards / MCQ) */}
+        {quickMode && (
+          <StyledQuickOverlay>
+            <StyledQuickHeader>
+              <div className="progress">
+                {cardIdx < deck.length
+                  ? `Card ${cardIdx + 1} of ${deck.length}`
+                  : `Session done · ${sessionStats.knew} knew · ${sessionStats.didnt} missed`}
+                {tierFilter && ` · ${tierMeta[tierFilter].label}`}
+              </div>
+              <div className="right">
+                <StyledModeToggle>
+                  <button
+                    type="button"
+                    className={quickFormat === 'flip' ? 'active' : ''}
+                    onClick={() => quickFormat !== 'flip' && startQuickMode('flip')}>
+                    Flip
+                  </button>
+                  <button
+                    type="button"
+                    className={quickFormat === 'mcq' ? 'active' : ''}
+                    onClick={() => quickFormat !== 'mcq' && startQuickMode('mcq')}>
+                    MCQ
+                  </button>
+                </StyledModeToggle>
+                <StyledToolbarButton onClick={restartDeck}>Reshuffle</StyledToolbarButton>
+                <StyledToolbarButton onClick={exitQuickMode}>✕ Exit</StyledToolbarButton>
+              </div>
+            </StyledQuickHeader>
+
+            <StyledQuickCard>
+              {cardIdx >= deck.length ? (
+                <>
+                  <div className="question">Done — {deck.length} cards reviewed</div>
+                  <div className="answer" style={{ borderLeftColor: '#facc15' }}>
+                    Knew: {sessionStats.knew} · Missed: {sessionStats.didnt}
+                    {sessionStats.didnt > 0 && (
+                      <div style={{ marginTop: 8, fontSize: 13 }}>
+                        Tip: missed cards stay in your stats — review them again later.
+                      </div>
+                    )}
+                  </div>
+                  <button className="reveal" type="button" onClick={restartDeck}>
+                    Restart
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="topic">
+                    {(() => {
+                      const card = deck[cardIdx];
+                      const w = interviewPrepData.find(wk =>
+                        wk.questions.some(q => q.id === card.id),
+                      );
+                      return `Week ${w?.week} · ${card.day} — ${card.topic}`;
+                    })()}
+                  </div>
+
+                  {quickFormat === 'mcq' && mcq[deck[cardIdx].id] ? (
+                    <>
+                      <div className="question">{mcq[deck[cardIdx].id].question}</div>
+                      <StyledMCQOptions>
+                        {mcq[deck[cardIdx].id].options.map((opt, i) => {
+                          const correct = mcq[deck[cardIdx].id].correct;
+                          const revealed = mcqSelected !== null;
+                          return (
+                            <StyledMCQOption
+                              key={i}
+                              type="button"
+                              $isSelected={mcqSelected === i}
+                              $isCorrect={i === correct}
+                              $revealed={revealed}
+                              onClick={() => mcqSelected === null && setMcqSelected(i)}
+                              disabled={revealed}>
+                              <span className="letter">{String.fromCharCode(65 + i)}.</span>
+                              {opt}
+                            </StyledMCQOption>
+                          );
+                        })}
+                      </StyledMCQOptions>
+                      {mcqSelected !== null && (
+                        <>
+                          <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
+                          <div className="rate" style={{ marginTop: 20 }}>
+                            <button
+                              type="button"
+                              className="knew"
+                              onClick={() =>
+                                rateCard(mcqSelected === mcq[deck[cardIdx].id].correct)
+                              }>
+                              {mcqSelected === mcq[deck[cardIdx].id].correct
+                                ? '✓ Correct — Next'
+                                : '✗ Wrong — Next'}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div className="question">{deck[cardIdx].question}</div>
+                      {!cardFlipped ? (
+                        <button
+                          className="reveal"
+                          type="button"
+                          onClick={() => setCardFlipped(true)}>
+                          Tap to reveal answer
+                        </button>
+                      ) : (
+                        <>
+                          <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                          <div className="rate">
+                            <button type="button" className="knew" onClick={() => rateCard(true)}>
+                              ✓ Knew it
+                            </button>
+                            <button type="button" className="didnt" onClick={() => rateCard(false)}>
+                              ✗ Didn&apos;t
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </StyledQuickCard>
+          </StyledQuickOverlay>
+        )}
+
         <StyledHeader>
           <h1>Cortex M4F</h1>
           <p>
-            Apple Firmware — 60 Q&amp;As across 12 weeks &middot; Write answers from memory for
-            retention
+            Apple Firmware prep · Tier 1 first (the 20 that matter) · Hands-on at the desk ·
+            Flashcards/MCQ on the train
           </p>
         </StyledHeader>
 
@@ -1752,6 +2539,38 @@ const InterviewPrepPage = ({ location }) => {
             {reviewMode ? '✕ Exit Review' : `🔄 Review${staleCount > 0 ? ` (${staleCount})` : ''}`}
           </StyledReviewBtn>
 
+          <StyledToolbarButton
+            onClick={() => startQuickMode('flip')}
+            title="Flashcards — for commute / low-focus practice">
+            🃏 Flashcards
+          </StyledToolbarButton>
+          <StyledToolbarButton
+            onClick={() => startQuickMode('mcq')}
+            title="Multiple-choice quiz — Tier 1 only">
+            🎯 MCQ
+          </StyledToolbarButton>
+
+          <StyledTierFilterBar>
+            <span className="label">Focus:</span>
+            <StyledTierBtn $active={tierFilter === null} onClick={() => setTierFilter(null)}>
+              All
+            </StyledTierBtn>
+            {[1, 2, 3, 4].map(t => (
+              <StyledTierBtn
+                key={t}
+                $active={tierFilter === t}
+                $color={tierMeta[t].color}
+                title={tierMeta[t].description}
+                onClick={() => setTierFilter(tierFilter === t ? null : t)}>
+                {tierMeta[t].label}
+              </StyledTierBtn>
+            ))}
+          </StyledTierFilterBar>
+
+          <StyledStreakChip $active={streakDays > 0} title="Consecutive days with a saved answer">
+            🔥 {streakDays}d streak
+          </StyledStreakChip>
+
           <StyledStatsBar>
             <div>
               Answered:{' '}
@@ -1770,6 +2589,14 @@ const InterviewPrepPage = ({ location }) => {
                 Stale:{' '}
                 <span className="count" style={{ color: '#facc15' }}>
                   {staleCount}
+                </span>
+              </div>
+            )}
+            {struggledCount > 0 && (
+              <div>
+                Weak cards:{' '}
+                <span className="count" style={{ color: '#f87171' }}>
+                  {struggledCount}
                 </span>
               </div>
             )}
@@ -1793,23 +2620,31 @@ const InterviewPrepPage = ({ location }) => {
                   <span className="arrow">▸</span>
                 </StyledWeekHeader>
                 <StyledQuestionList $expanded={expandedWeeks[week.week]}>
-                  {week.questions.map(q => (
-                    <StyledQuestionItem
-                      key={q.id}
-                      $active={activeQ === q.id}
-                      $status={getQuestionStatus(q.id)}
-                      onClick={() => handleSelectQuestion(q)}>
-                      <span className="status-dot" />
-                      {confidence[q.id] && (
-                        <span style={{ fontSize: 9, marginRight: 3 }}>
-                          {confidence[q.id] === 3 ? '💪' : confidence[q.id] === 2 ? '😐' : '😟'}
-                        </span>
-                      )}
-                      {isStale(q.id) && <StyledStaleBadge>⟳</StyledStaleBadge>}
-                      <span className="day-label">{q.day}</span>
-                      <span className="q-text">{q.question}</span>
-                    </StyledQuestionItem>
-                  ))}
+                  {week.questions.map(q => {
+                    const t = tiers[q.id];
+                    return (
+                      <StyledQuestionItem
+                        key={q.id}
+                        $active={activeQ === q.id}
+                        $status={getQuestionStatus(q.id)}
+                        onClick={() => handleSelectQuestion(q)}>
+                        <span className="status-dot" />
+                        {t && (
+                          <StyledTierBadge $color={tierMeta[t].color}>
+                            {tierMeta[t].label}
+                          </StyledTierBadge>
+                        )}
+                        {confidence[q.id] && (
+                          <span style={{ fontSize: 9, marginRight: 3 }}>
+                            {confidence[q.id] === 3 ? '💪' : confidence[q.id] === 2 ? '😐' : '😟'}
+                          </span>
+                        )}
+                        {isStale(q.id) && <StyledStaleBadge>⟳</StyledStaleBadge>}
+                        <span className="day-label">{q.day}</span>
+                        <span className="q-text">{q.question}</span>
+                      </StyledQuestionItem>
+                    );
+                  })}
                 </StyledQuestionList>
               </StyledWeekGroup>
             ))}
@@ -1817,13 +2652,83 @@ const InterviewPrepPage = ({ location }) => {
 
           <StyledRightPanel>
             {!activeQuestion ? (
-              <StyledEmptyState>
-                <div className="icon">📝</div>
-                <div>Select a question from the left panel</div>
-                <div style={{ marginTop: 8, fontSize: 12 }}>
-                  Try to answer from memory before revealing the reference
-                </div>
-              </StyledEmptyState>
+              <>
+                <StyledHardwareGuide>
+                  <div className="title">🔧 Hardware setup — what you actually need</div>
+                  <div className="sub">
+                    Most exercises are written portable. Pick the path that matches what you have.
+                  </div>
+                  <details>
+                    <summary>I have an EFR32 board (Thunderboard, WSTK, BG22-EK4108A)</summary>
+                    <p>
+                      Every hands-on maps directly. Use Simplicity Studio + Gecko SDK. CMU, LDMA,
+                      EM2/EM3, NVM3 — all native. <code>SLSTK3402A</code> ($30) and
+                      <code> BG22-EK4108A</code> ($40) are the cheapest with onboard mic + speaker
+                      support.
+                    </p>
+                  </details>
+                  <details>
+                    <summary>
+                      I have any other Cortex-M (STM32 Nucleo, RPi Pico, ESP32-S3, nRF52)
+                    </summary>
+                    <p>
+                      ~85% of exercises work as-is. Concepts are universal: pipeline, NVIC, MPU,
+                      faults, FreeRTOS, DMA, I2S, SPI, I2C. Skip vendor-specific ones (CMU register
+                      names, NVM3, EFR32 EM3 details) — read those instead.
+                    </p>
+                    <p>
+                      <strong>Cheapest pick:</strong> STM32F4 Nucleo (~$15) + a $5 SPH0645 I2S mic.
+                      Covers M4F + FPU + I2S without changing any concept.
+                    </p>
+                  </details>
+                  <details>
+                    <summary>I have no hardware</summary>
+                    <p>
+                      <strong>QEMU</strong> handles M3/M4 well: pipeline behavior, MPU, fault
+                      injection, FreeRTOS bring-up, linker scripts.{' '}
+                      <code>qemu-system-arm -M mps2-an385 </code> is a solid baseline. Renode is
+                      better for multi-peripheral sims (UART, I2C, SPI).
+                    </p>
+                    <p>
+                      Many exercises are pen-and-paper anyway: linker LMA/VMA tracing, CFSR
+                      decoding, BCLK math, stack-frame sketches. Don&apos;t skip these — they mirror
+                      what an interviewer asks on a whiteboard.
+                    </p>
+                  </details>
+                </StyledHardwareGuide>
+
+                <StyledTierProgress>
+                  <div className="heading">Progress by tier — crush T1 first</div>
+                  {tierProgress.map(tp => {
+                    const meta = tierMeta[tp.tier];
+                    const pct = tp.total > 0 ? Math.round((tp.done / tp.total) * 100) : 0;
+                    return (
+                      <div className="row" key={tp.tier}>
+                        <span className="tier-tag" style={{ color: meta.color }}>
+                          {meta.label}
+                        </span>
+                        <span className="name">{meta.name}</span>
+                        <div className="bar">
+                          <div
+                            className="fill"
+                            style={{ width: `${pct}%`, background: meta.color }}
+                          />
+                        </div>
+                        <span className="count">
+                          {tp.done}/{tp.total}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </StyledTierProgress>
+                <StyledEmptyState>
+                  <div className="icon">📝</div>
+                  <div>Select a question from the left panel</div>
+                  <div style={{ marginTop: 8, fontSize: 12 }}>
+                    Use the tier filter — start with T1. Answer from memory, then reveal reference.
+                  </div>
+                </StyledEmptyState>
+              </>
             ) : (
               <StyledQuestionDetail>
                 {timerVisible && (
@@ -1857,6 +2762,14 @@ const InterviewPrepPage = ({ location }) => {
                 <div className="topic-label">
                   Week {interviewPrepData.find(w => w.questions.some(q => q.id === activeQ))?.week}{' '}
                   · {activeQuestion.day} — {activeQuestion.topic}
+                  {tiers[activeQ] && (
+                    <StyledTierBadge
+                      $color={tierMeta[tiers[activeQ]].color}
+                      style={{ marginLeft: 10 }}
+                      title={tierMeta[tiers[activeQ]].description}>
+                      {tierMeta[tiers[activeQ]].label} · {tierMeta[tiers[activeQ]].name}
+                    </StyledTierBadge>
+                  )}
                 </div>
                 <div className="question-text">{activeQuestion.question}</div>
 
@@ -1868,6 +2781,35 @@ const InterviewPrepPage = ({ location }) => {
                     ))}
                   </ul>
                 </StyledReadingSection>
+
+                {practical[activeQ] && (
+                  <StyledPracticalSection>
+                    <h3>🛠 Hands-On — do these, don&apos;t just read</h3>
+                    <ol>
+                      {practical[activeQ].exercises.map((ex, i) => {
+                        const done = practicalDone[`${activeQ}:${i}`];
+                        return (
+                          <li key={i} className={done ? 'done' : ''}>
+                            <button
+                              type="button"
+                              className="check"
+                              onClick={() => togglePractical(activeQ, i)}
+                              aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
+                              {done ? '✓' : ''}
+                            </button>
+                            {ex}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                    {practical[activeQ].drill && (
+                      <div className="drill">
+                        <span className="drill-label">Drill:</span>
+                        {practical[activeQ].drill}
+                      </div>
+                    )}
+                  </StyledPracticalSection>
+                )}
 
                 {activeQuestion.readingNotes && activeQuestion.readingNotes.length > 0 && (
                   <StyledReferenceToggle>

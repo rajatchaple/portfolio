@@ -2486,8 +2486,8 @@ const InterviewPrepPage = ({ location }) => {
         <StyledHeader>
           <h1>Cortex M4F</h1>
           <p>
-            Apple Firmware prep · Tier 1 first (the 20 that matter) · Hands-on at the desk ·
-            Flashcards/MCQ on the train
+            Embedded systems study deck · Tier 1 first · Hands-on at the desk · Flashcards/MCQ on
+            the train
           </p>
         </StyledHeader>
 
@@ -2692,7 +2692,7 @@ const InterviewPrepPage = ({ location }) => {
                     <p>
                       Many exercises are pen-and-paper anyway: linker LMA/VMA tracing, CFSR
                       decoding, BCLK math, stack-frame sketches. Don&apos;t skip these — they mirror
-                      what an interviewer asks on a whiteboard.
+                      what gets asked on a whiteboard.
                     </p>
                   </details>
                 </StyledHardwareGuide>

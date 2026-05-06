@@ -43,7 +43,7 @@ module.exports = {
     },
     {
       name: 'Cortex M4F',
-      url: '/interview-prep',
+      url: '/cortex-m4f',
     },
   ],
 

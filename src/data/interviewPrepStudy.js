@@ -26,6 +26,33 @@ export const isWeekend = isoDate => {
   return wd === 0 || wd === 6;
 };
 
+// Default study start date:
+//   weekday → today (just start)
+//   weekend → upcoming Monday (treat the weekend as buffer pre-start)
+export const computeDefaultStart = today => {
+  const [y, m, d] = today.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  const dow = dt.getDay(); // 0=Sun..6=Sat
+  if (dow >= 1 && dow <= 5) {
+    return today;
+  }
+  const daysUntilMon = dow === 0 ? 1 : 2;
+  dt.setDate(dt.getDate() + daysUntilMon);
+  return dateKey(dt);
+};
+
+// Earliest activity in dayLog, or null
+export const earliestActivityDate = dayLog => {
+  const days = Object.keys(dayLog).filter(k => {
+    const log = dayLog[k];
+    return log && (log.answered > 0 || (log.practicalsDone || []).length > 0);
+  });
+  if (days.length === 0) {
+    return null;
+  }
+  return days.sort()[0];
+};
+
 const SR_INTERVALS = [1, 1, 3, 7, 14, 30];
 export const NEW_CARDS_PER_DAY = 3;
 export const MAX_REVIEW_CARDS = 10;
@@ -47,10 +74,22 @@ export const advance = (cur, gotItRight, today = dateKey()) => {
 };
 
 // Build today's plan: which new cards to introduce, which to review, which practicals.
-//   options.forceNew: include new cards even on weekend (user override)
+//   options.forceNew: include new cards even on weekend / pre-start (user override)
+//   options.startDate: if set and today < startDate, return empty plan unless forceNew
 // Sequential: new cards always come from source order (w1d1, w1d2, ... w12d5).
 // Tier is a label, not a sort key — that way you can't accidentally skip topics.
 export const buildDailyPlan = (today, studyState, options = {}) => {
+  const { startDate, forceNew } = options;
+  const isPreStart = startDate && today < startDate;
+  if (isPreStart && !forceNew) {
+    return {
+      isWeekend: isWeekend(today),
+      isPreStart: true,
+      newIds: [],
+      reviewIds: [],
+      practicalIds: [],
+    };
+  }
   const allQuestions = interviewPrepData.flatMap(w => w.questions);
   const idIndex = {};
   allQuestions.forEach((q, i) => {
@@ -68,7 +107,7 @@ export const buildDailyPlan = (today, studyState, options = {}) => {
     .slice(0, MAX_REVIEW_CARDS);
 
   const hasNeverStudied = Object.keys(studyState).length === 0;
-  const allowNew = !isWeekend(today) || hasNeverStudied || options.forceNew;
+  const allowNew = !isWeekend(today) || hasNeverStudied || forceNew;
 
   if (!allowNew) {
     return { isWeekend: true, newIds: [], reviewIds, practicalIds: [] };
@@ -122,7 +161,8 @@ const sameWeekWeekendActive = (cursor, dayLog) => {
 // Today is allowed pending without breaking the streak.
 // Weekends never count toward the streak directly, but weekend activity
 // "absorbs" up to one missed weekday in the same calendar week.
-export const computeStreak = (today, dayLog) => {
+// If startDate is provided, the walk stops there — pre-start days don't count as missed.
+export const computeStreak = (today, dayLog, startDate = null) => {
   const [yT, mT, dT] = today.split('-').map(Number);
   const cursor = new Date(yT, mT - 1, dT);
   let streak = 0;
@@ -138,6 +178,9 @@ export const computeStreak = (today, dayLog) => {
 
   for (let i = 0; i < 200; i++) {
     const k = dateKey(cursor);
+    if (startDate && k < startDate) {
+      break; // pre-start: don't count earlier days as missed
+    }
     const log = dayLog[k];
     const did = !!(log && (log.answered > 0 || (log.practicalsDone || []).length > 0));
 
@@ -165,7 +208,7 @@ export const computeStreak = (today, dayLog) => {
 };
 
 // Mon..Sun grid for the current week
-export const buildWeekGrid = (today, dayLog) => {
+export const buildWeekGrid = (today, dayLog, startDate = null) => {
   const [yT, mT, dT] = today.split('-').map(Number);
   const todayDate = new Date(yT, mT - 1, dT);
   const dow = todayDate.getDay() || 7; // Mon=1..Sun=7
@@ -184,6 +227,7 @@ export const buildWeekGrid = (today, dayLog) => {
       isWeekend: i >= 5,
       isToday: k === today,
       isFuture: k > today,
+      isPreStart: !!(startDate && k < startDate),
       done: !!(log && (log.answered > 0 || (log.practicalsDone || []).length > 0)),
     };
   });

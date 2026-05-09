@@ -15,6 +15,8 @@ import {
   masteryHistogram,
   reviewBacklog,
   isWeekend as isWeekendDay,
+  computeDefaultStart,
+  earliestActivityDate,
 } from '../data/interviewPrepStudy';
 import { getSavedPin, savePin, clearPin, pushToCloud, pullFromCloud } from '@utils/firebase';
 
@@ -52,6 +54,7 @@ const PRACTICAL_KEY = 'interview-prep-practical-done';
 const FLASHCARD_KEY = 'interview-prep-flashcard-stats';
 const STUDY_STATE_KEY = 'interview-prep-study-state';
 const DAY_LOG_KEY = 'interview-prep-day-log';
+const STUDY_START_KEY = 'interview-prep-study-start';
 
 const loadFromStorage = key => {
   if (typeof window === 'undefined') {
@@ -670,7 +673,7 @@ const StyledActionButton = styled.button`
   &:hover {
     opacity: 0.85;
     ${props =>
-      !props.$primary &&
+    !props.$primary &&
       `
       border-color: var(--green);
       color: var(--green);
@@ -715,7 +718,7 @@ const StyledSyncStatus = styled.div`
     border-radius: 50%;
     background: currentColor;
     ${props =>
-      props.$status === 'syncing' &&
+    props.$status === 'syncing' &&
       `
       animation: pulse 1s infinite;
     `}
@@ -877,14 +880,14 @@ const StyledTimerDisplay = styled.div`
     font-size: 28px;
     font-weight: 600;
     color: ${props => {
-      if (props.$seconds <= 30) {
-        return '#f87171';
-      }
-      if (props.$seconds <= 60) {
-        return '#facc15';
-      }
-      return 'var(--lightest-slate)';
-    }};
+    if (props.$seconds <= 30) {
+      return '#f87171';
+    }
+    if (props.$seconds <= 60) {
+      return '#facc15';
+    }
+    return 'var(--lightest-slate)';
+  }};
     min-width: 80px;
 
     @media (max-width: 768px) {
@@ -1309,17 +1312,17 @@ const StyledMCQOption = styled.button`
   }};
   border: 1px solid
     ${props => {
-      if (props.$revealed && props.$isCorrect) {
-        return '#4ade80';
-      }
-      if (props.$revealed && props.$isSelected && !props.$isCorrect) {
-        return '#f87171';
-      }
-      if (props.$isSelected) {
-        return 'var(--green)';
-      }
-      return 'var(--lightest-navy)';
-    }};
+    if (props.$revealed && props.$isCorrect) {
+      return '#4ade80';
+    }
+    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+      return '#f87171';
+    }
+    if (props.$isSelected) {
+      return 'var(--green)';
+    }
+    return 'var(--lightest-navy)';
+  }};
   border-radius: var(--border-radius);
   color: var(--lightest-slate);
   font-family: var(--font-sans);
@@ -1333,7 +1336,7 @@ const StyledMCQOption = styled.button`
 
   &:hover {
     ${props =>
-      !props.$revealed &&
+    !props.$revealed &&
       `
       border-color: var(--green);
       background: rgba(100, 255, 218, 0.05);
@@ -1710,6 +1713,9 @@ const StyledHeatCell = styled.div`
     if (props.$future) {
       return 'transparent';
     }
+    if (props.$preStart && !props.$count) {
+      return 'rgba(35, 53, 84, 0.2)';
+    }
     const c = props.$count || 0;
     if (c === 0) {
       return 'rgba(35, 53, 84, 0.5)';
@@ -1725,7 +1731,12 @@ const StyledHeatCell = styled.div`
     }
     return '#4ade80';
   }};
-  border: 1px solid ${props => (props.$today ? 'var(--green)' : 'transparent')};
+  border: ${props =>
+    props.$today
+      ? '1px solid var(--green)'
+      : props.$preStart && !props.$count
+        ? '1px dashed rgba(35, 53, 84, 0.6)'
+        : '1px solid transparent'};
   min-width: 0;
 `;
 
@@ -2041,17 +2052,17 @@ const StyledMasteryDot = styled.span`
   }};
   border: 1px solid
     ${props => {
-      if (props.$mastery === 0) {
-        return 'var(--lightest-navy)';
-      }
-      if (props.$mastery <= 2) {
-        return '#f87171';
-      }
-      if (props.$mastery <= 3) {
-        return '#facc15';
-      }
-      return '#4ade80';
-    }};
+    if (props.$mastery === 0) {
+      return 'var(--lightest-navy)';
+    }
+    if (props.$mastery <= 2) {
+      return '#f87171';
+    }
+    if (props.$mastery <= 3) {
+      return '#facc15';
+    }
+    return '#4ade80';
+  }};
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
@@ -2070,8 +2081,8 @@ const StyledSessionPhase = styled.div`
     props.$phase === 'new'
       ? 'var(--green)'
       : props.$phase === 'review'
-      ? '#facc15'
-      : 'var(--slate)'};
+        ? '#facc15'
+        : 'var(--slate)'};
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 8px;
@@ -2360,6 +2371,7 @@ const InterviewPrepPage = ({ location }) => {
   const [studyState, setStudyState] = useState({});
   const [dayLog, setDayLog] = useState({});
   const [today, setToday] = useState(dateKey());
+  const [studyStartDate, setStudyStartDate] = useState(null);
   const [introSeen, setIntroSeen] = useState({}); // qids that have passed intro this session
   const [weekendOverride, setWeekendOverride] = useState(false); // user opted to study new cards on a weekend
 
@@ -2394,9 +2406,30 @@ const InterviewPrepPage = ({ location }) => {
     setLastReviewed(loadFromStorage(REVIEWED_KEY));
     setPracticalDone(loadFromStorage(PRACTICAL_KEY));
     setFlashcardStats(loadFromStorage(FLASHCARD_KEY));
-    setStudyState(loadFromStorage(STUDY_STATE_KEY));
-    setDayLog(loadFromStorage(DAY_LOG_KEY));
-    setToday(dateKey());
+    const loadedStudy = loadFromStorage(STUDY_STATE_KEY);
+    const loadedDayLog = loadFromStorage(DAY_LOG_KEY);
+    setStudyState(loadedStudy);
+    setDayLog(loadedDayLog);
+    const todayStr = dateKey();
+    setToday(todayStr);
+
+    // Init studyStartDate: stored value > earliest dayLog activity > computed default
+    let startStored = null;
+    try {
+      startStored = window.localStorage.getItem(STUDY_START_KEY);
+    } catch (e) {
+      /* ignore */
+    }
+    let resolvedStart = startStored;
+    if (!resolvedStart) {
+      resolvedStart = earliestActivityDate(loadedDayLog) || computeDefaultStart(todayStr);
+      try {
+        window.localStorage.setItem(STUDY_START_KEY, resolvedStart);
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    setStudyStartDate(resolvedStart);
     if (typeof window !== 'undefined') {
       const t = window.localStorage.getItem('interview-prep-active-tab');
       if (t && ['today', 'browse', 'practice', 'progress'].includes(t)) {
@@ -2666,13 +2699,35 @@ const InterviewPrepPage = ({ location }) => {
   }, []);
 
   // Daily plan + streak (memoized via deps)
-  const plan = buildDailyPlan(today, studyState, { forceNew: weekendOverride });
-  const streakDays = computeStreak(today, dayLog);
-  const weekGrid = buildWeekGrid(today, dayLog);
+  const plan = buildDailyPlan(today, studyState, {
+    forceNew: weekendOverride,
+    startDate: studyStartDate,
+  });
+  const streakDays = computeStreak(today, dayLog, studyStartDate);
+  const weekGrid = buildWeekGrid(today, dayLog, studyStartDate);
   const histogram = masteryHistogram(studyState);
   const totalBacklog = reviewBacklog(today, studyState);
   const isWeekendToday = isWeekendDay(today);
   const hasNeverStudied = Object.keys(studyState).length === 0;
+  const isPreStart = !!(studyStartDate && today < studyStartDate);
+
+  const handleStartNow = useCallback(() => {
+    setStudyStartDate(today);
+    try {
+      window.localStorage.setItem(STUDY_START_KEY, today);
+    } catch (e) {
+      /* ignore */
+    }
+  }, [today]);
+
+  const handleSetStartDate = useCallback(date => {
+    setStudyStartDate(date);
+    try {
+      window.localStorage.setItem(STUDY_START_KEY, date);
+    } catch (e) {
+      /* ignore */
+    }
+  }, []);
 
   // Browse-tab flat list with chip filter + search
   const browseList = (() => {
@@ -3053,10 +3108,10 @@ const InterviewPrepPage = ({ location }) => {
                     {quickFormat === 'session' &&
                       sessionStats.didnt === 0 &&
                       sessionStats.knew > 0 && (
-                        <div style={{ marginTop: 8, fontSize: 13 }}>
+                      <div style={{ marginTop: 8, fontSize: 13 }}>
                           Clean run — those cards moved up the mastery ladder.
-                        </div>
-                      )}
+                      </div>
+                    )}
                     {quickFormat !== 'session' && sessionStats.didnt > 0 && (
                       <div style={{ marginTop: 8, fontSize: 13 }}>
                         Tip: missed cards stay in your stats — review them again later.
@@ -3086,157 +3141,157 @@ const InterviewPrepPage = ({ location }) => {
                   {quickFormat === 'session' &&
                   deck[cardIdx]._kind === 'new' &&
                   !introSeen[deck[cardIdx].id] ? (
-                    <>
-                      <StyledSessionPhase $phase="new">
+                      <>
+                        <StyledSessionPhase $phase="new">
                         📚 Learn — first time seeing this
-                      </StyledSessionPhase>
-                      <div className="question">{deck[cardIdx].question}</div>
-                      <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                      {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
-                        <div
-                          style={{
-                            marginBottom: 20,
-                            textAlign: 'left',
-                            width: '100%',
-                            fontSize: 13,
-                            color: 'var(--slate)',
-                            lineHeight: 1.6,
-                          }}>
+                        </StyledSessionPhase>
+                        <div className="question">{deck[cardIdx].question}</div>
+                        <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                        {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
                           <div
                             style={{
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: 11,
-                              textTransform: 'uppercase',
-                              letterSpacing: 0.5,
-                              marginBottom: 6,
+                              marginBottom: 20,
+                              textAlign: 'left',
+                              width: '100%',
+                              fontSize: 13,
+                              color: 'var(--slate)',
+                              lineHeight: 1.6,
                             }}>
+                            <div
+                              style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5,
+                                marginBottom: 6,
+                              }}>
                             Reading material
-                          </div>
-                          {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
-                            <div key={i}>▹ {r}</div>
-                          ))}
-                        </div>
-                      )}
-                      <button
-                        className="reveal"
-                        type="button"
-                        onClick={() =>
-                          setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
-                        }>
-                        Got it — test me
-                      </button>
-                    </>
-                  ) : quickFormat === 'mcq' ||
-                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
-                    mcq[deck[cardIdx].id] ? (
-                      <>
-                        {quickFormat === 'session' && (
-                          <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                            {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                          </StyledSessionPhase>
-                        )}
-                        <div className="question">{mcq[deck[cardIdx].id].question}</div>
-                        <StyledMCQOptions>
-                          {mcq[deck[cardIdx].id].options.map((opt, i) => {
-                            const correct = mcq[deck[cardIdx].id].correct;
-                            const revealed = mcqSelected !== null;
-                            return (
-                              <StyledMCQOption
-                                key={i}
-                                type="button"
-                                $isSelected={mcqSelected === i}
-                                $isCorrect={i === correct}
-                                $revealed={revealed}
-                                onClick={() => mcqSelected === null && setMcqSelected(i)}
-                                disabled={revealed}>
-                                <span className="letter">{String.fromCharCode(65 + i)}.</span>
-                                {opt}
-                              </StyledMCQOption>
-                            );
-                          })}
-                        </StyledMCQOptions>
-                        {mcqSelected !== null && (
-                          <>
-                            <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
-                            <div className="rate" style={{ marginTop: 20 }}>
-                              <button
-                                type="button"
-                                className="knew"
-                                onClick={() => {
-                                  const right = mcqSelected === mcq[deck[cardIdx].id].correct;
-                                  if (quickFormat === 'session') {
-                                    rateSessionCard(right);
-                                  } else {
-                                    rateCard(right);
-                                  }
-                                }}>
-                                {mcqSelected === mcq[deck[cardIdx].id].correct
-                                  ? '✓ Correct — Next'
-                                  : '✗ Wrong — Next'}
-                              </button>
                             </div>
-                          </>
+                            {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
+                              <div key={i}>▹ {r}</div>
+                            ))}
+                          </div>
                         )}
-                      </>
-                    ) : (
-                      <>
-                        <div className="question">No MCQ for this card.</div>
                         <button
                           className="reveal"
                           type="button"
-                          onClick={() => {
-                            if (cardIdx + 1 < deck.length) {
-                              setCardIdx(cardIdx + 1);
-                              setCardFlipped(false);
-                              setMcqSelected(null);
-                            } else {
-                              setCardIdx(deck.length);
-                            }
-                          }}>
+                          onClick={() =>
+                            setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
+                          }>
+                        Got it — test me
+                        </button>
+                      </>
+                    ) : quickFormat === 'mcq' ||
+                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
+                        mcq[deck[cardIdx].id] ? (
+                          <>
+                            {quickFormat === 'session' && (
+                              <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                                {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                              </StyledSessionPhase>
+                            )}
+                            <div className="question">{mcq[deck[cardIdx].id].question}</div>
+                            <StyledMCQOptions>
+                              {mcq[deck[cardIdx].id].options.map((opt, i) => {
+                                const correct = mcq[deck[cardIdx].id].correct;
+                                const revealed = mcqSelected !== null;
+                                return (
+                                  <StyledMCQOption
+                                    key={i}
+                                    type="button"
+                                    $isSelected={mcqSelected === i}
+                                    $isCorrect={i === correct}
+                                    $revealed={revealed}
+                                    onClick={() => mcqSelected === null && setMcqSelected(i)}
+                                    disabled={revealed}>
+                                    <span className="letter">{String.fromCharCode(65 + i)}.</span>
+                                    {opt}
+                                  </StyledMCQOption>
+                                );
+                              })}
+                            </StyledMCQOptions>
+                            {mcqSelected !== null && (
+                              <>
+                                <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
+                                <div className="rate" style={{ marginTop: 20 }}>
+                                  <button
+                                    type="button"
+                                    className="knew"
+                                    onClick={() => {
+                                      const right = mcqSelected === mcq[deck[cardIdx].id].correct;
+                                      if (quickFormat === 'session') {
+                                        rateSessionCard(right);
+                                      } else {
+                                        rateCard(right);
+                                      }
+                                    }}>
+                                    {mcqSelected === mcq[deck[cardIdx].id].correct
+                                      ? '✓ Correct — Next'
+                                      : '✗ Wrong — Next'}
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="question">No MCQ for this card.</div>
+                            <button
+                              className="reveal"
+                              type="button"
+                              onClick={() => {
+                                if (cardIdx + 1 < deck.length) {
+                                  setCardIdx(cardIdx + 1);
+                                  setCardFlipped(false);
+                                  setMcqSelected(null);
+                                } else {
+                                  setCardIdx(deck.length);
+                                }
+                              }}>
                           Skip
-                        </button>
-                      </>
-                    )
-                  ) : (
-                    <>
-                      {quickFormat === 'session' && (
-                        <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                          {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                        </StyledSessionPhase>
-                      )}
-                      <div className="question">{deck[cardIdx].question}</div>
-                      {!cardFlipped ? (
-                        <button
-                          className="reveal"
-                          type="button"
-                          onClick={() => setCardFlipped(true)}>
-                          Tap to reveal answer
-                        </button>
+                            </button>
+                          </>
+                        )
                       ) : (
                         <>
-                          <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                          <div className="rate">
+                          {quickFormat === 'session' && (
+                            <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                              {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                            </StyledSessionPhase>
+                          )}
+                          <div className="question">{deck[cardIdx].question}</div>
+                          {!cardFlipped ? (
                             <button
+                              className="reveal"
                               type="button"
-                              className="knew"
-                              onClick={() =>
-                                quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
-                              }>
+                              onClick={() => setCardFlipped(true)}>
+                          Tap to reveal answer
+                            </button>
+                          ) : (
+                            <>
+                              <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                              <div className="rate">
+                                <button
+                                  type="button"
+                                  className="knew"
+                                  onClick={() =>
+                                    quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
+                                  }>
                               ✓ Knew it
-                            </button>
-                            <button
-                              type="button"
-                              className="didnt"
-                              onClick={() =>
-                                quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
-                              }>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="didnt"
+                                  onClick={() =>
+                                    quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
+                                  }>
                               ✗ Didn&apos;t
-                            </button>
-                          </div>
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </>
                       )}
-                    </>
-                  )}
                 </>
               )}
             </StyledQuickCard>
@@ -3318,13 +3373,22 @@ const InterviewPrepPage = ({ location }) => {
                         d.isToday ? 'today' : '',
                         d.isWeekend ? 'weekend' : '',
                         d.isFuture ? 'future' : '',
+                        d.isPreStart && !d.done ? 'future' : '',
                       ]
                         .filter(Boolean)
                         .join(' ')}
-                      title={d.date}>
+                      title={d.isPreStart ? `${d.date} (pre-start)` : d.date}>
                       <span className="lbl">{d.label}</span>
                       <span className="mark">
-                        {d.done ? '✓' : d.isWeekend ? '–' : d.isToday ? '•' : ' '}
+                        {d.done
+                          ? '✓'
+                          : d.isPreStart
+                            ? '·'
+                            : d.isWeekend
+                              ? '–'
+                              : d.isToday
+                                ? '•'
+                                : ' '}
                       </span>
                     </div>
                   ))}
@@ -3366,7 +3430,35 @@ const InterviewPrepPage = ({ location }) => {
                   </div>
                 )}
 
-                {plan.newIds.length + plan.reviewIds.length > 0 ? (
+                {isPreStart ? (
+                  <>
+                    <div
+                      className="empty-state"
+                      style={{
+                        background: 'rgba(100, 255, 218, 0.05)',
+                        border: '1px solid rgba(100, 255, 218, 0.3)',
+                        borderRadius: 'var(--border-radius)',
+                        padding: '14px 16px',
+                        marginBottom: 14,
+                        textAlign: 'left',
+                        color: 'var(--light-slate)',
+                      }}>
+                      📅 Your prep starts{' '}
+                      <strong style={{ color: 'var(--green)' }}>
+                        {new Date(studyStartDate).toLocaleDateString(undefined, {
+                          weekday: 'long',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </strong>
+                      .<br />
+                      <small>Today is pre-start — no cards are introduced yet.</small>
+                    </div>
+                    <button type="button" className="start-btn" onClick={handleStartNow}>
+                      Start now (don&apos;t wait)
+                    </button>
+                  </>
+                ) : plan.newIds.length + plan.reviewIds.length > 0 ? (
                   <button type="button" className="start-btn" onClick={startDailySession}>
                     Start Session ({plan.newIds.length + plan.reviewIds.length} cards)
                   </button>
@@ -3517,8 +3609,8 @@ const InterviewPrepPage = ({ location }) => {
                                   {confidence[q.id] === 3
                                     ? '💪'
                                     : confidence[q.id] === 2
-                                    ? '😐'
-                                    : '😟'}
+                                      ? '😐'
+                                      : '😟'}
                                 </span>
                               )}
                               {isStale(q.id) && <StyledStaleBadge>⟳ stale</StyledStaleBadge>}
@@ -3819,6 +3911,50 @@ const InterviewPrepPage = ({ location }) => {
           {/* PROGRESS TAB */}
           {activeTab === 'progress' && (
             <div style={{ padding: '24px 50px', maxWidth: 760, margin: '0 auto' }}>
+              {studyStartDate && (
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    marginBottom: 18,
+                    background: 'rgba(35, 53, 84, 0.2)',
+                    border: '1px solid var(--lightest-navy)',
+                    borderRadius: 'var(--border-radius)',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 8,
+                    alignItems: 'center',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 12,
+                    color: 'var(--slate)',
+                  }}>
+                  <span>📅 Prep start date:</span>
+                  <strong style={{ color: 'var(--green)' }}>
+                    {new Date(studyStartDate).toLocaleDateString(undefined, {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </strong>
+                  <input
+                    type="date"
+                    value={studyStartDate}
+                    max={today}
+                    onChange={e => e.target.value && handleSetStartDate(e.target.value)}
+                    style={{
+                      background: 'rgba(2, 12, 27, 0.5)',
+                      border: '1px solid var(--lightest-navy)',
+                      borderRadius: 'var(--border-radius)',
+                      color: 'var(--lightest-slate)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 12,
+                      padding: '4px 8px',
+                      colorScheme: 'dark',
+                    }}
+                  />
+                </div>
+              )}
+
               <StyledHeatmap>
                 <h3>📅 Activity — last 13 weeks</h3>
                 <div className="grid">
@@ -3829,17 +3965,26 @@ const InterviewPrepPage = ({ location }) => {
                   {[0, 1, 2, 3, 4, 5, 6].map(rowIdx => (
                     <React.Fragment key={`row-${rowIdx}`}>
                       <div className="row-lbl">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][rowIdx]}</div>
-                      {heatmapCols.map((col, ci) => (
-                        <StyledHeatCell
-                          key={`cell-${rowIdx}-${ci}`}
-                          $count={col[rowIdx].count}
-                          $today={col[rowIdx].today}
-                          $future={col[rowIdx].future}
-                          title={`${col[rowIdx].date}: ${col[rowIdx].count} ${
-                            col[rowIdx].count === 1 ? 'item' : 'items'
-                          }`}
-                        />
-                      ))}
+                      {heatmapCols.map((col, ci) => {
+                        const cell = col[rowIdx];
+                        const preStart = !!(studyStartDate && cell.date < studyStartDate);
+                        return (
+                          <StyledHeatCell
+                            key={`cell-${rowIdx}-${ci}`}
+                            $count={cell.count}
+                            $today={cell.today}
+                            $future={cell.future}
+                            $preStart={preStart}
+                            title={
+                              preStart && !cell.count
+                                ? `${cell.date}: pre-start`
+                                : `${cell.date}: ${cell.count} ${
+                                  cell.count === 1 ? 'item' : 'items'
+                                }`
+                            }
+                          />
+                        );
+                      })}
                     </React.Fragment>
                   ))}
                 </div>

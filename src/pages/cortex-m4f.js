@@ -5,6 +5,15 @@ import { Layout } from '@components';
 import interviewPrepData from '../data/interviewPrepData';
 import { tiers, tierMeta, practical } from '../data/interviewPrepTiers';
 import { mcq } from '../data/interviewPrepFlashcards';
+import {
+  dateKey,
+  advance,
+  buildDailyPlan,
+  computeStreak,
+  buildWeekGrid,
+  logDayActivity,
+  masteryHistogram,
+} from '../data/interviewPrepStudy';
 import { getSavedPin, savePin, clearPin, pushToCloud, pullFromCloud } from '@utils/firebase';
 
 // localStorage helpers
@@ -38,8 +47,9 @@ const CONFIDENCE_KEY = 'interview-prep-confidence';
 const REVIEWED_KEY = 'interview-prep-last-reviewed';
 const SKETCH_KEY = 'interview-prep-sketches';
 const PRACTICAL_KEY = 'interview-prep-practical-done';
-const SAVE_LOG_KEY = 'interview-prep-save-log';
 const FLASHCARD_KEY = 'interview-prep-flashcard-stats';
+const STUDY_STATE_KEY = 'interview-prep-study-state';
+const DAY_LOG_KEY = 'interview-prep-day-log';
 
 const loadFromStorage = key => {
   if (typeof window === 'undefined') {
@@ -370,14 +380,14 @@ const StyledQuestionItem = styled.button`
     margin-right: 8px;
     flex-shrink: 0;
     background: ${props => {
-      if (props.$status === 'answered') {
-        return '#4ade80';
-      }
-      if (props.$status === 'partial') {
-        return '#facc15';
-      }
-      return 'var(--dark-slate)';
-    }};
+    if (props.$status === 'answered') {
+      return '#4ade80';
+    }
+    if (props.$status === 'partial') {
+      return '#facc15';
+    }
+    return 'var(--dark-slate)';
+  }};
   }
 
   .q-text {
@@ -823,7 +833,7 @@ const StyledActionButton = styled.button`
   &:hover {
     opacity: 0.85;
     ${props =>
-      !props.$primary &&
+    !props.$primary &&
       `
       border-color: var(--green);
       color: var(--green);
@@ -868,7 +878,7 @@ const StyledSyncStatus = styled.div`
     border-radius: 50%;
     background: currentColor;
     ${props =>
-      props.$status === 'syncing' &&
+    props.$status === 'syncing' &&
       `
       animation: pulse 1s infinite;
     `}
@@ -1030,14 +1040,14 @@ const StyledTimerDisplay = styled.div`
     font-size: 28px;
     font-weight: 600;
     color: ${props => {
-      if (props.$seconds <= 30) {
-        return '#f87171';
-      }
-      if (props.$seconds <= 60) {
-        return '#facc15';
-      }
-      return 'var(--lightest-slate)';
-    }};
+    if (props.$seconds <= 30) {
+      return '#f87171';
+    }
+    if (props.$seconds <= 60) {
+      return '#facc15';
+    }
+    return 'var(--lightest-slate)';
+  }};
     min-width: 80px;
 
     @media (max-width: 768px) {
@@ -1501,17 +1511,17 @@ const StyledMCQOption = styled.button`
   }};
   border: 1px solid
     ${props => {
-      if (props.$revealed && props.$isCorrect) {
-        return '#4ade80';
-      }
-      if (props.$revealed && props.$isSelected && !props.$isCorrect) {
-        return '#f87171';
-      }
-      if (props.$isSelected) {
-        return 'var(--green)';
-      }
-      return 'var(--lightest-navy)';
-    }};
+    if (props.$revealed && props.$isCorrect) {
+      return '#4ade80';
+    }
+    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+      return '#f87171';
+    }
+    if (props.$isSelected) {
+      return 'var(--green)';
+    }
+    return 'var(--lightest-navy)';
+  }};
   border-radius: var(--border-radius);
   color: var(--lightest-slate);
   font-family: var(--font-sans);
@@ -1525,7 +1535,7 @@ const StyledMCQOption = styled.button`
 
   &:hover {
     ${props =>
-      !props.$revealed &&
+    !props.$revealed &&
       `
       border-color: var(--green);
       background: rgba(100, 255, 218, 0.05);
@@ -1636,6 +1646,312 @@ const StyledHardwareGuide = styled.div`
     border-radius: 3px;
     color: var(--green);
   }
+`;
+
+const StyledTodayCard = styled.div`
+  padding: 22px 24px;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, rgba(100, 255, 218, 0.08) 0%, rgba(35, 53, 84, 0.4) 100%);
+  border: 1px solid rgba(100, 255, 218, 0.25);
+  border-radius: var(--border-radius);
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+
+  > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  h2 {
+    margin: 0;
+    color: var(--lightest-slate);
+    font-size: 20px;
+    font-family: var(--font-mono);
+
+    @media (max-width: 768px) {
+      font-size: 17px;
+    }
+  }
+
+  .date {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--slate);
+  }
+
+  .week-grid {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+
+    @media (max-width: 768px) {
+      gap: 4px;
+    }
+  }
+
+  .day-cell {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: var(--border-radius);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border: 1px solid var(--lightest-navy);
+    color: var(--slate);
+    min-width: 0;
+
+    .lbl {
+      display: block;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .mark {
+      display: block;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    &.done {
+      background: rgba(74, 222, 128, 0.15);
+      border-color: #4ade80;
+      color: #4ade80;
+    }
+
+    &.today {
+      border-color: var(--green);
+      background: rgba(100, 255, 218, 0.1);
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    &.weekend {
+      opacity: 0.5;
+      border-style: dashed;
+    }
+
+    &.future {
+      opacity: 0.4;
+    }
+  }
+
+  .plan-rows {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .plan-tile {
+    padding: 12px 14px;
+    background: rgba(2, 12, 27, 0.5);
+    border: 1px solid var(--lightest-navy);
+    border-radius: var(--border-radius);
+    text-align: center;
+
+    .icon {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .num {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--green);
+      line-height: 1;
+      margin-bottom: 2px;
+
+      @media (max-width: 768px) {
+        font-size: 18px;
+      }
+    }
+
+    .name {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--slate);
+    }
+  }
+
+  .start-btn {
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: var(--border-radius);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 14px 28px;
+    cursor: pointer;
+    width: 100%;
+    transition: var(--transition);
+    min-height: 50px;
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      background: var(--lightest-navy);
+      color: var(--slate);
+      cursor: not-allowed;
+    }
+  }
+
+  .empty-state {
+    color: var(--slate);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-align: center;
+    padding: 8px 0;
+    line-height: 1.6;
+  }
+
+  .pct {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--slate);
+    margin-top: 8px;
+    text-align: center;
+  }
+`;
+
+const StyledTodayPracticals = styled.div`
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  background: rgba(35, 53, 84, 0.2);
+  border: 1px solid var(--lightest-navy);
+  border-radius: var(--border-radius);
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 12px;
+  }
+
+  .pract-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(35, 53, 84, 0.4);
+    font-size: 13px;
+    color: var(--light-slate);
+    line-height: 1.5;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.done {
+      opacity: 0.55;
+      text-decoration: line-through;
+    }
+  }
+
+  .pract-check {
+    background: transparent;
+    border: 1px solid var(--lightest-navy);
+    border-radius: 3px;
+    width: 22px;
+    height: 22px;
+    color: var(--green);
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 20px;
+    padding: 0;
+    font-size: 13px;
+
+    @media (max-width: 768px) {
+      width: 28px;
+      height: 28px;
+      line-height: 26px;
+    }
+
+    &:hover {
+      border-color: var(--green);
+    }
+  }
+
+  .pract-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-top: 2px;
+  }
+`;
+
+const StyledMasteryDot = styled.span`
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: ${props => {
+    if (props.$mastery === 0) {
+      return 'transparent';
+    }
+    if (props.$mastery <= 2) {
+      return '#f87171';
+    }
+    if (props.$mastery <= 3) {
+      return '#facc15';
+    }
+    return '#4ade80';
+  }};
+  border: 1px solid
+    ${props => {
+    if (props.$mastery === 0) {
+      return 'var(--lightest-navy)';
+    }
+    if (props.$mastery <= 2) {
+      return '#f87171';
+    }
+    if (props.$mastery <= 3) {
+      return '#facc15';
+    }
+    return '#4ade80';
+  }};
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  color: #000;
+  margin-right: 6px;
+  flex-shrink: 0;
+  vertical-align: middle;
+`;
+
+const StyledSessionPhase = styled.div`
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: ${props =>
+    props.$phase === 'new'
+      ? 'var(--green)'
+      : props.$phase === 'review'
+        ? '#facc15'
+        : 'var(--slate)'};
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
 `;
 
 const StyledStreakChip = styled.div`
@@ -1919,17 +2235,22 @@ const InterviewPrepPage = ({ location }) => {
   // Tier filter & practical task tracking
   const [tierFilter, setTierFilter] = useState(null);
   const [practicalDone, setPracticalDone] = useState({});
-  const [saveLog, setSaveLog] = useState([]);
 
   // Quick Mode (flashcards / MCQ)
   const [quickMode, setQuickMode] = useState(false);
-  const [quickFormat, setQuickFormat] = useState('flip'); // 'flip' | 'mcq'
+  const [quickFormat, setQuickFormat] = useState('flip'); // 'flip' | 'mcq' | 'session'
   const [deck, setDeck] = useState([]);
   const [cardIdx, setCardIdx] = useState(0);
   const [cardFlipped, setCardFlipped] = useState(false);
   const [mcqSelected, setMcqSelected] = useState(null);
   const [sessionStats, setSessionStats] = useState({ knew: 0, didnt: 0 });
   const [flashcardStats, setFlashcardStats] = useState({});
+
+  // Daily mission (spaced-repetition study state)
+  const [studyState, setStudyState] = useState({});
+  const [dayLog, setDayLog] = useState({});
+  const [today, setToday] = useState(dateKey());
+  const [introSeen, setIntroSeen] = useState({}); // qids that have passed intro this session
 
   // Cloud sync state
   const [pin, setPin] = useState(null);
@@ -1946,9 +2267,10 @@ const InterviewPrepPage = ({ location }) => {
     setConfidence(loadFromStorage(CONFIDENCE_KEY));
     setLastReviewed(loadFromStorage(REVIEWED_KEY));
     setPracticalDone(loadFromStorage(PRACTICAL_KEY));
-    const log = loadFromStorage(SAVE_LOG_KEY);
-    setSaveLog(Array.isArray(log) ? log : []);
     setFlashcardStats(loadFromStorage(FLASHCARD_KEY));
+    setStudyState(loadFromStorage(STUDY_STATE_KEY));
+    setDayLog(loadFromStorage(DAY_LOG_KEY));
+    setToday(dateKey());
     setExpandedWeeks({ 1: true });
 
     const savedPin = getSavedPin();
@@ -2104,13 +2426,13 @@ const InterviewPrepPage = ({ location }) => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
 
-    // Append to save log (keep last 60 entries — enough for streak/heatmap)
-    setSaveLog(prev => {
-      const next = [...prev, new Date().toISOString()].slice(-60);
-      saveToStorage(SAVE_LOG_KEY, next);
+    // Saving a written answer also counts as study activity for the day
+    setDayLog(prev => {
+      const next = logDayActivity(prev, today, 'card-review', activeQ);
+      saveToStorage(DAY_LOG_KEY, next);
       return next;
     });
-  }, [activeQ, currentDraft, answers, cloudPush]);
+  }, [activeQ, currentDraft, answers, cloudPush, today]);
 
   const handleDelete = useCallback(() => {
     if (!activeQ) {
@@ -2192,35 +2514,35 @@ const InterviewPrepPage = ({ location }) => {
   // Filtered data (review mode shows only stale/low-confidence questions)
   const baseData = reviewMode
     ? interviewPrepData
-        .map(week => ({
-          ...week,
-          questions: week.questions.filter(
-            q => isStale(q.id) || !confidence[q.id] || confidence[q.id] <= 1,
-          ),
-        }))
-        .filter(week => week.questions.length > 0)
+      .map(week => ({
+        ...week,
+        questions: week.questions.filter(
+          q => isStale(q.id) || !confidence[q.id] || confidence[q.id] <= 1,
+        ),
+      }))
+      .filter(week => week.questions.length > 0)
     : interviewPrepData;
 
   const tierFilteredData = tierFilter
     ? baseData
-        .map(week => ({
-          ...week,
-          questions: week.questions.filter(q => tiers[q.id] === tierFilter),
-        }))
-        .filter(week => week.questions.length > 0)
+      .map(week => ({
+        ...week,
+        questions: week.questions.filter(q => tiers[q.id] === tierFilter),
+      }))
+      .filter(week => week.questions.length > 0)
     : baseData;
 
   const filteredData = searchTerm
     ? tierFilteredData
-        .map(week => ({
-          ...week,
-          questions: week.questions.filter(
-            q =>
-              q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      .map(week => ({
+        ...week,
+        questions: week.questions.filter(
+          q =>
+            q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
               q.topic.toLowerCase().includes(searchTerm.toLowerCase()),
-          ),
-        }))
-        .filter(week => week.questions.length > 0)
+        ),
+      }))
+      .filter(week => week.questions.length > 0)
     : tierFilteredData;
 
   // Per-tier progress: # answered ≥ 80 chars / # in tier
@@ -2234,25 +2556,6 @@ const InterviewPrepPage = ({ location }) => {
   const struggledCount = Object.values(flashcardStats).filter(
     s => s && s.shown >= 2 && s.knew / s.shown < 0.5,
   ).length;
-
-  // Study streak: count distinct calendar days with a save in the last 14
-  const streakDays = (() => {
-    const days = new Set();
-    saveLog.forEach(iso => {
-      days.add(new Date(iso).toISOString().slice(0, 10));
-    });
-    let streak = 0;
-    for (let i = 0; i < 30; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      if (days.has(d.toISOString().slice(0, 10))) {
-        streak++;
-      } else if (i > 0) {
-        break;
-      }
-    }
-    return streak;
-  })();
 
   const togglePractical = (qid, idx) => {
     setPracticalDone(prev => {
@@ -2283,6 +2586,90 @@ const InterviewPrepPage = ({ location }) => {
       return updated;
     });
   }, []);
+
+  // Daily plan + streak (memoized via deps)
+  const plan = buildDailyPlan(today, studyState);
+  const streakDays = computeStreak(today, dayLog);
+  const weekGrid = buildWeekGrid(today, dayLog);
+  const histogram = masteryHistogram(studyState);
+
+  // Start a daily session: deck = new cards then review cards
+  const startDailySession = useCallback(() => {
+    const newQs = plan.newIds
+      .map(id => interviewPrepData.flatMap(w => w.questions).find(q => q.id === id))
+      .filter(Boolean);
+    const reviewQs = plan.reviewIds
+      .map(id => interviewPrepData.flatMap(w => w.questions).find(q => q.id === id))
+      .filter(Boolean);
+    const sessionDeck = [
+      ...newQs.map(q => ({ ...q, _kind: 'new' })),
+      ...reviewQs.map(q => ({ ...q, _kind: 'review' })),
+    ];
+    if (sessionDeck.length === 0) {
+      return;
+    }
+    setDeck(sessionDeck);
+    setQuickFormat('session');
+    setCardIdx(0);
+    setCardFlipped(false);
+    setMcqSelected(null);
+    setIntroSeen({});
+    setSessionStats({ knew: 0, didnt: 0 });
+    setQuickMode(true);
+  }, [plan]);
+
+  // Rate a card during a daily session: update studyState + dayLog
+  const rateSessionCard = useCallback(
+    gotItRight => {
+      const card = deck[cardIdx];
+      if (!card) {
+        return;
+      }
+      setStudyState(prev => {
+        const next = { ...prev, [card.id]: advance(prev[card.id], gotItRight, today) };
+        saveToStorage(STUDY_STATE_KEY, next);
+        return next;
+      });
+      const kind = card._kind === 'new' ? 'card-new' : 'card-review';
+      setDayLog(prev => {
+        const next = logDayActivity(prev, today, kind, card.id);
+        saveToStorage(DAY_LOG_KEY, next);
+        return next;
+      });
+      setSessionStats(prev => ({
+        knew: prev.knew + (gotItRight ? 1 : 0),
+        didnt: prev.didnt + (gotItRight ? 0 : 1),
+      }));
+      if (cardIdx + 1 < deck.length) {
+        setCardIdx(cardIdx + 1);
+        setCardFlipped(false);
+        setMcqSelected(null);
+      } else {
+        setCardIdx(deck.length); // sentinel = done
+      }
+    },
+    [deck, cardIdx, today],
+  );
+
+  const togglePracticalDaily = useCallback(
+    (qid, idx) => {
+      const key = `${qid}:${idx}`;
+      setPracticalDone(prev => {
+        const updated = { ...prev, [key]: !prev[key] };
+        saveToStorage(PRACTICAL_KEY, updated);
+        return updated;
+      });
+      // Log practical completion for streak/day tracking
+      if (!practicalDone[key]) {
+        setDayLog(prev => {
+          const next = logDayActivity(prev, today, 'practical', key);
+          saveToStorage(DAY_LOG_KEY, next);
+          return next;
+        });
+      }
+    },
+    [today, practicalDone],
+  );
 
   // Quick Mode: build deck from current tier filter (or all if none) and shuffle
   const buildDeck = useCallback(
@@ -2462,7 +2849,7 @@ const InterviewPrepPage = ({ location }) => {
           </StyledPinOverlay>
         )}
 
-        {/* Quick Mode overlay (flashcards / MCQ) */}
+        {/* Quick Mode overlay (Session / Flashcards / MCQ) */}
         {quickMode && (
           <StyledQuickOverlay>
             <StyledQuickHeader>
@@ -2470,24 +2857,39 @@ const InterviewPrepPage = ({ location }) => {
                 {cardIdx < deck.length
                   ? `Card ${cardIdx + 1} of ${deck.length}`
                   : `Session done · ${sessionStats.knew} knew · ${sessionStats.didnt} missed`}
-                {tierFilter && ` · ${tierMeta[tierFilter].label}`}
+                {quickFormat === 'session' && cardIdx < deck.length && (
+                  <>
+                    {' · '}
+                    <span
+                      style={{
+                        color: deck[cardIdx]?._kind === 'new' ? 'var(--green)' : '#facc15',
+                      }}>
+                      {deck[cardIdx]?._kind === 'new' ? 'NEW' : 'REVIEW'}
+                    </span>
+                  </>
+                )}
+                {quickFormat !== 'session' && tierFilter && ` · ${tierMeta[tierFilter].label}`}
               </div>
               <div className="right">
-                <StyledModeToggle>
-                  <button
-                    type="button"
-                    className={quickFormat === 'flip' ? 'active' : ''}
-                    onClick={() => quickFormat !== 'flip' && startQuickMode('flip')}>
-                    Flip
-                  </button>
-                  <button
-                    type="button"
-                    className={quickFormat === 'mcq' ? 'active' : ''}
-                    onClick={() => quickFormat !== 'mcq' && startQuickMode('mcq')}>
-                    MCQ
-                  </button>
-                </StyledModeToggle>
-                <StyledToolbarButton onClick={restartDeck}>Reshuffle</StyledToolbarButton>
+                {quickFormat !== 'session' && (
+                  <>
+                    <StyledModeToggle>
+                      <button
+                        type="button"
+                        className={quickFormat === 'flip' ? 'active' : ''}
+                        onClick={() => quickFormat !== 'flip' && startQuickMode('flip')}>
+                        Flip
+                      </button>
+                      <button
+                        type="button"
+                        className={quickFormat === 'mcq' ? 'active' : ''}
+                        onClick={() => quickFormat !== 'mcq' && startQuickMode('mcq')}>
+                        MCQ
+                      </button>
+                    </StyledModeToggle>
+                    <StyledToolbarButton onClick={restartDeck}>Reshuffle</StyledToolbarButton>
+                  </>
+                )}
                 <StyledToolbarButton onClick={exitQuickMode}>✕ Exit</StyledToolbarButton>
               </div>
             </StyledQuickHeader>
@@ -2495,17 +2897,36 @@ const InterviewPrepPage = ({ location }) => {
             <StyledQuickCard>
               {cardIdx >= deck.length ? (
                 <>
-                  <div className="question">Done — {deck.length} cards reviewed</div>
+                  <div className="question">
+                    {quickFormat === 'session'
+                      ? '🎯 Session complete!'
+                      : `Done — ${deck.length} cards reviewed`}
+                  </div>
                   <div className="answer" style={{ borderLeftColor: '#facc15' }}>
                     Knew: {sessionStats.knew} · Missed: {sessionStats.didnt}
-                    {sessionStats.didnt > 0 && (
+                    {quickFormat === 'session' && sessionStats.didnt > 0 && (
+                      <div style={{ marginTop: 8, fontSize: 13 }}>
+                        Missed cards return tomorrow at lower mastery — that&apos;s the point.
+                      </div>
+                    )}
+                    {quickFormat === 'session' &&
+                      sessionStats.didnt === 0 &&
+                      sessionStats.knew > 0 && (
+                      <div style={{ marginTop: 8, fontSize: 13 }}>
+                          Clean run — those cards moved up the mastery ladder.
+                      </div>
+                    )}
+                    {quickFormat !== 'session' && sessionStats.didnt > 0 && (
                       <div style={{ marginTop: 8, fontSize: 13 }}>
                         Tip: missed cards stay in your stats — review them again later.
                       </div>
                     )}
                   </div>
-                  <button className="reveal" type="button" onClick={restartDeck}>
-                    Restart
+                  <button
+                    className="reveal"
+                    type="button"
+                    onClick={quickFormat === 'session' ? exitQuickMode : restartDeck}>
+                    {quickFormat === 'session' ? 'Back to Today' : 'Restart'}
                   </button>
                 </>
               ) : (
@@ -2520,71 +2941,161 @@ const InterviewPrepPage = ({ location }) => {
                     })()}
                   </div>
 
-                  {quickFormat === 'mcq' && mcq[deck[cardIdx].id] ? (
-                    <>
-                      <div className="question">{mcq[deck[cardIdx].id].question}</div>
-                      <StyledMCQOptions>
-                        {mcq[deck[cardIdx].id].options.map((opt, i) => {
-                          const correct = mcq[deck[cardIdx].id].correct;
-                          const revealed = mcqSelected !== null;
-                          return (
-                            <StyledMCQOption
-                              key={i}
-                              type="button"
-                              $isSelected={mcqSelected === i}
-                              $isCorrect={i === correct}
-                              $revealed={revealed}
-                              onClick={() => mcqSelected === null && setMcqSelected(i)}
-                              disabled={revealed}>
-                              <span className="letter">{String.fromCharCode(65 + i)}.</span>
-                              {opt}
-                            </StyledMCQOption>
-                          );
-                        })}
-                      </StyledMCQOptions>
-                      {mcqSelected !== null && (
-                        <>
-                          <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
-                          <div className="rate" style={{ marginTop: 20 }}>
-                            <button
-                              type="button"
-                              className="knew"
-                              onClick={() =>
-                                rateCard(mcqSelected === mcq[deck[cardIdx].id].correct)
-                              }>
-                              {mcqSelected === mcq[deck[cardIdx].id].correct
-                                ? '✓ Correct — Next'
-                                : '✗ Wrong — Next'}
-                            </button>
+                  {/* Session mode: intro phase for new cards before testing */}
+                  {quickFormat === 'session' &&
+                  deck[cardIdx]._kind === 'new' &&
+                  !introSeen[deck[cardIdx].id] ? (
+                      <>
+                        <StyledSessionPhase $phase="new">
+                        📚 Learn — first time seeing this
+                        </StyledSessionPhase>
+                        <div className="question">{deck[cardIdx].question}</div>
+                        <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                        {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
+                          <div
+                            style={{
+                              marginBottom: 20,
+                              textAlign: 'left',
+                              width: '100%',
+                              fontSize: 13,
+                              color: 'var(--slate)',
+                              lineHeight: 1.6,
+                            }}>
+                            <div
+                              style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5,
+                                marginBottom: 6,
+                              }}>
+                            Reading material
+                            </div>
+                            {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
+                              <div key={i}>▹ {r}</div>
+                            ))}
                           </div>
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <div className="question">{deck[cardIdx].question}</div>
-                      {!cardFlipped ? (
+                        )}
                         <button
                           className="reveal"
                           type="button"
-                          onClick={() => setCardFlipped(true)}>
-                          Tap to reveal answer
+                          onClick={() =>
+                            setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
+                          }>
+                        Got it — test me
                         </button>
+                      </>
+                    ) : quickFormat === 'mcq' ||
+                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
+                        mcq[deck[cardIdx].id] ? (
+                          <>
+                            {quickFormat === 'session' && (
+                              <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                                {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                              </StyledSessionPhase>
+                            )}
+                            <div className="question">{mcq[deck[cardIdx].id].question}</div>
+                            <StyledMCQOptions>
+                              {mcq[deck[cardIdx].id].options.map((opt, i) => {
+                                const correct = mcq[deck[cardIdx].id].correct;
+                                const revealed = mcqSelected !== null;
+                                return (
+                                  <StyledMCQOption
+                                    key={i}
+                                    type="button"
+                                    $isSelected={mcqSelected === i}
+                                    $isCorrect={i === correct}
+                                    $revealed={revealed}
+                                    onClick={() => mcqSelected === null && setMcqSelected(i)}
+                                    disabled={revealed}>
+                                    <span className="letter">{String.fromCharCode(65 + i)}.</span>
+                                    {opt}
+                                  </StyledMCQOption>
+                                );
+                              })}
+                            </StyledMCQOptions>
+                            {mcqSelected !== null && (
+                              <>
+                                <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
+                                <div className="rate" style={{ marginTop: 20 }}>
+                                  <button
+                                    type="button"
+                                    className="knew"
+                                    onClick={() => {
+                                      const right = mcqSelected === mcq[deck[cardIdx].id].correct;
+                                      if (quickFormat === 'session') {
+                                        rateSessionCard(right);
+                                      } else {
+                                        rateCard(right);
+                                      }
+                                    }}>
+                                    {mcqSelected === mcq[deck[cardIdx].id].correct
+                                      ? '✓ Correct — Next'
+                                      : '✗ Wrong — Next'}
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="question">No MCQ for this card.</div>
+                            <button
+                              className="reveal"
+                              type="button"
+                              onClick={() => {
+                                if (cardIdx + 1 < deck.length) {
+                                  setCardIdx(cardIdx + 1);
+                                  setCardFlipped(false);
+                                  setMcqSelected(null);
+                                } else {
+                                  setCardIdx(deck.length);
+                                }
+                              }}>
+                          Skip
+                            </button>
+                          </>
+                        )
                       ) : (
                         <>
-                          <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                          <div className="rate">
-                            <button type="button" className="knew" onClick={() => rateCard(true)}>
+                          {quickFormat === 'session' && (
+                            <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                              {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                            </StyledSessionPhase>
+                          )}
+                          <div className="question">{deck[cardIdx].question}</div>
+                          {!cardFlipped ? (
+                            <button
+                              className="reveal"
+                              type="button"
+                              onClick={() => setCardFlipped(true)}>
+                          Tap to reveal answer
+                            </button>
+                          ) : (
+                            <>
+                              <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                              <div className="rate">
+                                <button
+                                  type="button"
+                                  className="knew"
+                                  onClick={() =>
+                                    quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
+                                  }>
                               ✓ Knew it
-                            </button>
-                            <button type="button" className="didnt" onClick={() => rateCard(false)}>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="didnt"
+                                  onClick={() =>
+                                    quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
+                                  }>
                               ✗ Didn&apos;t
-                            </button>
-                          </div>
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </>
                       )}
-                    </>
-                  )}
                 </>
               )}
             </StyledQuickCard>
@@ -2593,10 +3104,7 @@ const InterviewPrepPage = ({ location }) => {
 
         <StyledHeader>
           <h1>Cortex M4F</h1>
-          <p>
-            Embedded systems study deck · Tier 1 first · Hands-on at the desk · Flashcards/MCQ on
-            the train
-          </p>
+          <p>Embedded systems study deck · Daily mission · Spaced repetition · Weekends free</p>
         </StyledHeader>
 
         <StyledToolbar>
@@ -2739,6 +3247,11 @@ const InterviewPrepPage = ({ location }) => {
                         $status={getQuestionStatus(q.id)}
                         onClick={() => handleSelectQuestion(q)}>
                         <span className="status-dot" />
+                        <StyledMasteryDot
+                          $mastery={studyState[q.id]?.mastery || 0}
+                          title={`Mastery ${studyState[q.id]?.mastery || 0} / 5`}>
+                          {studyState[q.id]?.mastery || ''}
+                        </StyledMasteryDot>
                         {t && (
                           <StyledTierBadge $color={tierMeta[t].color}>
                             {tierMeta[t].label}
@@ -2763,6 +3276,115 @@ const InterviewPrepPage = ({ location }) => {
           <StyledRightPanel>
             {!activeQuestion ? (
               <>
+                <StyledTodayCard>
+                  <header>
+                    <h2>Today&apos;s Mission</h2>
+                    <span className="date">
+                      {new Date(today).toLocaleDateString(undefined, {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                      {' · '}🔥 {streakDays}d streak
+                    </span>
+                  </header>
+
+                  <div className="week-grid">
+                    {weekGrid.map(d => (
+                      <div
+                        key={d.date}
+                        className={[
+                          'day-cell',
+                          d.done ? 'done' : '',
+                          d.isToday ? 'today' : '',
+                          d.isWeekend ? 'weekend' : '',
+                          d.isFuture ? 'future' : '',
+                        ]
+                          .filter(Boolean)
+                          .join(' ')}
+                        title={d.date}>
+                        <span className="lbl">{d.label}</span>
+                        <span className="mark">
+                          {d.done ? '✓' : d.isWeekend ? '–' : d.isToday ? '•' : ' '}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="plan-rows">
+                    <div className="plan-tile">
+                      <div className="icon">📚</div>
+                      <div className="num">{plan.newIds.length}</div>
+                      <div className="name">New today</div>
+                    </div>
+                    <div className="plan-tile">
+                      <div className="icon">🔁</div>
+                      <div className="num">{plan.reviewIds.length}</div>
+                      <div className="name">Due review</div>
+                    </div>
+                    <div className="plan-tile">
+                      <div className="icon">🛠</div>
+                      <div className="num">{plan.practicalIds.length}</div>
+                      <div className="name">Hands-on</div>
+                    </div>
+                  </div>
+
+                  {plan.newIds.length + plan.reviewIds.length > 0 ? (
+                    <button type="button" className="start-btn" onClick={startDailySession}>
+                      Start Session ({plan.newIds.length + plan.reviewIds.length} cards)
+                    </button>
+                  ) : plan.isWeekend ? (
+                    <div className="empty-state">
+                      Weekend — buffer day. Use it to catch up, or rest.
+                      <br />
+                      <small>(Streak doesn&apos;t break on weekends.)</small>
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      🎉 No cards due today. Come back tomorrow, or use Free Practice in the
+                      toolbar.
+                    </div>
+                  )}
+
+                  <div className="pct">
+                    Mastered: {histogram[5]} · Strong: {histogram[4]} · Solid: {histogram[3]} ·
+                    Familiar: {histogram[2]} · Intro: {histogram[1]} · Unseen: {histogram[0]}
+                  </div>
+                </StyledTodayCard>
+
+                {plan.practicalIds.length > 0 && (
+                  <StyledTodayPracticals>
+                    <h3>🛠 Today&apos;s Hands-On Tasks</h3>
+                    {plan.practicalIds.map(qid => {
+                      const q = interviewPrepData
+                        .flatMap(w => w.questions)
+                        .find(qq => qq.id === qid);
+                      const exs = practical[qid]?.exercises || [];
+                      return exs.map((ex, i) => {
+                        const key = `${qid}:${i}`;
+                        const done = practicalDone[key];
+                        return (
+                          <div key={key} className={`pract-row ${done ? 'done' : ''}`}>
+                            <button
+                              type="button"
+                              className="pract-check"
+                              onClick={() => togglePracticalDaily(qid, i)}
+                              aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
+                              {done ? '✓' : ''}
+                            </button>
+                            <div>
+                              {ex}
+                              <div className="pract-meta">
+                                {q?.day} · {q?.topic}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      });
+                    })}
+                  </StyledTodayPracticals>
+                )}
+
                 <StyledHardwareGuide>
                   <div className="title">🔧 Hardware setup — what you actually need</div>
                   <div className="sub">

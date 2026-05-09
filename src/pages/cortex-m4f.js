@@ -13,6 +13,8 @@ import {
   buildWeekGrid,
   logDayActivity,
   masteryHistogram,
+  reviewBacklog,
+  isWeekend as isWeekendDay,
 } from '../data/interviewPrepStudy';
 import { getSavedPin, savePin, clearPin, pushToCloud, pullFromCloud } from '@utils/firebase';
 
@@ -2251,6 +2253,7 @@ const InterviewPrepPage = ({ location }) => {
   const [dayLog, setDayLog] = useState({});
   const [today, setToday] = useState(dateKey());
   const [introSeen, setIntroSeen] = useState({}); // qids that have passed intro this session
+  const [weekendOverride, setWeekendOverride] = useState(false); // user opted to study new cards on a weekend
 
   // Cloud sync state
   const [pin, setPin] = useState(null);
@@ -2588,10 +2591,13 @@ const InterviewPrepPage = ({ location }) => {
   }, []);
 
   // Daily plan + streak (memoized via deps)
-  const plan = buildDailyPlan(today, studyState);
+  const plan = buildDailyPlan(today, studyState, { forceNew: weekendOverride });
   const streakDays = computeStreak(today, dayLog);
   const weekGrid = buildWeekGrid(today, dayLog);
   const histogram = masteryHistogram(studyState);
+  const totalBacklog = reviewBacklog(today, studyState);
+  const isWeekendToday = isWeekendDay(today);
+  const hasNeverStudied = Object.keys(studyState).length === 0;
 
   // Start a daily session: deck = new cards then review cards
   const startDailySession = useCallback(() => {
@@ -3329,16 +3335,47 @@ const InterviewPrepPage = ({ location }) => {
                     </div>
                   </div>
 
+                  {totalBacklog > plan.reviewIds.length && (
+                    <div
+                      className="empty-state"
+                      style={{
+                        background: 'rgba(250, 204, 21, 0.1)',
+                        border: '1px solid #facc15',
+                        borderRadius: 'var(--border-radius)',
+                        padding: '10px 14px',
+                        marginBottom: 14,
+                        color: '#facc15',
+                        textAlign: 'left',
+                        fontSize: 12,
+                      }}>
+                      ⚠ {totalBacklog} reviews piled up — capped at {plan.reviewIds.length} per
+                      session. Finish today&apos;s session to shrink the backlog.
+                    </div>
+                  )}
+
                   {plan.newIds.length + plan.reviewIds.length > 0 ? (
                     <button type="button" className="start-btn" onClick={startDailySession}>
                       Start Session ({plan.newIds.length + plan.reviewIds.length} cards)
                     </button>
-                  ) : plan.isWeekend ? (
-                    <div className="empty-state">
-                      Weekend — buffer day. Use it to catch up, or rest.
-                      <br />
-                      <small>(Streak doesn&apos;t break on weekends.)</small>
-                    </div>
+                  ) : isWeekendToday && !hasNeverStudied ? (
+                    <>
+                      <div className="empty-state">
+                        Weekend — buffer day. Streak doesn&apos;t break on weekends.
+                        <br />
+                        <small>Studying now will absorb a missed weekday in this same week.</small>
+                      </div>
+                      <button
+                        type="button"
+                        className="start-btn"
+                        style={{
+                          background: 'transparent',
+                          color: 'var(--green)',
+                          border: '1px solid var(--green)',
+                        }}
+                        onClick={() => setWeekendOverride(true)}>
+                        Study new cards anyway
+                      </button>
+                    </>
                   ) : (
                     <div className="empty-state">
                       🎉 No cards due today. Come back tomorrow, or use Free Practice in the

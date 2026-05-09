@@ -3,7 +3,7 @@
 // buffer days — no new cards introduced, streak doesn't break.
 
 import interviewPrepData from './interviewPrepData';
-import { tiers, practical } from './interviewPrepTiers';
+import { practical } from './interviewPrepTiers';
 
 export const dateKey = (d = new Date()) => {
   const y = d.getFullYear();
@@ -47,13 +47,17 @@ export const advance = (cur, gotItRight, today = dateKey()) => {
 };
 
 // Build today's plan: which new cards to introduce, which to review, which practicals.
-export const buildDailyPlan = (today, studyState) => {
+//   options.forceNew: include new cards even on weekend (user override)
+// Sequential: new cards always come from source order (w1d1, w1d2, ... w12d5).
+// Tier is a label, not a sort key — that way you can't accidentally skip topics.
+export const buildDailyPlan = (today, studyState, options = {}) => {
   const allQuestions = interviewPrepData.flatMap(w => w.questions);
   const idIndex = {};
   allQuestions.forEach((q, i) => {
     idIndex[q.id] = i;
   });
 
+  // Reviews due — same logic, no day-of-week dependency
   const reviewIds = allQuestions
     .map(q => q.id)
     .filter(id => {
@@ -63,29 +67,61 @@ export const buildDailyPlan = (today, studyState) => {
     .sort((a, b) => studyState[a].nextDue.localeCompare(studyState[b].nextDue))
     .slice(0, MAX_REVIEW_CARDS);
 
-  if (isWeekend(today)) {
+  const hasNeverStudied = Object.keys(studyState).length === 0;
+  const allowNew = !isWeekend(today) || hasNeverStudied || options.forceNew;
+
+  if (!allowNew) {
     return { isWeekend: true, newIds: [], reviewIds, practicalIds: [] };
   }
 
-  const unseenIds = allQuestions.map(q => q.id).filter(id => !studyState[id]);
-  unseenIds.sort((a, b) => {
-    const ta = tiers[a] || 99;
-    const tb = tiers[b] || 99;
-    if (ta !== tb) {
-      return ta - tb;
-    }
-    return idIndex[a] - idIndex[b];
-  });
-  const newIds = unseenIds.slice(0, NEW_CARDS_PER_DAY);
+  // Strict source order: w1d1 -> w1d2 -> ... -> w12d5
+  const unseenIds = allQuestions
+    .map(q => q.id)
+    .filter(id => !studyState[id])
+    .sort((a, b) => idIndex[a] - idIndex[b]);
 
+  const newIds = unseenIds.slice(0, NEW_CARDS_PER_DAY);
   const practicalIds = newIds.filter(id => practical[id]);
 
-  return { isWeekend: false, newIds, reviewIds, practicalIds };
+  return {
+    isWeekend: isWeekend(today),
+    newIds,
+    reviewIds,
+    practicalIds,
+  };
+};
+
+// Backlog — total review count due (uncapped) so the dashboard can warn
+export const reviewBacklog = (today, studyState) => {
+  const allQuestions = interviewPrepData.flatMap(w => w.questions);
+  return allQuestions
+    .map(q => q.id)
+    .filter(id => {
+      const s = studyState[id];
+      return s && s.nextDue && s.nextDue <= today;
+    }).length;
+};
+
+// Did Sat or Sun in the same calendar week as `cursor` have any activity?
+// Weekend activity excuses missed weekdays in that week.
+const sameWeekWeekendActive = (cursor, dayLog) => {
+  const dow = cursor.getDay() || 7; // Mon=1..Sun=7
+  const monday = new Date(cursor);
+  monday.setDate(cursor.getDate() - (dow - 1));
+  const saturday = new Date(monday);
+  saturday.setDate(monday.getDate() + 5);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  const satLog = dayLog[dateKey(saturday)];
+  const sunLog = dayLog[dateKey(sunday)];
+  const dayActive = log => !!(log && (log.answered > 0 || (log.practicalsDone || []).length > 0));
+  return dayActive(satLog) || dayActive(sunLog);
 };
 
 // Streak: consecutive weekdays where the user did at least one card.
-// Today is allowed to be pending without breaking the streak.
-// Weekends never count toward and never break the streak.
+// Today is allowed pending without breaking the streak.
+// Weekends never count toward the streak directly, but weekend activity
+// "absorbs" up to one missed weekday in the same calendar week.
 export const computeStreak = (today, dayLog) => {
   const [yT, mT, dT] = today.split('-').map(Number);
   const cursor = new Date(yT, mT - 1, dT);
@@ -96,18 +132,30 @@ export const computeStreak = (today, dayLog) => {
     cursor.setDate(cursor.getDate() - 1);
   }
 
+  // Track which weeks have already "spent" their weekend grace
+  const usedGrace = new Set();
   let isFirst = true;
+
   for (let i = 0; i < 200; i++) {
     const k = dateKey(cursor);
     const log = dayLog[k];
     const did = !!(log && (log.answered > 0 || (log.practicalsDone || []).length > 0));
+
     if (did) {
       streak++;
-    } else if (!isFirst) {
-      break; // earlier missed weekday breaks streak
+    } else if (isFirst) {
+      // today (or most recent weekday) pending — that's fine
+    } else {
+      // Missed weekday — try to forgive it via same-week weekend activity
+      const weekKey = `${dateKey(cursor).slice(0, 7)}-w${Math.ceil(cursor.getDate() / 7)}`;
+      if (!usedGrace.has(weekKey) && sameWeekWeekendActive(cursor, dayLog)) {
+        usedGrace.add(weekKey);
+        streak++;
+      } else {
+        break;
+      }
     }
     isFirst = false;
-    // step back one weekday
     do {
       cursor.setDate(cursor.getDate() - 1);
     } while (cursor.getDay() === 0 || cursor.getDay() === 6);

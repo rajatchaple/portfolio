@@ -114,20 +114,6 @@ const StyledHeader = styled.div`
   }
 `;
 
-const StyledToolbar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 50px;
-  border-bottom: 1px solid rgba(35, 53, 84, 0.5);
-  flex-wrap: wrap;
-
-  @media (max-width: 768px) {
-    padding: 10px 12px;
-    gap: 8px;
-  }
-`;
-
 const StyledSearchInput = styled.input`
   background: rgba(35, 53, 84, 0.4);
   border: 1px solid var(--lightest-navy);
@@ -185,28 +171,6 @@ const StyledDesktopOnly = styled.span`
 
   @media (max-width: 768px) {
     display: none;
-  }
-`;
-
-const StyledStatsBar = styled.div`
-  display: flex;
-  gap: 20px;
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--slate);
-
-  span.count {
-    color: var(--green);
-    font-weight: 600;
-  }
-
-  @media (max-width: 768px) {
-    margin-left: 0;
-    width: 100%;
-    justify-content: space-between;
-    font-size: 11px;
-    gap: 12px;
   }
 `;
 
@@ -268,135 +232,6 @@ const StyledLeftPanel = styled.div`
       background: var(--slate);
       border-radius: 3px;
     }
-  }
-`;
-
-const StyledMobileToggle = styled.button`
-  display: none;
-  width: 100%;
-  padding: 12px 16px;
-  background: rgba(35, 53, 84, 0.3);
-  border: none;
-  border-bottom: 1px solid rgba(35, 53, 84, 0.5);
-  color: var(--green);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  cursor: pointer;
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-
-  @media (max-width: 768px) {
-    display: block;
-  }
-`;
-
-const StyledWeekGroup = styled.div`
-  border-bottom: 1px solid rgba(35, 53, 84, 0.3);
-
-  @media (max-width: 768px) {
-    &:first-of-type {
-      margin-top: 0;
-    }
-  }
-`;
-
-const StyledWeekHeader = styled.button`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: transparent;
-  border: none;
-  color: var(--lightest-slate);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: var(--transition);
-  text-align: left;
-  letter-spacing: 0.2px;
-
-  &:hover {
-    background: rgba(35, 53, 84, 0.3);
-  }
-
-  .phase {
-    font-size: 12px;
-    color: var(--dark-slate);
-    font-weight: 400;
-    display: block;
-    margin-top: 4px;
-    letter-spacing: 0;
-  }
-
-  .arrow {
-    color: var(--green);
-    font-size: 12px;
-    transition: transform 0.2s ease;
-    transform: ${props => (props.$expanded ? 'rotate(90deg)' : 'rotate(0)')};
-    flex-shrink: 0;
-    margin-left: 10px;
-  }
-`;
-
-const StyledQuestionList = styled.div`
-  display: ${props => (props.$expanded ? 'block' : 'none')};
-`;
-
-const StyledQuestionItem = styled.button`
-  width: 100%;
-  display: block;
-  padding: 12px 20px 12px 28px;
-  background: ${props => (props.$active ? 'rgba(214, 5, 69, 0.08)' : 'transparent')};
-  border: none;
-  border-left: 2px solid ${props => (props.$active ? 'var(--green)' : 'transparent')};
-  color: ${props => (props.$active ? 'var(--lightest-slate)' : 'var(--light-slate)')};
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
-  cursor: pointer;
-  transition: var(--transition);
-  text-align: left;
-
-  &:hover {
-    background: rgba(35, 53, 84, 0.2);
-    color: var(--lightest-slate);
-  }
-
-  .day-label {
-    font-family: var(--font-sans);
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--green);
-    margin-right: 8px;
-  }
-
-  .status-dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    margin-right: 8px;
-    flex-shrink: 0;
-    background: ${props => {
-    if (props.$status === 'answered') {
-      return '#4ade80';
-    }
-    if (props.$status === 'partial') {
-      return '#facc15';
-    }
-    return 'var(--dark-slate)';
-  }};
-  }
-
-  .q-text {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 `;
 
@@ -835,7 +670,7 @@ const StyledActionButton = styled.button`
   &:hover {
     opacity: 0.85;
     ${props =>
-    !props.$primary &&
+      !props.$primary &&
       `
       border-color: var(--green);
       color: var(--green);
@@ -880,7 +715,7 @@ const StyledSyncStatus = styled.div`
     border-radius: 50%;
     background: currentColor;
     ${props =>
-    props.$status === 'syncing' &&
+      props.$status === 'syncing' &&
       `
       animation: pulse 1s infinite;
     `}
@@ -1042,14 +877,14 @@ const StyledTimerDisplay = styled.div`
     font-size: 28px;
     font-weight: 600;
     color: ${props => {
-    if (props.$seconds <= 30) {
-      return '#f87171';
-    }
-    if (props.$seconds <= 60) {
-      return '#facc15';
-    }
-    return 'var(--lightest-slate)';
-  }};
+      if (props.$seconds <= 30) {
+        return '#f87171';
+      }
+      if (props.$seconds <= 60) {
+        return '#facc15';
+      }
+      return 'var(--lightest-slate)';
+    }};
     min-width: 80px;
 
     @media (max-width: 768px) {
@@ -1086,45 +921,6 @@ const StyledStaleBadge = styled.span`
   margin-left: 2px;
   margin-right: 2px;
   opacity: 0.8;
-`;
-
-const StyledReviewBtn = styled.button`
-  background: ${props => (props.$active ? 'rgba(250, 204, 21, 0.15)' : 'transparent')};
-  border: 1px solid ${props => (props.$active ? '#facc15' : 'var(--lightest-navy)')};
-  border-radius: var(--border-radius);
-  color: ${props => (props.$active ? '#facc15' : 'var(--slate)')};
-  font-family: var(--font-mono);
-  font-size: 12px;
-  padding: 7px 14px;
-  cursor: pointer;
-  transition: var(--transition);
-  white-space: nowrap;
-
-  &:hover {
-    color: #facc15;
-    border-color: #facc15;
-  }
-
-  @media (max-width: 768px) {
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-`;
-
-const StyledTierFilterBar = styled.div`
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-
-  .label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--slate);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-right: 4px;
-  }
 `;
 
 const StyledTierBtn = styled.button`
@@ -1513,17 +1309,17 @@ const StyledMCQOption = styled.button`
   }};
   border: 1px solid
     ${props => {
-    if (props.$revealed && props.$isCorrect) {
-      return '#4ade80';
-    }
-    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
-      return '#f87171';
-    }
-    if (props.$isSelected) {
-      return 'var(--green)';
-    }
-    return 'var(--lightest-navy)';
-  }};
+      if (props.$revealed && props.$isCorrect) {
+        return '#4ade80';
+      }
+      if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+        return '#f87171';
+      }
+      if (props.$isSelected) {
+        return 'var(--green)';
+      }
+      return 'var(--lightest-navy)';
+    }};
   border-radius: var(--border-radius);
   color: var(--lightest-slate);
   font-family: var(--font-sans);
@@ -1537,7 +1333,7 @@ const StyledMCQOption = styled.button`
 
   &:hover {
     ${props =>
-    !props.$revealed &&
+      !props.$revealed &&
       `
       border-color: var(--green);
       background: rgba(100, 255, 218, 0.05);
@@ -1647,6 +1443,331 @@ const StyledHardwareGuide = styled.div`
     padding: 1px 5px;
     border-radius: 3px;
     color: var(--green);
+  }
+`;
+
+const StyledTabBar = styled.nav`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--navy);
+  border-top: 1px solid var(--lightest-navy);
+  display: flex;
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  @media (min-width: 769px) {
+    position: sticky;
+    top: var(--nav-height);
+    bottom: auto;
+    border-top: none;
+    border-bottom: 1px solid var(--lightest-navy);
+    margin: 0 80px;
+    padding-bottom: 0;
+  }
+`;
+
+const StyledTab = styled.button`
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: ${props => (props.$active ? 'var(--green)' : 'var(--slate)')};
+  font-family: var(--font-mono);
+  padding: 10px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: var(--transition);
+  border-top: 2px solid ${props => (props.$active ? 'var(--green)' : 'transparent')};
+  min-height: 56px;
+
+  .icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .lbl {
+    font-size: 10px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    font-weight: ${props => (props.$active ? 600 : 400)};
+  }
+
+  &:hover {
+    color: var(--green);
+  }
+
+  @media (min-width: 769px) {
+    flex-direction: row;
+    gap: 8px;
+    border-top: none;
+    border-bottom: 2px solid ${props => (props.$active ? 'var(--green)' : 'transparent')};
+    padding: 14px 22px;
+    min-height: auto;
+
+    .icon {
+      font-size: 16px;
+    }
+
+    .lbl {
+      font-size: 12px;
+    }
+  }
+`;
+
+const StyledTabBody = styled.div`
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+
+  @media (min-width: 769px) {
+    padding-bottom: 24px;
+  }
+`;
+
+const StyledFilterChips = styled.div`
+  display: flex;
+  gap: 8px;
+  padding: 12px 50px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(35, 53, 84, 0.5);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+  }
+`;
+
+const StyledChip = styled.button`
+  background: ${props => (props.$active ? 'var(--green)' : 'transparent')};
+  color: ${props => (props.$active ? '#000' : 'var(--slate)')};
+  border: 1px solid ${props => (props.$active ? 'var(--green)' : 'var(--lightest-navy)')};
+  border-radius: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 7px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: var(--transition);
+  font-weight: ${props => (props.$active ? 600 : 400)};
+
+  &:hover {
+    border-color: var(--green);
+    color: ${props => (props.$active ? '#000' : 'var(--green)')};
+  }
+
+  @media (max-width: 768px) {
+    padding: 9px 16px;
+    font-size: 13px;
+    min-height: 38px;
+  }
+`;
+
+const StyledFlatRow = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px 50px;
+  background: ${props => (props.$active ? 'rgba(214, 5, 69, 0.06)' : 'transparent')};
+  border: none;
+  border-left: 3px solid ${props => (props.$active ? 'var(--green)' : 'transparent')};
+  border-bottom: 1px solid rgba(35, 53, 84, 0.4);
+  color: var(--lightest-slate);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: var(--transition);
+
+  &:hover {
+    background: rgba(35, 53, 84, 0.25);
+  }
+
+  @media (max-width: 768px) {
+    padding: 14px 14px;
+  }
+
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--slate);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .qtxt {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--lightest-slate);
+  }
+`;
+
+const StyledPracticeCard = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  background: rgba(35, 53, 84, 0.25);
+  border: 1px solid var(--lightest-navy);
+  border-radius: var(--border-radius);
+  color: var(--lightest-slate);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: var(--transition);
+  min-height: 80px;
+
+  &:hover {
+    border-color: var(--green);
+    background: rgba(100, 255, 218, 0.05);
+  }
+
+  .ic {
+    font-size: 32px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .body {
+    flex: 1;
+
+    .ttl {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--green);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .desc {
+      font-size: 13px;
+      color: var(--slate);
+      line-height: 1.5;
+    }
+  }
+`;
+
+const StyledHeatmap = styled.div`
+  padding: 16px;
+  background: rgba(35, 53, 84, 0.2);
+  border: 1px solid var(--lightest-navy);
+  border-radius: var(--border-radius);
+  margin-bottom: 18px;
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 12px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 18px repeat(13, 1fr);
+    gap: 3px;
+    align-items: center;
+  }
+
+  .row-lbl {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--slate);
+    text-align: right;
+    padding-right: 4px;
+  }
+
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--slate);
+    justify-content: flex-end;
+  }
+`;
+
+const StyledHeatCell = styled.div`
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: ${props => {
+    if (props.$future) {
+      return 'transparent';
+    }
+    const c = props.$count || 0;
+    if (c === 0) {
+      return 'rgba(35, 53, 84, 0.5)';
+    }
+    if (c === 1) {
+      return 'rgba(74, 222, 128, 0.25)';
+    }
+    if (c === 2) {
+      return 'rgba(74, 222, 128, 0.5)';
+    }
+    if (c <= 4) {
+      return 'rgba(74, 222, 128, 0.75)';
+    }
+    return '#4ade80';
+  }};
+  border: 1px solid ${props => (props.$today ? 'var(--green)' : 'transparent')};
+  min-width: 0;
+`;
+
+const StyledMobileBackBar = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--navy);
+    border-bottom: 1px solid var(--lightest-navy);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  button {
+    background: transparent;
+    border: 1px solid var(--lightest-navy);
+    border-radius: var(--border-radius);
+    color: var(--green);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 14px;
+    cursor: pointer;
+    min-height: 36px;
+
+    &:hover {
+      border-color: var(--green);
+    }
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--slate);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `;
 
@@ -1920,17 +2041,17 @@ const StyledMasteryDot = styled.span`
   }};
   border: 1px solid
     ${props => {
-    if (props.$mastery === 0) {
-      return 'var(--lightest-navy)';
-    }
-    if (props.$mastery <= 2) {
-      return '#f87171';
-    }
-    if (props.$mastery <= 3) {
-      return '#facc15';
-    }
-    return '#4ade80';
-  }};
+      if (props.$mastery === 0) {
+        return 'var(--lightest-navy)';
+      }
+      if (props.$mastery <= 2) {
+        return '#f87171';
+      }
+      if (props.$mastery <= 3) {
+        return '#facc15';
+      }
+      return '#4ade80';
+    }};
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
@@ -1949,21 +2070,11 @@ const StyledSessionPhase = styled.div`
     props.$phase === 'new'
       ? 'var(--green)'
       : props.$phase === 'review'
-        ? '#facc15'
-        : 'var(--slate)'};
+      ? '#facc15'
+      : 'var(--slate)'};
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 8px;
-`;
-
-const StyledStreakChip = styled.div`
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: ${props => (props.$active ? '#4ade80' : 'var(--slate)')};
-  padding: 5px 10px;
-  border: 1px solid ${props => (props.$active ? '#4ade80' : 'var(--lightest-navy)')};
-  border-radius: var(--border-radius);
-  white-space: nowrap;
 `;
 
 const StyledSketchSection = styled.div`
@@ -2218,21 +2329,18 @@ SketchPad.propTypes = {
 const InterviewPrepPage = ({ location }) => {
   const [answers, setAnswers] = useState({});
   const [activeQ, setActiveQ] = useState(null);
-  const [expandedWeeks, setExpandedWeeks] = useState({});
   const [currentDraft, setCurrentDraft] = useState('');
   const [showReference, setShowReference] = useState(false);
   const [showReading, setShowReading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [leftCollapsed, setLeftCollapsed] = useState(true);
 
-  // Confidence & review state
+  // Confidence + timer state
   const [confidence, setConfidence] = useState({});
   const [lastReviewed, setLastReviewed] = useState({});
   const [timerSeconds, setTimerSeconds] = useState(300);
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerVisible, setTimerVisible] = useState(false);
-  const [reviewMode, setReviewMode] = useState(false);
 
   // Tier filter & practical task tracking
   const [tierFilter, setTierFilter] = useState(null);
@@ -2255,6 +2363,21 @@ const InterviewPrepPage = ({ location }) => {
   const [introSeen, setIntroSeen] = useState({}); // qids that have passed intro this session
   const [weekendOverride, setWeekendOverride] = useState(false); // user opted to study new cards on a weekend
 
+  // Tab navigation
+  const [activeTab, setActiveTabState] = useState('today'); // 'today' | 'browse' | 'practice' | 'progress'
+  const [browseFilter, setBrowseFilter] = useState('all'); // 'all' | 't1'..'t4' | 'unseen' | 'weak' | 'mastered' | 'stale'
+
+  const setActiveTab = useCallback(t => {
+    setActiveTabState(t);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem('interview-prep-active-tab', t);
+      } catch (e) {
+        /* ignore */
+      }
+    }
+  }, []);
+
   // Cloud sync state
   const [pin, setPin] = useState(null);
   const [showPinModal, setShowPinModal] = useState(false);
@@ -2274,7 +2397,12 @@ const InterviewPrepPage = ({ location }) => {
     setStudyState(loadFromStorage(STUDY_STATE_KEY));
     setDayLog(loadFromStorage(DAY_LOG_KEY));
     setToday(dateKey());
-    setExpandedWeeks({ 1: true });
+    if (typeof window !== 'undefined') {
+      const t = window.localStorage.getItem('interview-prep-active-tab');
+      if (t && ['today', 'browse', 'practice', 'progress'].includes(t)) {
+        setActiveTab(t);
+      }
+    }
 
     const savedPin = getSavedPin();
     if (savedPin) {
@@ -2484,22 +2612,8 @@ const InterviewPrepPage = ({ location }) => {
     [answers],
   );
 
-  const toggleWeek = week => {
-    setExpandedWeeks(prev => ({ ...prev, [week]: !prev[week] }));
-  };
-
-  const getQuestionStatus = id => {
-    const text = answers[id];
-    if (!text) {
-      return 'empty';
-    }
-    return text.length > 80 ? 'answered' : 'partial';
-  };
-
   // Stats
   const allQuestions = interviewPrepData.flatMap(w => w.questions);
-  const totalQ = allQuestions.length;
-  const answeredQ = allQuestions.filter(q => answers[q.id] && answers[q.id].length > 80).length;
 
   // Stale detection: answered > 3 days ago without review
   const isStale = qid => {
@@ -2514,51 +2628,12 @@ const InterviewPrepPage = ({ location }) => {
   };
   const staleCount = allQuestions.filter(q => isStale(q.id)).length;
 
-  // Filtered data (review mode shows only stale/low-confidence questions)
-  const baseData = reviewMode
-    ? interviewPrepData
-      .map(week => ({
-        ...week,
-        questions: week.questions.filter(
-          q => isStale(q.id) || !confidence[q.id] || confidence[q.id] <= 1,
-        ),
-      }))
-      .filter(week => week.questions.length > 0)
-    : interviewPrepData;
-
-  const tierFilteredData = tierFilter
-    ? baseData
-      .map(week => ({
-        ...week,
-        questions: week.questions.filter(q => tiers[q.id] === tierFilter),
-      }))
-      .filter(week => week.questions.length > 0)
-    : baseData;
-
-  const filteredData = searchTerm
-    ? tierFilteredData
-      .map(week => ({
-        ...week,
-        questions: week.questions.filter(
-          q =>
-            q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              q.topic.toLowerCase().includes(searchTerm.toLowerCase()),
-        ),
-      }))
-      .filter(week => week.questions.length > 0)
-    : tierFilteredData;
-
   // Per-tier progress: # answered ≥ 80 chars / # in tier
   const tierProgress = [1, 2, 3, 4].map(t => {
     const inTier = allQuestions.filter(q => tiers[q.id] === t);
     const done = inTier.filter(q => answers[q.id] && answers[q.id].length > 80).length;
     return { tier: t, total: inTier.length, done };
   });
-
-  // Flashcard "struggled": shown ≥ 2 with hit rate < 50%
-  const struggledCount = Object.values(flashcardStats).filter(
-    s => s && s.shown >= 2 && s.knew / s.shown < 0.5,
-  ).length;
 
   const togglePractical = (qid, idx) => {
     setPracticalDone(prev => {
@@ -2598,6 +2673,66 @@ const InterviewPrepPage = ({ location }) => {
   const totalBacklog = reviewBacklog(today, studyState);
   const isWeekendToday = isWeekendDay(today);
   const hasNeverStudied = Object.keys(studyState).length === 0;
+
+  // Browse-tab flat list with chip filter + search
+  const browseList = (() => {
+    let list = interviewPrepData.flatMap(w =>
+      w.questions.map(q => ({ ...q, _week: w.week, _weekTitle: w.title })),
+    );
+    if (browseFilter !== 'all') {
+      if (browseFilter === 'unseen') {
+        list = list.filter(q => !studyState[q.id]);
+      } else if (browseFilter === 'weak') {
+        list = list.filter(q => {
+          const s = studyState[q.id];
+          return s && s.mastery > 0 && s.mastery <= 2;
+        });
+      } else if (browseFilter === 'mastered') {
+        list = list.filter(q => studyState[q.id]?.mastery >= 4);
+      } else if (browseFilter === 'stale') {
+        list = list.filter(q => isStale(q.id));
+      } else if (browseFilter.startsWith('t')) {
+        const tn = parseInt(browseFilter.slice(1), 10);
+        list = list.filter(q => tiers[q.id] === tn);
+      }
+    }
+    if (searchTerm) {
+      const s = searchTerm.toLowerCase();
+      list = list.filter(
+        q => q.question.toLowerCase().includes(s) || q.topic.toLowerCase().includes(s),
+      );
+    }
+    return list;
+  })();
+
+  // Heatmap: last 13 weeks of activity, 7 rows (Mon..Sun) × 13 cols
+  const heatmapCols = (() => {
+    const weeks = 13;
+    const [yT, mT, dT] = today.split('-').map(Number);
+    const todayDate = new Date(yT, mT - 1, dT);
+    const dow = todayDate.getDay() || 7;
+    // The Sunday at end of current week
+    const thisSun = new Date(todayDate);
+    thisSun.setDate(todayDate.getDate() + (7 - dow));
+    // Monday at start of (weeks-1) ago
+    const startMon = new Date(thisSun);
+    startMon.setDate(thisSun.getDate() - weeks * 7 + 1);
+
+    const cols = [];
+    for (let w = 0; w < weeks; w++) {
+      const col = [];
+      for (let d = 0; d < 7; d++) {
+        const date = new Date(startMon);
+        date.setDate(startMon.getDate() + w * 7 + d);
+        const k = dateKey(date);
+        const log = dayLog[k];
+        const count = log ? (log.answered || 0) + ((log.practicalsDone || []).length || 0) : 0;
+        col.push({ date: k, count, future: k > today, today: k === today });
+      }
+      cols.push(col);
+    }
+    return cols;
+  })();
 
   // Start a daily session: deck = new cards then review cards
   const startDailySession = useCallback(() => {
@@ -2918,10 +3053,10 @@ const InterviewPrepPage = ({ location }) => {
                     {quickFormat === 'session' &&
                       sessionStats.didnt === 0 &&
                       sessionStats.knew > 0 && (
-                      <div style={{ marginTop: 8, fontSize: 13 }}>
+                        <div style={{ marginTop: 8, fontSize: 13 }}>
                           Clean run — those cards moved up the mastery ladder.
-                      </div>
-                    )}
+                        </div>
+                      )}
                     {quickFormat !== 'session' && sessionStats.didnt > 0 && (
                       <div style={{ marginTop: 8, fontSize: 13 }}>
                         Tip: missed cards stay in your stats — review them again later.
@@ -2951,157 +3086,157 @@ const InterviewPrepPage = ({ location }) => {
                   {quickFormat === 'session' &&
                   deck[cardIdx]._kind === 'new' &&
                   !introSeen[deck[cardIdx].id] ? (
-                      <>
-                        <StyledSessionPhase $phase="new">
+                    <>
+                      <StyledSessionPhase $phase="new">
                         📚 Learn — first time seeing this
-                        </StyledSessionPhase>
-                        <div className="question">{deck[cardIdx].question}</div>
-                        <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                        {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
+                      </StyledSessionPhase>
+                      <div className="question">{deck[cardIdx].question}</div>
+                      <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                      {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
+                        <div
+                          style={{
+                            marginBottom: 20,
+                            textAlign: 'left',
+                            width: '100%',
+                            fontSize: 13,
+                            color: 'var(--slate)',
+                            lineHeight: 1.6,
+                          }}>
                           <div
                             style={{
-                              marginBottom: 20,
-                              textAlign: 'left',
-                              width: '100%',
-                              fontSize: 13,
-                              color: 'var(--slate)',
-                              lineHeight: 1.6,
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: 11,
+                              textTransform: 'uppercase',
+                              letterSpacing: 0.5,
+                              marginBottom: 6,
                             }}>
-                            <div
-                              style={{
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: 11,
-                                textTransform: 'uppercase',
-                                letterSpacing: 0.5,
-                                marginBottom: 6,
-                              }}>
                             Reading material
-                            </div>
-                            {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
-                              <div key={i}>▹ {r}</div>
-                            ))}
                           </div>
+                          {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
+                            <div key={i}>▹ {r}</div>
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        className="reveal"
+                        type="button"
+                        onClick={() =>
+                          setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
+                        }>
+                        Got it — test me
+                      </button>
+                    </>
+                  ) : quickFormat === 'mcq' ||
+                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
+                    mcq[deck[cardIdx].id] ? (
+                      <>
+                        {quickFormat === 'session' && (
+                          <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                            {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                          </StyledSessionPhase>
                         )}
+                        <div className="question">{mcq[deck[cardIdx].id].question}</div>
+                        <StyledMCQOptions>
+                          {mcq[deck[cardIdx].id].options.map((opt, i) => {
+                            const correct = mcq[deck[cardIdx].id].correct;
+                            const revealed = mcqSelected !== null;
+                            return (
+                              <StyledMCQOption
+                                key={i}
+                                type="button"
+                                $isSelected={mcqSelected === i}
+                                $isCorrect={i === correct}
+                                $revealed={revealed}
+                                onClick={() => mcqSelected === null && setMcqSelected(i)}
+                                disabled={revealed}>
+                                <span className="letter">{String.fromCharCode(65 + i)}.</span>
+                                {opt}
+                              </StyledMCQOption>
+                            );
+                          })}
+                        </StyledMCQOptions>
+                        {mcqSelected !== null && (
+                          <>
+                            <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
+                            <div className="rate" style={{ marginTop: 20 }}>
+                              <button
+                                type="button"
+                                className="knew"
+                                onClick={() => {
+                                  const right = mcqSelected === mcq[deck[cardIdx].id].correct;
+                                  if (quickFormat === 'session') {
+                                    rateSessionCard(right);
+                                  } else {
+                                    rateCard(right);
+                                  }
+                                }}>
+                                {mcqSelected === mcq[deck[cardIdx].id].correct
+                                  ? '✓ Correct — Next'
+                                  : '✗ Wrong — Next'}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <div className="question">No MCQ for this card.</div>
                         <button
                           className="reveal"
                           type="button"
-                          onClick={() =>
-                            setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
-                          }>
-                        Got it — test me
+                          onClick={() => {
+                            if (cardIdx + 1 < deck.length) {
+                              setCardIdx(cardIdx + 1);
+                              setCardFlipped(false);
+                              setMcqSelected(null);
+                            } else {
+                              setCardIdx(deck.length);
+                            }
+                          }}>
+                          Skip
                         </button>
                       </>
-                    ) : quickFormat === 'mcq' ||
-                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
-                        mcq[deck[cardIdx].id] ? (
-                          <>
-                            {quickFormat === 'session' && (
-                              <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                                {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                              </StyledSessionPhase>
-                            )}
-                            <div className="question">{mcq[deck[cardIdx].id].question}</div>
-                            <StyledMCQOptions>
-                              {mcq[deck[cardIdx].id].options.map((opt, i) => {
-                                const correct = mcq[deck[cardIdx].id].correct;
-                                const revealed = mcqSelected !== null;
-                                return (
-                                  <StyledMCQOption
-                                    key={i}
-                                    type="button"
-                                    $isSelected={mcqSelected === i}
-                                    $isCorrect={i === correct}
-                                    $revealed={revealed}
-                                    onClick={() => mcqSelected === null && setMcqSelected(i)}
-                                    disabled={revealed}>
-                                    <span className="letter">{String.fromCharCode(65 + i)}.</span>
-                                    {opt}
-                                  </StyledMCQOption>
-                                );
-                              })}
-                            </StyledMCQOptions>
-                            {mcqSelected !== null && (
-                              <>
-                                <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
-                                <div className="rate" style={{ marginTop: 20 }}>
-                                  <button
-                                    type="button"
-                                    className="knew"
-                                    onClick={() => {
-                                      const right = mcqSelected === mcq[deck[cardIdx].id].correct;
-                                      if (quickFormat === 'session') {
-                                        rateSessionCard(right);
-                                      } else {
-                                        rateCard(right);
-                                      }
-                                    }}>
-                                    {mcqSelected === mcq[deck[cardIdx].id].correct
-                                      ? '✓ Correct — Next'
-                                      : '✗ Wrong — Next'}
-                                  </button>
-                                </div>
-                              </>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <div className="question">No MCQ for this card.</div>
-                            <button
-                              className="reveal"
-                              type="button"
-                              onClick={() => {
-                                if (cardIdx + 1 < deck.length) {
-                                  setCardIdx(cardIdx + 1);
-                                  setCardFlipped(false);
-                                  setMcqSelected(null);
-                                } else {
-                                  setCardIdx(deck.length);
-                                }
-                              }}>
-                          Skip
-                            </button>
-                          </>
-                        )
+                    )
+                  ) : (
+                    <>
+                      {quickFormat === 'session' && (
+                        <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                          {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                        </StyledSessionPhase>
+                      )}
+                      <div className="question">{deck[cardIdx].question}</div>
+                      {!cardFlipped ? (
+                        <button
+                          className="reveal"
+                          type="button"
+                          onClick={() => setCardFlipped(true)}>
+                          Tap to reveal answer
+                        </button>
                       ) : (
                         <>
-                          {quickFormat === 'session' && (
-                            <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                              {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                            </StyledSessionPhase>
-                          )}
-                          <div className="question">{deck[cardIdx].question}</div>
-                          {!cardFlipped ? (
+                          <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                          <div className="rate">
                             <button
-                              className="reveal"
                               type="button"
-                              onClick={() => setCardFlipped(true)}>
-                          Tap to reveal answer
-                            </button>
-                          ) : (
-                            <>
-                              <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                              <div className="rate">
-                                <button
-                                  type="button"
-                                  className="knew"
-                                  onClick={() =>
-                                    quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
-                                  }>
+                              className="knew"
+                              onClick={() =>
+                                quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
+                              }>
                               ✓ Knew it
-                                </button>
-                                <button
-                                  type="button"
-                                  className="didnt"
-                                  onClick={() =>
-                                    quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
-                                  }>
+                            </button>
+                            <button
+                              type="button"
+                              className="didnt"
+                              onClick={() =>
+                                quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
+                              }>
                               ✗ Didn&apos;t
-                                </button>
-                              </div>
-                            </>
-                          )}
+                            </button>
+                          </div>
                         </>
                       )}
+                    </>
+                  )}
                 </>
               )}
             </StyledQuickCard>
@@ -3113,548 +3248,808 @@ const InterviewPrepPage = ({ location }) => {
           <p>Embedded systems study deck · Daily mission · Spaced repetition · Weekends free</p>
         </StyledHeader>
 
-        <StyledToolbar>
-          <StyledSearchInput
-            placeholder="Search questions or topics..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-          <StyledDesktopOnly>
-            <StyledToolbarButton onClick={handleExport}>Export</StyledToolbarButton>
-            <StyledToolbarButton onClick={() => fileInputRef.current?.click()}>
-              Import
-            </StyledToolbarButton>
-            <HiddenInput ref={fileInputRef} type="file" accept=".json" onChange={handleImport} />
-
-            {/* Cloud sync controls — power-user, desktop only */}
-            {pin ? (
-              <>
-                <StyledToolbarButton onClick={handleManualSync}>Sync Now</StyledToolbarButton>
-                <StyledToolbarButton onClick={handleDisconnect}>Disconnect</StyledToolbarButton>
-                <StyledSyncStatus $status={syncStatus}>
-                  <span className="sync-dot" />
-                  {syncStatus === 'syncing' && 'Syncing...'}
-                  {syncStatus === 'synced' && 'Synced'}
-                  {syncStatus === 'error' && 'Sync failed'}
-                  {syncStatus === 'idle' &&
-                    (lastSynced
-                      ? `Last: ${new Date(lastSynced).toLocaleTimeString()}`
-                      : 'Cloud connected')}
-                </StyledSyncStatus>
-              </>
-            ) : (
-              <StyledToolbarButton onClick={() => setShowPinModal(true)}>
-                ☁ Connect Cloud
-              </StyledToolbarButton>
-            )}
-          </StyledDesktopOnly>
-
-          <StyledToolbarButton
+        {/* Bottom tab bar (top nav on desktop) */}
+        <StyledTabBar>
+          <StyledTab
+            $active={activeTab === 'today'}
             onClick={() => {
-              setTimerVisible(v => !v);
-              if (!timerVisible) {
-                setTimerSeconds(300);
-                setTimerRunning(false);
-              }
-            }}>
-            ⏱ Timer
-          </StyledToolbarButton>
-          <StyledReviewBtn $active={reviewMode} onClick={() => setReviewMode(r => !r)}>
-            {reviewMode ? '✕ Exit Review' : `🔄 Review${staleCount > 0 ? ` (${staleCount})` : ''}`}
-          </StyledReviewBtn>
+              setActiveQ(null);
+              setActiveTab('today');
+            }}
+            type="button">
+            <span className="icon">🏠</span>
+            <span className="lbl">Today</span>
+          </StyledTab>
+          <StyledTab
+            $active={activeTab === 'browse'}
+            onClick={() => setActiveTab('browse')}
+            type="button">
+            <span className="icon">📚</span>
+            <span className="lbl">Browse</span>
+          </StyledTab>
+          <StyledTab
+            $active={activeTab === 'practice'}
+            onClick={() => {
+              setActiveQ(null);
+              setActiveTab('practice');
+            }}
+            type="button">
+            <span className="icon">🃏</span>
+            <span className="lbl">Practice</span>
+          </StyledTab>
+          <StyledTab
+            $active={activeTab === 'progress'}
+            onClick={() => {
+              setActiveQ(null);
+              setActiveTab('progress');
+            }}
+            type="button">
+            <span className="icon">📊</span>
+            <span className="lbl">Progress</span>
+          </StyledTab>
+        </StyledTabBar>
 
-          <StyledToolbarButton
-            onClick={() => startQuickMode('flip')}
-            title="Flashcards — for commute / low-focus practice">
-            🃏 Flashcards
-          </StyledToolbarButton>
-          <StyledToolbarButton
-            onClick={() => startQuickMode('mcq')}
-            title="Multiple-choice quiz — Tier 1 only">
-            🎯 MCQ
-          </StyledToolbarButton>
+        <StyledTabBody>
+          <HiddenInput ref={fileInputRef} type="file" accept=".json" onChange={handleImport} />
 
-          <StyledTierFilterBar>
-            <span className="label">Focus:</span>
-            <StyledTierBtn $active={tierFilter === null} onClick={() => setTierFilter(null)}>
-              All
-            </StyledTierBtn>
-            {[1, 2, 3, 4].map(t => (
-              <StyledTierBtn
-                key={t}
-                $active={tierFilter === t}
-                $color={tierMeta[t].color}
-                title={tierMeta[t].description}
-                onClick={() => setTierFilter(tierFilter === t ? null : t)}>
-                {tierMeta[t].label}
-              </StyledTierBtn>
-            ))}
-          </StyledTierFilterBar>
+          {/* TODAY TAB */}
+          {activeTab === 'today' && (
+            <div style={{ padding: '24px 50px', maxWidth: 760, margin: '0 auto' }}>
+              <StyledTodayCard>
+                <header>
+                  <h2>Today&apos;s Mission</h2>
+                  <span className="date">
+                    {new Date(today).toLocaleDateString(undefined, {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                    {' · '}🔥 {streakDays}d streak
+                  </span>
+                </header>
 
-          <StyledStreakChip $active={streakDays > 0} title="Consecutive days with a saved answer">
-            🔥 {streakDays}d streak
-          </StyledStreakChip>
-
-          <StyledStatsBar>
-            <div>
-              Answered:{' '}
-              <span className="count">
-                {answeredQ}/{totalQ}
-              </span>
-            </div>
-            <div>
-              Progress:{' '}
-              <span className="count">
-                {totalQ > 0 ? Math.round((answeredQ / totalQ) * 100) : 0}%
-              </span>
-            </div>
-            {staleCount > 0 && (
-              <div>
-                Stale:{' '}
-                <span className="count" style={{ color: '#facc15' }}>
-                  {staleCount}
-                </span>
-              </div>
-            )}
-            {struggledCount > 0 && (
-              <div>
-                Weak cards:{' '}
-                <span className="count" style={{ color: '#f87171' }}>
-                  {struggledCount}
-                </span>
-              </div>
-            )}
-          </StyledStatsBar>
-        </StyledToolbar>
-
-        <StyledPanels>
-          <StyledLeftPanel $collapsed={leftCollapsed}>
-            <StyledMobileToggle onClick={() => setLeftCollapsed(!leftCollapsed)}>
-              {leftCollapsed ? '▸ Show Questions' : '▾ Hide Questions'}
-            </StyledMobileToggle>
-            {filteredData.map(week => (
-              <StyledWeekGroup key={week.week}>
-                <StyledWeekHeader
-                  $expanded={expandedWeeks[week.week]}
-                  onClick={() => toggleWeek(week.week)}>
-                  <div>
-                    Week {week.week}: {week.title}
-                    <span className="phase">{week.phase}</span>
-                  </div>
-                  <span className="arrow">▸</span>
-                </StyledWeekHeader>
-                <StyledQuestionList $expanded={expandedWeeks[week.week]}>
-                  {week.questions.map(q => {
-                    const t = tiers[q.id];
-                    return (
-                      <StyledQuestionItem
-                        key={q.id}
-                        $active={activeQ === q.id}
-                        $status={getQuestionStatus(q.id)}
-                        onClick={() => handleSelectQuestion(q)}>
-                        <span className="status-dot" />
-                        <StyledMasteryDot
-                          $mastery={studyState[q.id]?.mastery || 0}
-                          title={`Mastery ${studyState[q.id]?.mastery || 0} / 5`}>
-                          {studyState[q.id]?.mastery || ''}
-                        </StyledMasteryDot>
-                        {t && (
-                          <StyledTierBadge $color={tierMeta[t].color}>
-                            {tierMeta[t].label}
-                          </StyledTierBadge>
-                        )}
-                        {confidence[q.id] && (
-                          <span style={{ fontSize: 9, marginRight: 3 }}>
-                            {confidence[q.id] === 3 ? '💪' : confidence[q.id] === 2 ? '😐' : '😟'}
-                          </span>
-                        )}
-                        {isStale(q.id) && <StyledStaleBadge>⟳</StyledStaleBadge>}
-                        <span className="day-label">{q.day}</span>
-                        <span className="q-text">{q.question}</span>
-                      </StyledQuestionItem>
-                    );
-                  })}
-                </StyledQuestionList>
-              </StyledWeekGroup>
-            ))}
-          </StyledLeftPanel>
-
-          <StyledRightPanel>
-            {!activeQuestion ? (
-              <>
-                <StyledTodayCard>
-                  <header>
-                    <h2>Today&apos;s Mission</h2>
-                    <span className="date">
-                      {new Date(today).toLocaleDateString(undefined, {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                      {' · '}🔥 {streakDays}d streak
-                    </span>
-                  </header>
-
-                  <div className="week-grid">
-                    {weekGrid.map(d => (
-                      <div
-                        key={d.date}
-                        className={[
-                          'day-cell',
-                          d.done ? 'done' : '',
-                          d.isToday ? 'today' : '',
-                          d.isWeekend ? 'weekend' : '',
-                          d.isFuture ? 'future' : '',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                        title={d.date}>
-                        <span className="lbl">{d.label}</span>
-                        <span className="mark">
-                          {d.done ? '✓' : d.isWeekend ? '–' : d.isToday ? '•' : ' '}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="plan-rows">
-                    <div className="plan-tile">
-                      <div className="icon">📚</div>
-                      <div className="num">{plan.newIds.length}</div>
-                      <div className="name">New today</div>
-                    </div>
-                    <div className="plan-tile">
-                      <div className="icon">🔁</div>
-                      <div className="num">{plan.reviewIds.length}</div>
-                      <div className="name">Due review</div>
-                    </div>
-                    <div className="plan-tile">
-                      <div className="icon">🛠</div>
-                      <div className="num">{plan.practicalIds.length}</div>
-                      <div className="name">Hands-on</div>
-                    </div>
-                  </div>
-
-                  {totalBacklog > plan.reviewIds.length && (
+                <div className="week-grid">
+                  {weekGrid.map(d => (
                     <div
-                      className="empty-state"
-                      style={{
-                        background: 'rgba(250, 204, 21, 0.1)',
-                        border: '1px solid #facc15',
-                        borderRadius: 'var(--border-radius)',
-                        padding: '10px 14px',
-                        marginBottom: 14,
-                        color: '#facc15',
-                        textAlign: 'left',
-                        fontSize: 12,
-                      }}>
-                      ⚠ {totalBacklog} reviews piled up — capped at {plan.reviewIds.length} per
-                      session. Finish today&apos;s session to shrink the backlog.
+                      key={d.date}
+                      className={[
+                        'day-cell',
+                        d.done ? 'done' : '',
+                        d.isToday ? 'today' : '',
+                        d.isWeekend ? 'weekend' : '',
+                        d.isFuture ? 'future' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      title={d.date}>
+                      <span className="lbl">{d.label}</span>
+                      <span className="mark">
+                        {d.done ? '✓' : d.isWeekend ? '–' : d.isToday ? '•' : ' '}
+                      </span>
                     </div>
-                  )}
+                  ))}
+                </div>
 
-                  {plan.newIds.length + plan.reviewIds.length > 0 ? (
-                    <button type="button" className="start-btn" onClick={startDailySession}>
-                      Start Session ({plan.newIds.length + plan.reviewIds.length} cards)
-                    </button>
-                  ) : isWeekendToday && !hasNeverStudied ? (
-                    <>
-                      <div className="empty-state">
-                        Weekend — buffer day. Streak doesn&apos;t break on weekends.
-                        <br />
-                        <small>Studying now will absorb a missed weekday in this same week.</small>
-                      </div>
-                      <button
-                        type="button"
-                        className="start-btn"
-                        style={{
-                          background: 'transparent',
-                          color: 'var(--green)',
-                          border: '1px solid var(--green)',
-                        }}
-                        onClick={() => setWeekendOverride(true)}>
-                        Study new cards anyway
-                      </button>
-                    </>
-                  ) : (
-                    <div className="empty-state">
-                      🎉 No cards due today. Come back tomorrow, or use Free Practice in the
-                      toolbar.
-                    </div>
-                  )}
-
-                  <div className="pct">
-                    Mastered: {histogram[5]} · Strong: {histogram[4]} · Solid: {histogram[3]} ·
-                    Familiar: {histogram[2]} · Intro: {histogram[1]} · Unseen: {histogram[0]}
+                <div className="plan-rows">
+                  <div className="plan-tile">
+                    <div className="icon">📚</div>
+                    <div className="num">{plan.newIds.length}</div>
+                    <div className="name">New today</div>
                   </div>
-                </StyledTodayCard>
+                  <div className="plan-tile">
+                    <div className="icon">🔁</div>
+                    <div className="num">{plan.reviewIds.length}</div>
+                    <div className="name">Due review</div>
+                  </div>
+                  <div className="plan-tile">
+                    <div className="icon">🛠</div>
+                    <div className="num">{plan.practicalIds.length}</div>
+                    <div className="name">Hands-on</div>
+                  </div>
+                </div>
 
-                {plan.practicalIds.length > 0 && (
-                  <StyledTodayPracticals>
-                    <h3>🛠 Today&apos;s Hands-On Tasks</h3>
-                    {plan.practicalIds.map(qid => {
-                      const q = interviewPrepData
-                        .flatMap(w => w.questions)
-                        .find(qq => qq.id === qid);
-                      const exs = practical[qid]?.exercises || [];
-                      return exs.map((ex, i) => {
-                        const key = `${qid}:${i}`;
-                        const done = practicalDone[key];
-                        return (
-                          <div key={key} className={`pract-row ${done ? 'done' : ''}`}>
-                            <button
-                              type="button"
-                              className="pract-check"
-                              onClick={() => togglePracticalDaily(qid, i)}
-                              aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
-                              {done ? '✓' : ''}
-                            </button>
-                            <div>
-                              {ex}
-                              <div className="pract-meta">
-                                {q?.day} · {q?.topic}
-                              </div>
+                {totalBacklog > plan.reviewIds.length && (
+                  <div
+                    className="empty-state"
+                    style={{
+                      background: 'rgba(250, 204, 21, 0.1)',
+                      border: '1px solid #facc15',
+                      borderRadius: 'var(--border-radius)',
+                      padding: '10px 14px',
+                      marginBottom: 14,
+                      color: '#facc15',
+                      textAlign: 'left',
+                      fontSize: 12,
+                    }}>
+                    ⚠ {totalBacklog} reviews piled up — capped at {plan.reviewIds.length} per
+                    session. Finish today&apos;s session to shrink the backlog.
+                  </div>
+                )}
+
+                {plan.newIds.length + plan.reviewIds.length > 0 ? (
+                  <button type="button" className="start-btn" onClick={startDailySession}>
+                    Start Session ({plan.newIds.length + plan.reviewIds.length} cards)
+                  </button>
+                ) : isWeekendToday && !hasNeverStudied ? (
+                  <>
+                    <div className="empty-state">
+                      Weekend — buffer day. Streak doesn&apos;t break on weekends.
+                      <br />
+                      <small>Studying now will absorb a missed weekday in this same week.</small>
+                    </div>
+                    <button
+                      type="button"
+                      className="start-btn"
+                      style={{
+                        background: 'transparent',
+                        color: 'var(--green)',
+                        border: '1px solid var(--green)',
+                      }}
+                      onClick={() => setWeekendOverride(true)}>
+                      Study new cards anyway
+                    </button>
+                  </>
+                ) : (
+                  <div className="empty-state">
+                    🎉 No cards due today. Come back tomorrow, or use the Practice tab.
+                  </div>
+                )}
+
+                <div className="pct">
+                  Mastered: {histogram[5]} · Strong: {histogram[4]} · Solid: {histogram[3]} ·
+                  Familiar: {histogram[2]} · Intro: {histogram[1]} · Unseen: {histogram[0]}
+                </div>
+              </StyledTodayCard>
+
+              {plan.practicalIds.length > 0 && (
+                <StyledTodayPracticals>
+                  <h3>🛠 Today&apos;s Hands-On Tasks</h3>
+                  {plan.practicalIds.map(qid => {
+                    const q = interviewPrepData.flatMap(w => w.questions).find(qq => qq.id === qid);
+                    const exs = practical[qid]?.exercises || [];
+                    return exs.map((ex, i) => {
+                      const key = `${qid}:${i}`;
+                      const done = practicalDone[key];
+                      return (
+                        <div key={key} className={`pract-row ${done ? 'done' : ''}`}>
+                          <button
+                            type="button"
+                            className="pract-check"
+                            onClick={() => togglePracticalDaily(qid, i)}
+                            aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
+                            {done ? '✓' : ''}
+                          </button>
+                          <div>
+                            {ex}
+                            <div className="pract-meta">
+                              {q?.day} · {q?.topic}
                             </div>
                           </div>
-                        );
-                      });
-                    })}
-                  </StyledTodayPracticals>
-                )}
-
-                <StyledHardwareGuide>
-                  <div className="title">🔧 Hardware setup — what you actually need</div>
-                  <div className="sub">
-                    Most exercises are written portable. Pick the path that matches what you have.
-                  </div>
-                  <details>
-                    <summary>I have an EFR32 board (Thunderboard, WSTK, BG22-EK4108A)</summary>
-                    <p>
-                      Every hands-on maps directly. Use Simplicity Studio + Gecko SDK. CMU, LDMA,
-                      EM2/EM3, NVM3 — all native. <code>SLSTK3402A</code> ($30) and
-                      <code> BG22-EK4108A</code> ($40) are the cheapest with onboard mic + speaker
-                      support.
-                    </p>
-                  </details>
-                  <details>
-                    <summary>
-                      I have any other Cortex-M (STM32 Nucleo, RPi Pico, ESP32-S3, nRF52)
-                    </summary>
-                    <p>
-                      ~85% of exercises work as-is. Concepts are universal: pipeline, NVIC, MPU,
-                      faults, FreeRTOS, DMA, I2S, SPI, I2C. Skip vendor-specific ones (CMU register
-                      names, NVM3, EFR32 EM3 details) — read those instead.
-                    </p>
-                    <p>
-                      <strong>Cheapest pick:</strong> STM32F4 Nucleo (~$15) + a $5 SPH0645 I2S mic.
-                      Covers M4F + FPU + I2S without changing any concept.
-                    </p>
-                  </details>
-                  <details>
-                    <summary>I have no hardware</summary>
-                    <p>
-                      <strong>QEMU</strong> handles M3/M4 well: pipeline behavior, MPU, fault
-                      injection, FreeRTOS bring-up, linker scripts.{' '}
-                      <code>qemu-system-arm -M mps2-an385 </code> is a solid baseline. Renode is
-                      better for multi-peripheral sims (UART, I2C, SPI).
-                    </p>
-                    <p>
-                      Many exercises are pen-and-paper anyway: linker LMA/VMA tracing, CFSR
-                      decoding, BCLK math, stack-frame sketches. Don&apos;t skip these — they mirror
-                      what gets asked on a whiteboard.
-                    </p>
-                  </details>
-                </StyledHardwareGuide>
-
-                <StyledTierProgress>
-                  <div className="heading">Progress by tier — crush T1 first</div>
-                  {tierProgress.map(tp => {
-                    const meta = tierMeta[tp.tier];
-                    const pct = tp.total > 0 ? Math.round((tp.done / tp.total) * 100) : 0;
-                    return (
-                      <div className="row" key={tp.tier}>
-                        <span className="tier-tag" style={{ color: meta.color }}>
-                          {meta.label}
-                        </span>
-                        <span className="name">{meta.name}</span>
-                        <div className="bar">
-                          <div
-                            className="fill"
-                            style={{ width: `${pct}%`, background: meta.color }}
-                          />
                         </div>
-                        <span className="count">
-                          {tp.done}/{tp.total}
-                        </span>
-                      </div>
-                    );
+                      );
+                    });
                   })}
-                </StyledTierProgress>
-                <StyledEmptyState>
-                  <div className="icon">📝</div>
-                  <div>Select a question from the left panel</div>
-                  <div style={{ marginTop: 8, fontSize: 12 }}>
-                    Use the tier filter — start with T1. Answer from memory, then reveal reference.
-                  </div>
-                </StyledEmptyState>
-              </>
-            ) : (
-              <StyledQuestionDetail>
-                {timerVisible && (
-                  <StyledTimerDisplay $seconds={timerSeconds}>
-                    <span className="time">{formatTimer(timerSeconds)}</span>
-                    <div className="timer-controls">
-                      <button
-                        className="timer-btn"
-                        type="button"
-                        onClick={() => setTimerRunning(r => !r)}>
-                        {timerRunning ? 'Pause' : 'Start'}
-                      </button>
-                      <button
-                        className="timer-btn"
-                        type="button"
-                        onClick={() => {
-                          setTimerRunning(false);
-                          setTimerSeconds(300);
-                        }}>
-                        Reset
-                      </button>
+                </StyledTodayPracticals>
+              )}
+            </div>
+          )}
+
+          {/* BROWSE TAB */}
+          {activeTab === 'browse' && (
+            <>
+              <StyledFilterChips>
+                <StyledSearchInput
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  style={{ width: 200, flexShrink: 0 }}
+                />
+                {[
+                  { k: 'all', l: `All (${browseList.length})` },
+                  { k: 't1', l: 'T1' },
+                  { k: 't2', l: 'T2' },
+                  { k: 't3', l: 'T3' },
+                  { k: 't4', l: 'T4' },
+                  { k: 'unseen', l: 'Unseen' },
+                  { k: 'weak', l: 'Weak' },
+                  { k: 'mastered', l: 'Mastered' },
+                  { k: 'stale', l: 'Stale' },
+                ].map(c => (
+                  <StyledChip
+                    key={c.k}
+                    $active={browseFilter === c.k}
+                    onClick={() => setBrowseFilter(c.k)}
+                    type="button">
+                    {c.l}
+                  </StyledChip>
+                ))}
+              </StyledFilterChips>
+
+              {activeQuestion && (
+                <StyledMobileBackBar>
+                  <button type="button" onClick={() => setActiveQ(null)}>
+                    ← Back
+                  </button>
+                  <span className="label">{activeQuestion.topic}</span>
+                </StyledMobileBackBar>
+              )}
+
+              <StyledPanels>
+                <StyledLeftPanel
+                  $collapsed={false}
+                  style={{ display: activeQuestion ? undefined : undefined }}>
+                  {browseList.length === 0 ? (
+                    <div
+                      style={{
+                        padding: 30,
+                        textAlign: 'center',
+                        color: 'var(--slate)',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 13,
+                      }}>
+                      No questions match that filter.
                     </div>
-                    {timerSeconds === 0 && (
-                      <span
-                        style={{ color: '#f87171', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
-                        Time&apos;s up!
+                  ) : (
+                    browseList.map(q => {
+                      const t = tiers[q.id];
+                      const m = studyState[q.id]?.mastery || 0;
+                      return (
+                        <StyledFlatRow
+                          key={q.id}
+                          $active={activeQ === q.id}
+                          onClick={() => handleSelectQuestion(q)}
+                          type="button">
+                          <StyledMasteryDot $mastery={m} title={`Mastery ${m}/5`}>
+                            {m || ''}
+                          </StyledMasteryDot>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div className="meta">
+                              <span>
+                                W{q._week} · {q.day}
+                              </span>
+                              {t && (
+                                <StyledTierBadge $color={tierMeta[t].color}>
+                                  {tierMeta[t].label}
+                                </StyledTierBadge>
+                              )}
+                              {confidence[q.id] && (
+                                <span style={{ fontSize: 12 }}>
+                                  {confidence[q.id] === 3
+                                    ? '💪'
+                                    : confidence[q.id] === 2
+                                    ? '😐'
+                                    : '😟'}
+                                </span>
+                              )}
+                              {isStale(q.id) && <StyledStaleBadge>⟳ stale</StyledStaleBadge>}
+                            </div>
+                            <div className="qtxt">{q.question}</div>
+                          </div>
+                        </StyledFlatRow>
+                      );
+                    })
+                  )}
+                </StyledLeftPanel>
+
+                <StyledRightPanel>
+                  {!activeQuestion ? (
+                    <StyledEmptyState>
+                      <div className="icon">📝</div>
+                      <div>Pick a question from the list</div>
+                      <div style={{ marginTop: 8, fontSize: 12 }}>
+                        Filter chips at top narrow the deck. Mastery dot = how solid you are.
+                      </div>
+                    </StyledEmptyState>
+                  ) : (
+                    <StyledQuestionDetail>
+                      {timerVisible && (
+                        <StyledTimerDisplay $seconds={timerSeconds}>
+                          <span className="time">{formatTimer(timerSeconds)}</span>
+                          <div className="timer-controls">
+                            <button
+                              className="timer-btn"
+                              type="button"
+                              onClick={() => setTimerRunning(r => !r)}>
+                              {timerRunning ? 'Pause' : 'Start'}
+                            </button>
+                            <button
+                              className="timer-btn"
+                              type="button"
+                              onClick={() => {
+                                setTimerRunning(false);
+                                setTimerSeconds(300);
+                              }}>
+                              Reset
+                            </button>
+                          </div>
+                          {timerSeconds === 0 && (
+                            <span
+                              style={{
+                                color: '#f87171',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: 12,
+                              }}>
+                              Time&apos;s up!
+                            </span>
+                          )}
+                        </StyledTimerDisplay>
+                      )}
+                      <div className="topic-label">
+                        Week{' '}
+                        {interviewPrepData.find(w => w.questions.some(q => q.id === activeQ))?.week}{' '}
+                        · {activeQuestion.day} — {activeQuestion.topic}
+                        {tiers[activeQ] && (
+                          <StyledTierBadge
+                            $color={tierMeta[tiers[activeQ]].color}
+                            style={{ marginLeft: 10 }}
+                            title={tierMeta[tiers[activeQ]].description}>
+                            {tierMeta[tiers[activeQ]].label} · {tierMeta[tiers[activeQ]].name}
+                          </StyledTierBadge>
+                        )}
+                      </div>
+                      <div className="question-text">{activeQuestion.question}</div>
+
+                      <StyledReadingSection>
+                        <h3>Reading Material</h3>
+                        <ul>
+                          {activeQuestion.reading.map((r, i) => (
+                            <li key={i}>{r}</li>
+                          ))}
+                        </ul>
+                      </StyledReadingSection>
+
+                      {practical[activeQ] && (
+                        <StyledPracticalSection>
+                          <h3>🛠 Hands-On — do these, don&apos;t just read</h3>
+                          <ol>
+                            {practical[activeQ].exercises.map((ex, i) => {
+                              const done = practicalDone[`${activeQ}:${i}`];
+                              return (
+                                <li key={i} className={done ? 'done' : ''}>
+                                  <button
+                                    type="button"
+                                    className="check"
+                                    onClick={() => togglePractical(activeQ, i)}
+                                    aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
+                                    {done ? '✓' : ''}
+                                  </button>
+                                  {ex}
+                                </li>
+                              );
+                            })}
+                          </ol>
+                          {practical[activeQ].drill && (
+                            <div className="drill">
+                              <span className="drill-label">Drill:</span>
+                              {practical[activeQ].drill}
+                            </div>
+                          )}
+                        </StyledPracticalSection>
+                      )}
+
+                      {activeQuestion.readingNotes && activeQuestion.readingNotes.length > 0 && (
+                        <StyledReferenceToggle>
+                          <button onClick={() => setShowReading(!showReading)}>
+                            {showReading ? '▾ Hide Study Notes' : '▸ Show Study Notes'}
+                          </button>
+                          {showReading && (
+                            <div className="ref-answer" style={{ padding: '20px 20px 12px' }}>
+                              <StyledNotesPanel>
+                                {activeQuestion.readingNotes.map((section, i) => (
+                                  <div
+                                    key={i}
+                                    style={{
+                                      marginBottom:
+                                        i < activeQuestion.readingNotes.length - 1 ? 28 : 0,
+                                    }}>
+                                    <div className="note-source">{section.source}</div>
+                                    <MarkdownBlock content={section.content} />
+                                  </div>
+                                ))}
+                              </StyledNotesPanel>
+                            </div>
+                          )}
+                        </StyledReferenceToggle>
+                      )}
+
+                      <StyledAnswerSection $saved={saved}>
+                        <h3>
+                          Your Answer
+                          <span className="save-indicator">✓ Saved</span>
+                        </h3>
+                        <StyledTextarea
+                          value={currentDraft}
+                          onChange={e => setCurrentDraft(e.target.value)}
+                          placeholder="Write your answer from memory... try without looking at the reference first. (Ctrl+S to save)"
+                        />
+                        <StyledAnswerActions>
+                          <StyledActionButton $primary onClick={handleSave}>
+                            Save Answer
+                          </StyledActionButton>
+                          <StyledActionButton onClick={handleDelete} disabled={!answers[activeQ]}>
+                            Clear
+                          </StyledActionButton>
+                        </StyledAnswerActions>
+
+                        <StyledConfidenceSection>
+                          <span className="label">Confidence:</span>
+                          {[
+                            { level: 1, label: 'Low', color: '#f87171' },
+                            { level: 2, label: 'Medium', color: '#facc15' },
+                            { level: 3, label: 'High', color: '#4ade80' },
+                          ].map(c => (
+                            <StyledConfidenceBtn
+                              key={c.level}
+                              $active={confidence[activeQ] === c.level}
+                              $color={c.color}
+                              onClick={() => handleConfidence(activeQ, c.level)}>
+                              {c.label}
+                            </StyledConfidenceBtn>
+                          ))}
+                        </StyledConfidenceSection>
+                      </StyledAnswerSection>
+
+                      <SketchPad questionId={activeQ} />
+
+                      <StyledReferenceToggle>
+                        <button onClick={() => setShowReference(!showReference)}>
+                          {showReference ? '▾ Hide Reference Answer' : '▸ Show Reference Answer'}
+                        </button>
+                        {showReference && (
+                          <div className="ref-answer">{activeQuestion.referenceAnswer}</div>
+                        )}
+                      </StyledReferenceToggle>
+                    </StyledQuestionDetail>
+                  )}
+                </StyledRightPanel>
+              </StyledPanels>
+            </>
+          )}
+
+          {/* PRACTICE TAB */}
+          {activeTab === 'practice' && (
+            <div style={{ padding: '24px 50px', maxWidth: 760, margin: '0 auto' }}>
+              <h2
+                style={{
+                  color: 'var(--lightest-slate)',
+                  fontSize: 18,
+                  fontFamily: 'var(--font-mono)',
+                  margin: '0 0 8px',
+                }}>
+                Free Practice
+              </h2>
+              <p
+                style={{
+                  color: 'var(--slate)',
+                  fontSize: 13,
+                  margin: '0 0 20px',
+                  lineHeight: 1.6,
+                }}>
+                Off-schedule study — no mastery tracking, no streak impact. Pick a mode.
+              </p>
+
+              <StyledPracticeCard onClick={() => startQuickMode('flip')} type="button">
+                <span className="ic">🃏</span>
+                <div className="body">
+                  <div className="ttl">Flashcards</div>
+                  <div className="desc">
+                    Tap-to-reveal cards from the deck. Self-rate. Good for commute or low-focus
+                    moments.
+                  </div>
+                </div>
+              </StyledPracticeCard>
+
+              <StyledPracticeCard onClick={() => startQuickMode('mcq')} type="button">
+                <span className="ic">🎯</span>
+                <div className="body">
+                  <div className="ttl">Multiple Choice Quiz</div>
+                  <div className="desc">
+                    21 hand-written MCQs with explanations. Distractors test discrimination, not
+                    just recognition.
+                  </div>
+                </div>
+              </StyledPracticeCard>
+
+              <StyledPracticeCard
+                onClick={() => {
+                  setBrowseFilter('stale');
+                  setActiveTab('browse');
+                }}
+                type="button">
+                <span className="ic">🔄</span>
+                <div className="body">
+                  <div className="ttl">
+                    Review weak / stale{staleCount > 0 ? ` (${staleCount} stale)` : ''}
+                  </div>
+                  <div className="desc">
+                    Jump to Browse with the stale filter applied — what&apos;s gone cold.
+                  </div>
+                </div>
+              </StyledPracticeCard>
+
+              <StyledPracticeCard
+                onClick={() => {
+                  setTimerVisible(true);
+                  setTimerSeconds(300);
+                  setActiveTab('browse');
+                }}
+                type="button">
+                <span className="ic">⏱</span>
+                <div className="body">
+                  <div className="ttl">Timed practice</div>
+                  <div className="desc">
+                    5-minute countdown for whiteboard rehearsal. Pick a question after enabling.
+                  </div>
+                </div>
+              </StyledPracticeCard>
+
+              <h3
+                style={{
+                  color: 'var(--slate)',
+                  fontSize: 11,
+                  fontFamily: 'var(--font-mono)',
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.5,
+                  margin: '24px 0 10px',
+                }}>
+                Free-practice tier filter
+              </h3>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <StyledTierBtn
+                  $active={tierFilter === null}
+                  onClick={() => setTierFilter(null)}
+                  type="button">
+                  All
+                </StyledTierBtn>
+                {[1, 2, 3, 4].map(t => (
+                  <StyledTierBtn
+                    key={t}
+                    $active={tierFilter === t}
+                    $color={tierMeta[t].color}
+                    title={tierMeta[t].description}
+                    onClick={() => setTierFilter(tierFilter === t ? null : t)}
+                    type="button">
+                    {tierMeta[t].label}
+                  </StyledTierBtn>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* PROGRESS TAB */}
+          {activeTab === 'progress' && (
+            <div style={{ padding: '24px 50px', maxWidth: 760, margin: '0 auto' }}>
+              <StyledHeatmap>
+                <h3>📅 Activity — last 13 weeks</h3>
+                <div className="grid">
+                  <div />
+                  {heatmapCols.map((_, i) => (
+                    <div key={`hdr-${i}`} />
+                  ))}
+                  {[0, 1, 2, 3, 4, 5, 6].map(rowIdx => (
+                    <React.Fragment key={`row-${rowIdx}`}>
+                      <div className="row-lbl">{['M', 'T', 'W', 'T', 'F', 'S', 'S'][rowIdx]}</div>
+                      {heatmapCols.map((col, ci) => (
+                        <StyledHeatCell
+                          key={`cell-${rowIdx}-${ci}`}
+                          $count={col[rowIdx].count}
+                          $today={col[rowIdx].today}
+                          $future={col[rowIdx].future}
+                          title={`${col[rowIdx].date}: ${col[rowIdx].count} ${
+                            col[rowIdx].count === 1 ? 'item' : 'items'
+                          }`}
+                        />
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </div>
+                <div className="legend">
+                  Less
+                  <StyledHeatCell
+                    $count={0}
+                    style={{ width: 12, height: 12, aspectRatio: 'unset' }}
+                  />
+                  <StyledHeatCell
+                    $count={1}
+                    style={{ width: 12, height: 12, aspectRatio: 'unset' }}
+                  />
+                  <StyledHeatCell
+                    $count={2}
+                    style={{ width: 12, height: 12, aspectRatio: 'unset' }}
+                  />
+                  <StyledHeatCell
+                    $count={4}
+                    style={{ width: 12, height: 12, aspectRatio: 'unset' }}
+                  />
+                  <StyledHeatCell
+                    $count={6}
+                    style={{ width: 12, height: 12, aspectRatio: 'unset' }}
+                  />
+                  More
+                </div>
+              </StyledHeatmap>
+
+              <StyledTierProgress>
+                <div className="heading">Mastery by tier</div>
+                {tierProgress.map(tp => {
+                  const meta = tierMeta[tp.tier];
+                  const pct = tp.total > 0 ? Math.round((tp.done / tp.total) * 100) : 0;
+                  return (
+                    <div className="row" key={tp.tier}>
+                      <span className="tier-tag" style={{ color: meta.color }}>
+                        {meta.label}
                       </span>
+                      <span className="name">{meta.name}</span>
+                      <div className="bar">
+                        <div
+                          className="fill"
+                          style={{ width: `${pct}%`, background: meta.color }}
+                        />
+                      </div>
+                      <span className="count">
+                        {tp.done}/{tp.total}
+                      </span>
+                    </div>
+                  );
+                })}
+              </StyledTierProgress>
+
+              <StyledTierProgress>
+                <div className="heading">Mastery breakdown — all 60 cards</div>
+                {[
+                  { lvl: 5, name: 'Mastered', color: '#4ade80' },
+                  { lvl: 4, name: 'Strong', color: '#86efac' },
+                  { lvl: 3, name: 'Solid', color: '#facc15' },
+                  { lvl: 2, name: 'Familiar', color: '#fb923c' },
+                  { lvl: 1, name: 'Intro', color: '#f87171' },
+                  { lvl: 0, name: 'Unseen', color: 'var(--slate)' },
+                ].map(b => {
+                  const total = histogram.reduce((a, n) => a + n, 0);
+                  const pct = total > 0 ? Math.round((histogram[b.lvl] / total) * 100) : 0;
+                  return (
+                    <div className="row" key={b.lvl}>
+                      <span className="tier-tag" style={{ color: b.color }}>
+                        L{b.lvl}
+                      </span>
+                      <span className="name">{b.name}</span>
+                      <div className="bar">
+                        <div className="fill" style={{ width: `${pct}%`, background: b.color }} />
+                      </div>
+                      <span className="count">
+                        {histogram[b.lvl]}/{total}
+                      </span>
+                    </div>
+                  );
+                })}
+              </StyledTierProgress>
+
+              {(() => {
+                const struggledCount = Object.values(flashcardStats).filter(
+                  s => s && s.shown >= 2 && s.knew / s.shown < 0.5,
+                ).length;
+                if (struggledCount === 0) {
+                  return null;
+                }
+                return (
+                  <div
+                    style={{
+                      padding: '12px 16px',
+                      marginBottom: 18,
+                      background: 'rgba(248, 113, 113, 0.08)',
+                      border: '1px solid #f87171',
+                      borderRadius: 'var(--border-radius)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 12,
+                      color: '#f87171',
+                    }}>
+                    💢 {struggledCount} weak free-practice card
+                    {struggledCount === 1 ? '' : 's'} (shown ≥ 2× with &lt; 50% recall). Practice
+                    tab → Flashcards.
+                  </div>
+                );
+              })()}
+
+              <StyledHardwareGuide>
+                <div className="title">🔧 Hardware setup — what you actually need</div>
+                <div className="sub">
+                  Most exercises are written portable. Pick the path that matches what you have.
+                </div>
+                <details>
+                  <summary>I have an EFR32 board (Thunderboard, WSTK, BG22-EK4108A)</summary>
+                  <p>
+                    Every hands-on maps directly. Use Simplicity Studio + Gecko SDK. CMU, LDMA,
+                    EM2/EM3, NVM3 — all native. <code>SLSTK3402A</code> ($30) and
+                    <code> BG22-EK4108A</code> ($40) are the cheapest with onboard mic + speaker
+                    support.
+                  </p>
+                </details>
+                <details>
+                  <summary>
+                    I have any other Cortex-M (STM32 Nucleo, RPi Pico, ESP32-S3, nRF52)
+                  </summary>
+                  <p>
+                    ~85% of exercises work as-is. Concepts are universal: pipeline, NVIC, MPU,
+                    faults, FreeRTOS, DMA, I2S, SPI, I2C. Skip vendor-specific ones (CMU register
+                    names, NVM3, EFR32 EM3 details) — read those instead.
+                  </p>
+                  <p>
+                    <strong>Cheapest pick:</strong> STM32F4 Nucleo (~$15) + a $5 SPH0645 I2S mic.
+                    Covers M4F + FPU + I2S without changing any concept.
+                  </p>
+                </details>
+                <details>
+                  <summary>I have no hardware</summary>
+                  <p>
+                    <strong>QEMU</strong> handles M3/M4 well: pipeline behavior, MPU, fault
+                    injection, FreeRTOS bring-up, linker scripts.{' '}
+                    <code>qemu-system-arm -M mps2-an385 </code> is a solid baseline. Renode is
+                    better for multi-peripheral sims (UART, I2C, SPI).
+                  </p>
+                  <p>
+                    Many exercises are pen-and-paper anyway: linker LMA/VMA tracing, CFSR decoding,
+                    BCLK math, stack-frame sketches. Don&apos;t skip these — they mirror what gets
+                    asked on a whiteboard.
+                  </p>
+                </details>
+              </StyledHardwareGuide>
+
+              <StyledDesktopOnly>
+                <div
+                  style={{
+                    marginTop: 18,
+                    padding: 16,
+                    background: 'rgba(35, 53, 84, 0.2)',
+                    border: '1px solid var(--lightest-navy)',
+                    borderRadius: 'var(--border-radius)',
+                  }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 12,
+                      color: 'var(--green)',
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.5,
+                      marginBottom: 12,
+                    }}>
+                    Data &amp; sync
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <StyledToolbarButton onClick={handleExport}>Export JSON</StyledToolbarButton>
+                    <StyledToolbarButton onClick={() => fileInputRef.current?.click()}>
+                      Import JSON
+                    </StyledToolbarButton>
+                    {pin ? (
+                      <>
+                        <StyledToolbarButton onClick={handleManualSync}>
+                          Sync Now
+                        </StyledToolbarButton>
+                        <StyledToolbarButton onClick={handleDisconnect}>
+                          Disconnect Cloud
+                        </StyledToolbarButton>
+                      </>
+                    ) : (
+                      <StyledToolbarButton onClick={() => setShowPinModal(true)}>
+                        ☁ Connect Cloud
+                      </StyledToolbarButton>
                     )}
-                  </StyledTimerDisplay>
-                )}
-                <div className="topic-label">
-                  Week {interviewPrepData.find(w => w.questions.some(q => q.id === activeQ))?.week}{' '}
-                  · {activeQuestion.day} — {activeQuestion.topic}
-                  {tiers[activeQ] && (
-                    <StyledTierBadge
-                      $color={tierMeta[tiers[activeQ]].color}
-                      style={{ marginLeft: 10 }}
-                      title={tierMeta[tiers[activeQ]].description}>
-                      {tierMeta[tiers[activeQ]].label} · {tierMeta[tiers[activeQ]].name}
-                    </StyledTierBadge>
+                  </div>
+                  {pin && (
+                    <StyledSyncStatus $status={syncStatus} style={{ marginTop: 10 }}>
+                      <span className="sync-dot" />
+                      {syncStatus === 'syncing' && 'Syncing...'}
+                      {syncStatus === 'synced' && 'Synced'}
+                      {syncStatus === 'error' && 'Sync failed'}
+                      {syncStatus === 'idle' &&
+                        (lastSynced
+                          ? `Last: ${new Date(lastSynced).toLocaleTimeString()}`
+                          : 'Cloud connected')}
+                    </StyledSyncStatus>
                   )}
                 </div>
-                <div className="question-text">{activeQuestion.question}</div>
-
-                <StyledReadingSection>
-                  <h3>Reading Material</h3>
-                  <ul>
-                    {activeQuestion.reading.map((r, i) => (
-                      <li key={i}>{r}</li>
-                    ))}
-                  </ul>
-                </StyledReadingSection>
-
-                {practical[activeQ] && (
-                  <StyledPracticalSection>
-                    <h3>🛠 Hands-On — do these, don&apos;t just read</h3>
-                    <ol>
-                      {practical[activeQ].exercises.map((ex, i) => {
-                        const done = practicalDone[`${activeQ}:${i}`];
-                        return (
-                          <li key={i} className={done ? 'done' : ''}>
-                            <button
-                              type="button"
-                              className="check"
-                              onClick={() => togglePractical(activeQ, i)}
-                              aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
-                              {done ? '✓' : ''}
-                            </button>
-                            {ex}
-                          </li>
-                        );
-                      })}
-                    </ol>
-                    {practical[activeQ].drill && (
-                      <div className="drill">
-                        <span className="drill-label">Drill:</span>
-                        {practical[activeQ].drill}
-                      </div>
-                    )}
-                  </StyledPracticalSection>
-                )}
-
-                {activeQuestion.readingNotes && activeQuestion.readingNotes.length > 0 && (
-                  <StyledReferenceToggle>
-                    <button onClick={() => setShowReading(!showReading)}>
-                      {showReading ? '▾ Hide Study Notes' : '▸ Show Study Notes'}
-                    </button>
-                    {showReading && (
-                      <div className="ref-answer" style={{ padding: '20px 20px 12px' }}>
-                        <StyledNotesPanel>
-                          {activeQuestion.readingNotes.map((section, i) => (
-                            <div
-                              key={i}
-                              style={{
-                                marginBottom: i < activeQuestion.readingNotes.length - 1 ? 28 : 0,
-                              }}>
-                              <div className="note-source">{section.source}</div>
-                              <MarkdownBlock content={section.content} />
-                            </div>
-                          ))}
-                        </StyledNotesPanel>
-                      </div>
-                    )}
-                  </StyledReferenceToggle>
-                )}
-
-                <StyledAnswerSection $saved={saved}>
-                  <h3>
-                    Your Answer
-                    <span className="save-indicator">✓ Saved</span>
-                  </h3>
-                  <StyledTextarea
-                    value={currentDraft}
-                    onChange={e => setCurrentDraft(e.target.value)}
-                    placeholder="Write your answer from memory... try without looking at the reference first. (Ctrl+S to save)"
-                  />
-                  <StyledAnswerActions>
-                    <StyledActionButton $primary onClick={handleSave}>
-                      Save Answer
-                    </StyledActionButton>
-                    <StyledActionButton onClick={handleDelete} disabled={!answers[activeQ]}>
-                      Clear
-                    </StyledActionButton>
-                  </StyledAnswerActions>
-
-                  <StyledConfidenceSection>
-                    <span className="label">Confidence:</span>
-                    {[
-                      { level: 1, label: 'Low', color: '#f87171' },
-                      { level: 2, label: 'Medium', color: '#facc15' },
-                      { level: 3, label: 'High', color: '#4ade80' },
-                    ].map(c => (
-                      <StyledConfidenceBtn
-                        key={c.level}
-                        $active={confidence[activeQ] === c.level}
-                        $color={c.color}
-                        onClick={() => handleConfidence(activeQ, c.level)}>
-                        {c.label}
-                      </StyledConfidenceBtn>
-                    ))}
-                  </StyledConfidenceSection>
-                </StyledAnswerSection>
-
-                <SketchPad questionId={activeQ} />
-
-                <StyledReferenceToggle>
-                  <button onClick={() => setShowReference(!showReference)}>
-                    {showReference ? '▾ Hide Reference Answer' : '▸ Show Reference Answer'}
-                  </button>
-                  {showReference && (
-                    <div className="ref-answer">{activeQuestion.referenceAnswer}</div>
-                  )}
-                </StyledReferenceToggle>
-              </StyledQuestionDetail>
-            )}
-          </StyledRightPanel>
-        </StyledPanels>
+              </StyledDesktopOnly>
+            </div>
+          )}
+        </StyledTabBody>
       </StyledContainer>
     </Layout>
   );

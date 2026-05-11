@@ -1627,6 +1627,35 @@ Profile
           },
         ],
       },
+      {
+        id: 'w4d6',
+        day: 'Sat',
+        topic: 'LE Audio + LC3 codec vs BT Classic A2DP (AirPods relevance)',
+        reading: [
+          'BT Classic A2DP: SBC or AAC codec, ~110-150 ms latency, Classic-only radio mode. Mature, broad host support, but power-hungry.',
+          'BT LE Audio (BT 5.2+): LC3 codec, ~30-60 ms latency, runs on the LE radio. AirPods Pro 2 and AirPods 4 use LE Audio.',
+          'LC3: lower bitrate than AAC at equal quality. Critical for tiny batteries. Mandatory for Auracast and hearing-aid compatibility.',
+          'AirPods firmware coordinates radio between LE Audio (streaming) and standard BLE (control) on a shared antenna.',
+        ],
+        question:
+          'Compare A2DP over BT Classic vs LE Audio with LC3. What is the firmware trade-off?',
+        referenceAnswer:
+          'A2DP (Classic): mature, broad device support, but Classic radio is power-hungry and adds latency (~110-150ms with AAC). LE Audio with LC3: lower latency (~30-60ms), much lower power (LE radio), but newer — older sources cannot stream. Modern AirPods (Pro 2, Air 4) use LE Audio. Firmware impact: simpler single-radio scheduler (no Classic+LE coexistence), better battery, but you must dual-mode for older host compatibility.',
+      },
+      {
+        id: 'w4d7',
+        day: 'Sun',
+        topic: 'AirPods dedicated-DSP architecture (H1 / H2 conceptual)',
+        reading: [
+          'AirPods Pro uses the H2 chip: dedicated audio DSP + ML accelerator + BLE radio in one die. No general-purpose RTOS for audio.',
+          'ANC, transparency, voice isolation run on the DSP as fixed-latency hardware pipelines — not as FreeRTOS tasks.',
+          'A Cortex-M-class core runs the control plane: pairing, telemetry, power management, OTA. Audio plane is silicon.',
+          'Why: audio loop latency must be <1 ms. Cortex-M + RTOS + DMA + queues = best case ~10 ms. A hardware pipeline hits <100 µs.',
+        ],
+        question: 'Why does AirPods need a dedicated DSP rather than running ANC on a Cortex-M?',
+        referenceAnswer:
+          'Two reasons. (1) Latency: ANC needs <1ms mic-sample to anti-noise output. Cortex-M + RTOS + DMA + queue handoff = best case ~10ms. A dedicated DSP with a fixed-latency pipeline + parallel ALUs hits <100µs. (2) Power: dedicated silicon at 1 MHz beats a general MCU at 100 MHz for the same workload. The control plane (BLE, pairing, OTA) still runs on a Cortex-M-class core — only the audio path is silicon. My EFR32 project demonstrates the gap clearly: ~17ms RTOS-mediated transparency vs AirPods <1ms hardware ANC.',
+      },
     ],
   },
   {
@@ -3048,6 +3077,36 @@ Real ANC requires:
           'Design a state machine for a BLE-paired wearable: idle → advertising → connected → streaming → error. What pattern, and what goes wrong with naive switch-case?',
         referenceAnswer:
           'Use a 2D transition table: `state_t next[STATE_COUNT][EVENT_COUNT]`. Each step: validate event range → table lookup → optional enter/exit handlers → set new state. Switch-case fails because adding a state means editing every case block; unhandled events fall through silently. The table is data — easy to inspect, hard to mis-edit. Always log every transition with structured trace (ITM) — when the FSM misbehaves in the field you need the timeline.',
+      },
+      {
+        id: 'w7d7',
+        day: 'Sun',
+        topic: 'Apple Watch always-on coordination (S-series dual-die)',
+        reading: [
+          'Apple Watch S-series packages an always-on co-processor (HID, sensors) + main SoC in one System-in-Package. Two dies, one substrate.',
+          'Always-on die: <100 µA, runs sensor sampling, watchdog, wake decisions.',
+          'Main SoC: 100s of mA active, sleeps >95% of the time. Wakes only when always-on says "interesting event".',
+          'Coordination via low-pin-count IPC: mailboxes, shared SRAM, doorbell IRQs.',
+          'Heart rate measurement: always-on runs PPG capture continuously; main SoC wakes on demand to compute & display.',
+        ],
+        question: 'Apple Watch S-series has 2 processor dies. How do they coordinate sleep/wake?',
+        referenceAnswer:
+          'Always-on die does ALL sensor acquisition + minimal processing (accelerometer activity classification, PPG raw sampling, gesture detection). It maintains a shared SRAM mailbox + doorbell IRQ to the main SoC. When the always-on detects an event worth processing (wrist raise, HR change, notification due), it raises the doorbell. Main SoC wakes from a deep-sleep state, drains the mailbox, processes, sleeps again. Main SoC is dormant >95% of the time. This is what enables 18-hour battery on ~300 mAh.',
+      },
+      {
+        id: 'w7d8',
+        day: 'Sun',
+        topic: 'PPG → heart-rate pipeline + sensor fusion (Apple Watch relevance)',
+        reading: [
+          'Photoplethysmography (PPG): green LED illuminates skin, photodiode measures reflected light. Blood volume in capillaries modulates absorption.',
+          'Pipeline: LED pulse → photodiode sample @ 100 Hz → bandpass filter 0.5-4 Hz (HR range) → peak detection → BPM.',
+          'Motion is the biggest source of noise. Accel data fed in parallel — high-motion windows discarded or motion-compensated.',
+          'Apple Watch fuses PPG with accel + sometimes ECG for higher confidence. ML on the always-on die classifies "valid reading" vs "discard".',
+        ],
+        question:
+          'Walk through PPG sensor reading to displayed heart rate. What signal processing is involved?',
+        referenceAnswer:
+          'Hardware: LED + photodiode. Firmware: (1) pulse LED, ADC samples reflected light at 100 Hz. (2) DC-block (remove ambient light bias). (3) Bandpass 0.5-4 Hz (30-240 BPM range). (4) Detect peaks via zero-crossing or windowed FFT — peak interval is the period, BPM = 60/period. (5) Sensor fusion: read accelerometer in parallel. If |accel| > threshold, discard the PPG window (motion artifact). (6) Confidence score: stability of last N readings. Apple Watch adds ML on the always-on die to classify valid-vs-discard. Output one BPM/sec when confidence is high.',
       },
     ],
   },

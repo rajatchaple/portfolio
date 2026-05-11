@@ -1,44 +1,48 @@
 // Tiering layer over interviewPrepData.
-// Goal: replace "study all 60 in order" with "crush the right 20, then expand."
-// Map each question ID to a tier; UI filters/sorts by this.
+// Target priority: (1) AirPods firmware, (2) Apple Watch firmware.
+// Audio-pipeline depth is promoted to Tier 1 for AirPods; sensor-hub /
+// dual-die / power topics live in Tier 2 for the Apple Watch fallback.
 //
-// Tier 1 — Must crush. Apple WILL ask. Answer cold, on a whiteboard.
-// Tier 2 — Strong pass. Project depth + breadth. Solid-but-not-perfect is OK.
-// Tier 3 — Read once. Bonus credibility. Don't over-invest.
-// Tier 4 — Meta. Behavioral, narratives, application logistics. One focused week.
+// Tier 1 — Must crush. AirPods-critical + core firmware fundamentals.
+// Tier 2 — Strong pass. Apple Watch-relevant + general project depth.
+// Tier 3 — Read once. Bonus credibility (M33 / TrustZone / DVFS).
+// Tier 4 — Meta. Behavioral, narratives, application logistics.
 
 export const tiers = {
-  // Tier 1 — must-crush
+  // Tier 1 — must-crush. AirPods-critical + core firmware fundamentals.
   w1d1: 1,
   w1d2: 1,
   w1d3: 1,
   w1d4: 1,
   w1d5: 1,
-  w1d6: 1, // const volatile + stack growth (gap-fill)
+  w1d6: 1, // const volatile + stack growth
   w2d1: 1,
   w2d2: 1,
   w2d3: 1,
   w2d4: 1,
   w2d5: 1,
-  w2d6: 1, // process vs thread vs FreeRTOS task (gap-fill)
+  w2d6: 1, // process vs thread vs FreeRTOS task
   w3d1: 1,
   w3d2: 1,
   w3d3: 1,
+  w3d4: 1, // I2S protocol — AirPods audio
+  w3d5: 1, // I2S DMA pipeline — AirPods audio
+  w4d1: 1, // MAX98357A DAC + I2S TX — AirPods audio
+  w4d2: 1, // Transparency mode latency budget — AirPods
+  w4d3: 1, // Adaptive gain — AirPods
+  w4d4: 1, // FFT wind detection — AirPods
+  w4d6: 1, // LE Audio + LC3 codec — AirPods specific
+  w4d7: 1, // AirPods dedicated DSP architecture
   w5d1: 1,
   w5d4: 1,
   w5d5: 1,
   w6d3: 1,
+  w7d5: 1, // ANC architecture — AirPods specific
   w8d1: 1,
   w8d5: 1,
   w9d1: 1,
 
-  // Tier 2 — 20 questions
-  w3d4: 2,
-  w3d5: 2,
-  w4d1: 2,
-  w4d2: 2,
-  w4d3: 2,
-  w4d4: 2,
+  // Tier 2 — strong pass. Apple Watch-relevant + general depth.
   w4d5: 2,
   w5d2: 2,
   w5d3: 2,
@@ -46,25 +50,26 @@ export const tiers = {
   w6d2: 2,
   w6d4: 2,
   w6d5: 2,
-  w6d6: 2, // USB + HID class (gap-fill)
+  w6d6: 2, // USB + HID class
   w7d1: 2,
   w7d2: 2,
-  w7d4: 2,
-  w7d6: 2, // state machine design patterns (gap-fill)
+  w7d4: 2, // Low-power sensor hub — Apple Watch primary
+  w7d6: 2, // State machine design
+  w7d7: 2, // Apple Watch always-on dual-die
+  w7d8: 2, // PPG heart-rate pipeline — Apple Watch
   w8d2: 2,
   w8d3: 2,
   w8d4: 2,
-  w8d6: 2, // unit testing in embedded (gap-fill)
-  w8d7: 2, // schematic literacy + HW co-design (gap-fill)
+  w8d6: 2, // Unit testing
+  w8d7: 2, // Schematic literacy
   w9d2: 2,
+  w10d3: 2, // DVFS — Apple Watch relevant for power
+  w10d4: 2, // Multi-core firmware — Apple Watch dual-die
 
-  // Tier 3 — 9 questions
+  // Tier 3 — read once.
   w7d3: 3,
-  w7d5: 3,
   w10d1: 3,
   w10d2: 3,
-  w10d3: 3,
-  w10d4: 3,
   w10d5: 3,
   w11d2: 3,
   w11d3: 3,
@@ -87,20 +92,20 @@ export const tiers = {
 export const tierMeta = {
   1: {
     label: 'T1',
-    name: 'Must crush',
-    description: 'Apple WILL ask. Answer cold on a whiteboard. No notes.',
+    name: 'Must crush (AirPods)',
+    description: 'AirPods firmware critical + core firmware fundamentals. Cold cold.',
     color: '#f87171',
   },
   2: {
     label: 'T2',
-    name: 'Strong pass',
-    description: 'Domain depth + project specifics. Solid — not necessarily perfect.',
+    name: 'Strong (Apple Watch)',
+    description: 'Apple Watch-relevant + general project depth. Solid, not necessarily perfect.',
     color: '#facc15',
   },
   3: {
     label: 'T3',
     name: 'Read once',
-    description: 'Bonus credibility if asked. Skim. Do not over-invest.',
+    description: 'Bonus credibility (M33 / TrustZone / DVFS). Skim. Do not over-invest.',
     color: '#94a3b8',
   },
   4: {
@@ -327,6 +332,92 @@ export const practical = {
       'Profile the top 3 functions by cycles. Pick one and optimize. Re-measure.',
     ],
     drill: 'How do you compute % CPU from a DWT cycle count and a frame period?',
+  },
+  w3d5: {
+    exercises: [
+      'Wire SPH0645 or ICS-43434 I2S mic to your board. Configure I2S RX with two ping-pong DMA buffers @ 16 kHz / 32-bit / mono.',
+      'Toggle a GPIO at each DMA half/full callback. Verify on scope: rising edges should be 8 ms apart for 128-sample buffers @ 16 kHz.',
+      'Stress test: run for 30 minutes, log a "missed frame" counter. Should stay at 0. If it climbs, you have priority/blocking somewhere in the audio path.',
+    ],
+    drill:
+      'You see frame drops once every 100 seconds. List 5 things to check, in order of likelihood.',
+  },
+  w4d1: {
+    exercises: [
+      'Wire MAX98357A (or equivalent I2S DAC). Configure I2S TX. Send a 1 kHz sine table to it. Verify on speaker.',
+      'Stop the BCLK mid-playback (set the I2S clock register to 0). Listen — you should hear a click/pop as the DAC loses sync.',
+      'Now repeat but write zero samples instead of stopping BCLK. The output should silence smoothly.',
+    ],
+    drill: 'Why does stopping BCLK cause a click? What is the correct way to silence?',
+  },
+  w4d2: {
+    exercises: [
+      'Sketch the full mic-to-speaker latency budget on paper: DMA buffer fill + queue + processing + DAC FIFO. Aim for the total.',
+      'Halve your DMA buffer size and re-measure. Did latency halve too? At what point does the buffer get too small to be reliable?',
+    ],
+    drill:
+      'Apple AirPods achieves <1 ms transparency latency. Yours is 17 ms on EFR32. List the architectural differences.',
+  },
+  w4d3: {
+    exercises: [
+      'Implement a simple adaptive gain: target -20 dBFS RMS, max gain change 1 dB/frame.',
+      'Feed it a step input (silence → 0 dB). Observe gain ramp. Plot if you can.',
+      'Try without the ramp limit (jump to target). Listen to the artifact — that pumping is why slew rate exists.',
+    ],
+    drill: 'Why asymmetric attack vs release rates? When would you want fast attack, slow release?',
+  },
+  w4d4: {
+    exercises: [
+      'Implement 128-point FFT on a captured mic frame. Compute energy in low band (< 500 Hz) vs total energy.',
+      'Test with two recordings: someone talking, vs blowing on the mic.',
+      'Find a threshold ratio that classifies wind vs speech with no false positives on speech.',
+    ],
+    drill:
+      'Why is the energy RATIO more robust than absolute threshold? Give an example failure case for absolute.',
+  },
+  w4d6: {
+    exercises: [
+      'Read the LC3 codec spec abstract (Bluetooth SIG: TS 0.1.7). Note the bitrate range (16–345 kbps) and frame size options.',
+      'Compare with AAC-LD: same audio quality at roughly half the bitrate? Note why this matters for battery.',
+      'If your dev board supports BLE 5.2, scan for LE Audio advertising — packets have a different format than classic GAP.',
+    ],
+    drill:
+      'You are designing a Bluetooth earbud today. Pick LC3 / AAC / SBC and justify in 3 sentences.',
+  },
+  w4d7: {
+    exercises: [
+      'Sketch a block diagram of AirPods Pro from a public teardown: H2 die + battery + mic array + speaker.',
+      'On your EFR32 audio prototype, measure the latency end-to-end. Now reason: where would each ms shrink if you had a fixed-latency hardware DSP instead of RTOS + DMA?',
+    ],
+    drill:
+      'Whiteboard the AirPods control plane vs audio plane split. Where does the RTOS run, and what is *not* on it?',
+  },
+  w7d5: {
+    exercises: [
+      'Read the LMS (least mean squares) adaptive filter section in any DSP textbook. Sketch the block diagram.',
+      'Simulate feedforward ANC in MATLAB/Python on a recorded noise sample. Adjust filter taps and step size. Listen to the residual.',
+      'Now sketch the AirPods Pro hybrid (feedforward + feedback). What does each branch buy you?',
+    ],
+    drill:
+      'AirPods Pro hybrid ANC: why not just feedforward? Why not just feedback? Answer in one sentence each.',
+  },
+  w7d7: {
+    exercises: [
+      'On a dual-core dev board (RP2040, or any M-class with multi-core demo), get core 0 sleeping and core 1 sampling at 1 kHz.',
+      'Implement a mailbox in shared SRAM. Core 1 fills it, core 0 wakes via doorbell IRQ, drains, sleeps again.',
+      'Measure the wake latency and the duty cycle. Aim for core-0 < 5% duty.',
+    ],
+    drill:
+      'Why is the Apple Watch always-on die a SEPARATE die in the SiP, not just a small core on the main die?',
+  },
+  w7d8: {
+    exercises: [
+      'Wire any PPG / pulse-ox eval board (MAX30100, MAX86150). Capture raw 16-bit samples at 100 Hz over UART.',
+      'In Python: DC-block (subtract moving avg), bandpass 0.5-4 Hz, peak-detect. Print BPM. Hold your finger on the sensor — should converge to your actual HR.',
+      'Add motion: shake your finger. Watch BPM jump to nonsense. Now feed accel data — discard windows where accel > threshold. BPM stabilizes.',
+    ],
+    drill:
+      'Why does Apple Watch take ~5 seconds to start displaying HR? List the steps that consume the time.',
   },
   w9d2: {
     exercises: [

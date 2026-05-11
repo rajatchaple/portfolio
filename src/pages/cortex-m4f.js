@@ -3510,7 +3510,9 @@ const InterviewPrepPage = ({ location }) => {
 
         <StyledHeader>
           <h1>Cortex M4F</h1>
-          <p>Embedded systems study deck · Daily mission · Spaced repetition · Weekends free</p>
+          <p>
+            Target: AirPods firmware (Apple Watch secondary) · Daily mission · Spaced repetition
+          </p>
         </StyledHeader>
 
         {/* Bottom tab bar (top nav on desktop) */}

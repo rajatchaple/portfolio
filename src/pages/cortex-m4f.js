@@ -5,6 +5,7 @@ import { Layout } from '@components';
 import interviewPrepData from '../data/interviewPrepData';
 import { tiers, tierMeta, practical } from '../data/interviewPrepTiers';
 import { mcq } from '../data/interviewPrepFlashcards';
+import { codingProblems } from '../data/interviewPrepCoding';
 import {
   dateKey,
   advance,
@@ -55,6 +56,7 @@ const FLASHCARD_KEY = 'interview-prep-flashcard-stats';
 const STUDY_STATE_KEY = 'interview-prep-study-state';
 const DAY_LOG_KEY = 'interview-prep-day-log';
 const STUDY_START_KEY = 'interview-prep-study-start';
+const CODING_DONE_KEY = 'interview-prep-coding-done';
 
 const loadFromStorage = key => {
   if (typeof window === 'undefined') {
@@ -1782,6 +1784,186 @@ const StyledMobileBackBar = styled.div`
   }
 `;
 
+const StyledCodingCard = styled.div`
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  background: rgba(167, 139, 250, 0.05);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: var(--border-radius);
+
+  @media (max-width: 768px) {
+    padding: 14px 16px;
+  }
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #a78bfa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px;
+  }
+
+  .meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--slate);
+    margin-bottom: 8px;
+  }
+
+  .diff {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+
+  .diff.easy {
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+  }
+  .diff.medium {
+    background: rgba(250, 204, 21, 0.15);
+    color: #facc15;
+  }
+  .diff.hard {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+  }
+
+  .title {
+    color: var(--lightest-slate);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .problem {
+    color: var(--light-slate);
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0 0 14px;
+  }
+
+  .toggle {
+    background: transparent;
+    border: 1px dashed var(--lightest-navy);
+    border-radius: var(--border-radius);
+    color: var(--slate);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 6px 12px;
+    cursor: pointer;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    transition: var(--transition);
+    min-height: 36px;
+
+    &:hover {
+      border-color: #a78bfa;
+      color: #a78bfa;
+    }
+  }
+
+  ul.list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 14px;
+
+    li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 6px;
+      color: var(--light-slate);
+      font-size: 13px;
+      line-height: 1.6;
+
+      &::before {
+        content: '▹';
+        position: absolute;
+        left: 0;
+        color: #a78bfa;
+      }
+    }
+  }
+
+  pre {
+    background: rgba(2, 12, 27, 0.7);
+    border: 1px solid var(--lightest-navy);
+    border-radius: var(--border-radius);
+    padding: 12px 14px;
+    margin: 8px 0 14px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--lightest-slate);
+    -webkit-overflow-scrolling: touch;
+
+    @media (max-width: 768px) {
+      font-size: 11px;
+      padding: 10px 12px;
+    }
+  }
+
+  .apple-note {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: rgba(35, 53, 84, 0.3);
+    border-left: 3px solid #a78bfa;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--slate);
+    font-style: italic;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .done-btn {
+    background: #a78bfa;
+    color: #000;
+    border: none;
+    border-radius: var(--border-radius);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    cursor: pointer;
+    min-height: 40px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 14px;
+      font-size: 14px;
+      min-height: 50px;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  .done-tag {
+    color: #4ade80;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 0;
+  }
+`;
+
 const StyledTodayCard = styled.div`
   padding: 22px 24px;
   margin-bottom: 18px;
@@ -2372,6 +2554,8 @@ const InterviewPrepPage = ({ location }) => {
   const [dayLog, setDayLog] = useState({});
   const [today, setToday] = useState(dateKey());
   const [studyStartDate, setStudyStartDate] = useState(null);
+  const [codingDone, setCodingDone] = useState({});
+  const [codingReveal, setCodingReveal] = useState({}); // { hints: bool, solution: bool, pitfalls: bool }
   const [introSeen, setIntroSeen] = useState({}); // qids that have passed intro this session
   const [weekendOverride, setWeekendOverride] = useState(false); // user opted to study new cards on a weekend
 
@@ -2406,6 +2590,7 @@ const InterviewPrepPage = ({ location }) => {
     setLastReviewed(loadFromStorage(REVIEWED_KEY));
     setPracticalDone(loadFromStorage(PRACTICAL_KEY));
     setFlashcardStats(loadFromStorage(FLASHCARD_KEY));
+    setCodingDone(loadFromStorage(CODING_DONE_KEY));
     const loadedStudy = loadFromStorage(STUDY_STATE_KEY);
     const loadedDayLog = loadFromStorage(DAY_LOG_KEY);
     setStudyState(loadedStudy);
@@ -2866,6 +3051,31 @@ const InterviewPrepPage = ({ location }) => {
     },
     [today, practicalDone],
   );
+
+  // Today's coding challenge = the next uncompleted problem in order
+  const todaysCoding = codingProblems.find(c => !codingDone[c.id]) || null;
+  const codingCompletedCount = Object.keys(codingDone).filter(k => codingDone[k]).length;
+
+  const markCodingDone = useCallback(() => {
+    if (!todaysCoding) {
+      return;
+    }
+    setCodingDone(prev => {
+      const updated = { ...prev, [todaysCoding.id]: true };
+      saveToStorage(CODING_DONE_KEY, updated);
+      return updated;
+    });
+    setDayLog(prev => {
+      const next = logDayActivity(prev, today, 'practical', `coding:${todaysCoding.id}`);
+      saveToStorage(DAY_LOG_KEY, next);
+      return next;
+    });
+    setCodingReveal({});
+  }, [todaysCoding, today]);
+
+  const toggleCodingReveal = useCallback(section => {
+    setCodingReveal(prev => ({ ...prev, [section]: !prev[section] }));
+  }, []);
 
   // Quick Mode: build deck from current tier filter (or all if none) and shuffle
   const buildDeck = useCallback(
@@ -3523,6 +3733,88 @@ const InterviewPrepPage = ({ location }) => {
                   })}
                 </StyledTodayPracticals>
               )}
+
+              <StyledCodingCard>
+                <h3>
+                  💻 Today&apos;s Coding Challenge
+                  {todaysCoding && (
+                    <span style={{ float: 'right', color: 'var(--slate)', fontSize: 10 }}>
+                      {codingCompletedCount}/{codingProblems.length} done
+                    </span>
+                  )}
+                </h3>
+                {!todaysCoding ? (
+                  <div style={{ color: 'var(--slate)', fontSize: 13, padding: '8px 0' }}>
+                    🎉 All {codingProblems.length} coding problems complete. Practice tab → revisit
+                    any of them for a refresher.
+                  </div>
+                ) : (
+                  <>
+                    <div className="meta">
+                      <span className={`diff ${todaysCoding.difficulty}`}>
+                        {todaysCoding.difficulty}
+                      </span>
+                      <span>{todaysCoding.topic}</span>
+                      <span>
+                        · Problem {todaysCoding.day} of {codingProblems.length}
+                      </span>
+                    </div>
+                    <div className="title">{todaysCoding.title}</div>
+                    <p className="problem">{todaysCoding.problem}</p>
+
+                    <div>
+                      <button
+                        type="button"
+                        className="toggle"
+                        onClick={() => toggleCodingReveal('hints')}>
+                        {codingReveal.hints ? '▾' : '▸'} Hints
+                      </button>
+                      <button
+                        type="button"
+                        className="toggle"
+                        onClick={() => toggleCodingReveal('solution')}>
+                        {codingReveal.solution ? '▾' : '▸'} Solution
+                      </button>
+                      <button
+                        type="button"
+                        className="toggle"
+                        onClick={() => toggleCodingReveal('pitfalls')}>
+                        {codingReveal.pitfalls ? '▾' : '▸'} Pitfalls
+                      </button>
+                    </div>
+
+                    {codingReveal.hints && (
+                      <ul className="list">
+                        {todaysCoding.hints.map((h, i) => (
+                          <li key={i}>{h}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {codingReveal.solution && (
+                      <pre>
+                        <code>{todaysCoding.solution}</code>
+                      </pre>
+                    )}
+                    {codingReveal.pitfalls && (
+                      <ul className="list">
+                        {todaysCoding.pitfalls.map((p, i) => (
+                          <li key={i}>{p}</li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {todaysCoding.appleNote && (
+                      <div className="apple-note">💡 {todaysCoding.appleNote}</div>
+                    )}
+
+                    <div className="actions">
+                      <button type="button" className="done-btn" onClick={markCodingDone}>
+                        ✓ Mark complete & next
+                      </button>
+                    </div>
+                  </>
+                )}
+              </StyledCodingCard>
             </div>
           )}
 
@@ -3838,6 +4130,23 @@ const InterviewPrepPage = ({ location }) => {
                   <div className="desc">
                     21 hand-written MCQs with explanations. Distractors test discrimination, not
                     just recognition.
+                  </div>
+                </div>
+              </StyledPracticeCard>
+
+              <StyledPracticeCard
+                onClick={() => {
+                  setActiveTab('today');
+                }}
+                type="button">
+                <span className="ic">💻</span>
+                <div className="body">
+                  <div className="ttl">
+                    Coding Challenges ({codingCompletedCount}/{codingProblems.length})
+                  </div>
+                  <div className="desc">
+                    {codingProblems.length} hand-picked embedded-C problems: bit ops, memory, linked
+                    lists, drivers, concurrency. One per study day on the Today tab.
                   </div>
                 </div>
               </StyledPracticeCard>

@@ -909,6 +909,132 @@ int is_valid_bst(Tree *root) {
       'Tree problems appear in Apple firmware screens but less often than linked lists. Know the bounds trick.',
   },
   {
+    id: 'c26',
+    day: 26,
+    title: 'Detect stack growth direction at runtime',
+    difficulty: 'medium',
+    topic: 'Memory',
+    problem:
+      'Write `int stack_grows_up(void)` returning 1 if the stack grows upward, -1 if downward, without compiler intrinsics or platform assumptions.',
+    hints: [
+      'Take the address of a local in the caller, pass it to a callee.',
+      'Inside the callee, compare the callee\'s local address to the passed pointer.',
+      'Callee\'s local > caller\'s → stack grows up. Lower → grows down.',
+    ],
+    solution: `static int probe(int *caller_local) {
+    int callee_local;
+    return (&callee_local > caller_local) ? 1 : -1;
+}
+
+int stack_grows_up(void) {
+    int local;
+    return probe(&local);
+}
+
+// ARM, x86, MIPS, PowerPC grow DOWN — result is -1.
+// HP-PA and some older z/Architecture grow UP.`,
+    pitfalls: [
+      'Doing both compares in the same function — compiler can reorder locals, so two locals in the SAME frame don\'t tell you direction.',
+      'Inlining: if `probe` gets inlined, both "locals" share the same frame. Mark static (or split TUs) to prevent that.',
+      'Pointer comparison across separate objects is technically UB. In practice every flat-address system gets this right.',
+    ],
+    appleNote:
+      'Dataford lists this verbatim as an Apple embedded question. Apple silicon (ARM) grows down — but the interviewer wants to see you not assume it.',
+  },
+  {
+    id: 'c27',
+    day: 27,
+    title: 'Table-driven state machine',
+    difficulty: 'medium',
+    topic: 'Embedded',
+    problem:
+      'Implement a 4-state BLE connection FSM: IDLE, ADVERTISING, CONNECTED, ERROR. Events: ADV_START, ADV_TIMEOUT, CONN_OK, CONN_LOST, RESET. Use a transition table — not a giant switch.',
+    hints: [
+      '2D table indexed `next[STATE][EVENT]`. Invalid transitions stay in current state or go to ERROR.',
+      'Parallel handler table optional — called on each transition.',
+      'Validate event range — don\'t index out of bounds on a junk event.',
+    ],
+    solution: `typedef enum { S_IDLE, S_ADV, S_CONN, S_ERR, S_COUNT } state_t;
+typedef enum { E_ADV_START, E_ADV_TIMEOUT, E_CONN_OK,
+               E_CONN_LOST, E_RESET, E_COUNT } event_t;
+
+static const state_t transitions[S_COUNT][E_COUNT] = {
+    /*           ADV_START  ADV_TIMEOUT  CONN_OK   CONN_LOST  RESET   */
+    /* IDLE  */ {S_ADV,     S_IDLE,      S_IDLE,   S_IDLE,    S_IDLE},
+    /* ADV   */ {S_ADV,     S_IDLE,      S_CONN,   S_IDLE,    S_IDLE},
+    /* CONN  */ {S_CONN,    S_CONN,      S_CONN,   S_ADV,     S_IDLE},
+    /* ERR   */ {S_IDLE,    S_IDLE,      S_IDLE,   S_IDLE,    S_IDLE},
+};
+
+static state_t current = S_IDLE;
+
+state_t fsm_step(event_t e) {
+    if (e >= E_COUNT) {
+        current = S_ERR;
+        return current;
+    }
+    state_t next = transitions[current][e];
+    // hook: call exit(current) / enter(next) here if needed
+    current = next;
+    return current;
+}`,
+    pitfalls: [
+      'Giant switch-case scales O(states × events) lines. Table is O(1) lookup, O(s*e) static data.',
+      'Forgetting to validate event index — junk event indexes past the table.',
+      'Not handling "stay in same state" explicitly — implicit zero-init sends those to S_IDLE silently.',
+      'No logging on transition — when the FSM misbehaves you have nothing to debug.',
+    ],
+    appleNote:
+      'Apple firmware engineer Parth Thakkar called state machines "core Apple competency." Expect a "design the FSM for X" prompt.',
+  },
+  {
+    id: 'c28',
+    day: 28,
+    title: 'Parse a HID report descriptor',
+    difficulty: 'medium',
+    topic: 'Embedded',
+    problem:
+      'A HID report descriptor is a byte stream. Each item starts with a 1-byte header: bits [1:0] = size (maps to {0,1,2,4} bytes of data), [3:2] = type (0=Main, 1=Global, 2=Local), [7:4] = tag. Walk the buffer and count items by type.',
+    hints: [
+      'size field 0..3 maps to actual byte count {0, 1, 2, 4}.',
+      'Advance by 1 (header) + data_size each step.',
+      'Type 3 is reserved — bail with an error. Long items (header 0xFE) are a separate format; out of scope here.',
+    ],
+    solution: `typedef struct {
+    int main_count;
+    int global_count;
+    int local_count;
+} hid_counts_t;
+
+static const uint8_t size_map[4] = {0, 1, 2, 4};
+
+int parse_hid_descriptor(const uint8_t *buf, size_t len, hid_counts_t *out) {
+    out->main_count = out->global_count = out->local_count = 0;
+    size_t i = 0;
+    while (i < len) {
+        uint8_t hdr = buf[i++];
+        uint8_t size = size_map[hdr & 0x03];
+        uint8_t type = (hdr >> 2) & 0x03;
+
+        if      (type == 0) out->main_count++;
+        else if (type == 1) out->global_count++;
+        else if (type == 2) out->local_count++;
+        else                return -1;  // reserved
+
+        if (i + size > len) return -1;  // truncated
+        i += size;
+    }
+    return 0;
+}`,
+    pitfalls: [
+      'Treating size field as literal byte count — it\'s an lookup into {0,1,2,4}, not raw 0..3 bytes.',
+      'Not validating that `i + size` stays in bounds — malformed descriptors walk off the buffer.',
+      'Ignoring long items (0xFE header) — production HID parsers must handle them.',
+    ],
+    appleNote:
+      'HID is core to Apple Pencil, Magic Keyboard, and Trackpad firmware. If you\'re targeting the HID team, expect descriptor parsing or USB enumeration.',
+  },
+  {
     id: 'c25',
     day: 25,
     title: 'Find substring (strstr)',

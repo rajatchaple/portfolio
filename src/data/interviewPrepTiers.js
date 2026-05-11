@@ -8,17 +8,19 @@
 // Tier 4 — Meta. Behavioral, narratives, application logistics. One focused week.
 
 export const tiers = {
-  // Tier 1 — 20 questions
+  // Tier 1 — must-crush
   w1d1: 1,
   w1d2: 1,
   w1d3: 1,
   w1d4: 1,
   w1d5: 1,
+  w1d6: 1, // const volatile + stack growth (gap-fill)
   w2d1: 1,
   w2d2: 1,
   w2d3: 1,
   w2d4: 1,
   w2d5: 1,
+  w2d6: 1, // process vs thread vs FreeRTOS task (gap-fill)
   w3d1: 1,
   w3d2: 1,
   w3d3: 1,
@@ -44,12 +46,16 @@ export const tiers = {
   w6d2: 2,
   w6d4: 2,
   w6d5: 2,
+  w6d6: 2, // USB + HID class (gap-fill)
   w7d1: 2,
   w7d2: 2,
   w7d4: 2,
+  w7d6: 2, // state machine design patterns (gap-fill)
   w8d2: 2,
   w8d3: 2,
   w8d4: 2,
+  w8d6: 2, // unit testing in embedded (gap-fill)
+  w8d7: 2, // schematic literacy + HW co-design (gap-fill)
   w9d2: 2,
 
   // Tier 3 — 9 questions
@@ -70,6 +76,7 @@ export const tiers = {
   w11d1: 4,
   w11d4: 4,
   w11d5: 4,
+  w11d6: 4, // behavioral: disagreement with hardware engineer (gap-fill)
   w12d1: 4,
   w12d2: 4,
   w12d3: 4,
@@ -150,6 +157,15 @@ export const practical = {
     ],
     drill: 'Explain LMA vs VMA in one sentence. Why does .bss need only one address?',
   },
+  w1d6: {
+    exercises: [
+      'Declare `const volatile uint32_t * const status_reg = (uint32_t *)0x40000000U;`. Try to write `*status_reg = 1;` — compiler should reject it. Read it in a loop — compiler must emit a load each time.',
+      'Implement the stack-direction detector from coding problem c26 on your board. Run it. On Cortex-M you should get -1 (grows down).',
+      'Look at the linker .ld for `_stack_start` / `_stack_end`. Confirm with a small program that printing &local matches your detector\'s direction.',
+    ],
+    drill:
+      'What does `volatile const uint32_t *p` mean? Walk through reads vs writes the compiler will or won\'t emit.',
+  },
   w2d1: {
     exercises: [
       'Erase a flash sector. Read it back — should be all 0xFF. Now write 0xAA. Read back — confirm.',
@@ -193,6 +209,15 @@ export const practical = {
     ],
     drill:
       'How can mode-2 stack overflow detection still miss an overflow? Hint: write pattern, large local array.',
+  },
+  w2d6: {
+    exercises: [
+      'Spawn 3 FreeRTOS tasks. Print xTaskGetCurrentTaskHandle and the address of a local in each. Observe each task has its own stack.',
+      'Open tasks.c in FreeRTOS source. Find the TCB struct. Identify: stack pointer, priority, state, list pointers. That is the minimum a "thread" needs to context-switch.',
+      'Now contrast: a Linux thread has its own kernel stack + signal mask + thread-local storage on top of all that. Sketch the difference on paper.',
+    ],
+    drill:
+      'In one sentence each: what does a process give you, what does a thread give you, what does a FreeRTOS task give you?',
   },
   w3d1: {
     exercises: [

@@ -432,6 +432,20 @@ void Reset_Handler(void) {
           },
         ],
       },
+      {
+        id: 'w1d6',
+        day: 'Sat',
+        topic: 'const volatile semantics + stack growth direction',
+        reading: [
+          '`const volatile` qualifier: hardware can change the value (volatile blocks read elision); firmware cannot write (const blocks assignments). Used for read-only status registers.',
+          'Stack growth direction is implementation-defined. ARM, x86, MIPS, PowerPC grow DOWN. HP-PA and some older z/Architecture grow UP.',
+          'Runtime detection: take &local in caller, pass to callee, compare callee\'s &local to it. Locals MUST be in separate frames — same-frame layout is reorderable by the compiler.',
+        ],
+        question:
+          'What does `const volatile uint32_t *reg` mean, and how would you detect at runtime whether the stack grows up or down?',
+        referenceAnswer:
+          '`const volatile uint32_t *reg`: pointer-to-a-read-only-but-volatile uint32. Compiler must emit a load each access (volatile, no caching/elision) but rejects writes (const). Common for HW status registers. Stack direction: take &local in caller, pass to callee, callee compares its own &local; higher → up, lower → down. ARM grows down → result is -1. Both compares must be in separate stack frames.',
+      },
     ],
   },
   {
@@ -805,6 +819,21 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
 \`\`\``,
           },
         ],
+      },
+      {
+        id: 'w2d6',
+        day: 'Sat',
+        topic: 'Process vs Thread vs FreeRTOS Task',
+        reading: [
+          'Process: independent virtual address space, MMU-isolated. Heaviest context switch (TLB flush, page tables).',
+          'Thread: shares its process\'s address space + heap; private stack + thread-local storage. Lighter switch — just registers + stack pointer.',
+          'FreeRTOS task: one flat address space, no MMU isolation (unless MPU port). Like a thread on a process-less RTOS. ~50–100 cycles to switch on Cortex-M4F.',
+          'Cost ordering: process >> thread > FreeRTOS task.',
+        ],
+        question:
+          'What is the difference between a process and a thread, and where does a FreeRTOS task fit?',
+        referenceAnswer:
+          'Process = independent virtual address space + heap, OS-isolated by MMU. Thread = shares process address space, has its own stack + TLS. FreeRTOS task = like a thread on a no-MMU bare-metal system; all tasks share flat memory unless the MPU port enforces. Context switch: process >> thread > FreeRTOS task (no TLB flush). Apple-relevant: audio MCU on AirPods has no MMU — pure task model.',
       },
     ],
   },
@@ -2472,6 +2501,21 @@ arm_rfft_fast_f32(...);  // outside mutex
           },
         ],
       },
+      {
+        id: 'w6d6',
+        day: 'Sat',
+        topic: 'USB enumeration + HID class basics',
+        reading: [
+          'USB device speed signaled by D+/D- pull-ups: FS = 1.5kΩ on D+; LS = 1.5kΩ on D-; HS negotiated post-reset via chirp.',
+          'Enumeration flow: attach → bus reset → GET_DESCRIPTOR(device, 8 bytes) → SET_ADDRESS → GET_DESCRIPTOR(full) → SET_CONFIGURATION → ready.',
+          'HID class: standardized for human input devices. Reports self-describe via a HID descriptor (report ID + field layout). No vendor driver needed on the host.',
+          'Apple HID: Magic Keyboard, Trackpad, Apple Pencil expose HID over BLE (HID-over-GATT) or USB.',
+        ],
+        question:
+          'Walk through USB enumeration from cable insert to device ready. What is special about the HID class?',
+        referenceAnswer:
+          '1) D+/D- pull-up signals speed. 2) Host sees attach, drives bus reset. 3) Host issues GET_DESCRIPTOR(device, first 8 bytes) — enough to learn EP0 max packet. 4) SET_ADDRESS to a host-assigned address. 5) GET_DESCRIPTOR full device + config — learn endpoints and interfaces. 6) SET_CONFIGURATION — device ready. HID: standardized class for human input; reports self-describe via the HID descriptor so the host needs no vendor driver. Same model carries over BLE via HID-over-GATT (Apple Pencil, Magic Keyboard).',
+      },
     ],
   },
   {
@@ -2988,6 +3032,22 @@ Real ANC requires:
 **Our project vs ANC:** Our FFT-based wind detection is NOT ANC. It's heuristic wind noise reduction — detects wind energy > speech energy, reduces output gain. Similar to "wind noise reduction" mode on a camcorder. Honest about this distinction in interviews.`,
           },
         ],
+      },
+      {
+        id: 'w7d6',
+        day: 'Sat',
+        topic: 'State machine design patterns',
+        reading: [
+          'Three FSM implementations: (1) switch-case in main loop, (2) function-pointer array per state, (3) 2D transition table [state][event] → next_state.',
+          '(1) is simplest, scales worst — N states × M events → giant nested switch, easy to miss a transition when editing.',
+          '(2) is clean per-state code, harder to see global structure.',
+          '(3) is most maintainable — structure is data, easy to inspect. Validate event index before lookup.',
+          'Always: log every transition (ITM is ideal). Handle "unexpected event in state X" explicitly — never silently drop.',
+        ],
+        question:
+          'Design a state machine for a BLE-paired wearable: idle → advertising → connected → streaming → error. What pattern, and what goes wrong with naive switch-case?',
+        referenceAnswer:
+          'Use a 2D transition table: `state_t next[STATE_COUNT][EVENT_COUNT]`. Each step: validate event range → table lookup → optional enter/exit handlers → set new state. Switch-case fails because adding a state means editing every case block; unhandled events fall through silently. The table is data — easy to inspect, hard to mis-edit. Always log every transition with structured trace (ITM) — when the FSM misbehaves in the field you need the timeline.',
       },
     ],
   },
@@ -3576,6 +3636,37 @@ Rule 5: No HAL state shared across modules without explicit API
 \`\`\``,
           },
         ],
+      },
+      {
+        id: 'w8d6',
+        day: 'Sat',
+        topic: 'Unit testing embedded firmware (Unity, CMock, HIL)',
+        reading: [
+          'Three test layers: (1) host-side unit tests on pure logic (Unity, CppUTest); (2) target-side driver tests; (3) hardware-in-loop (HIL) integration on a board farm.',
+          'Mock the HAL with CMock — gives you "this driver call sequence was made" assertions without real hardware.',
+          'Renode + QEMU simulate enough of a Cortex-M target to run unit tests on CI without physical boards.',
+          'Apple-grade: every commit runs (1) on CI, (2) on emulator, (3) on a board farm nightly. Coverage targets: ~80% on (1), ~50% on full HIL.',
+        ],
+        question:
+          'How do you unit test firmware that depends on hardware? Walk through the strategy.',
+        referenceAnswer:
+          'Three layers. (1) Pure-logic unit tests on host with Unity — parsers, state machines, math, anything without hardware deps. Mock the HAL with CMock so driver-using code can be tested. (2) Driver tests on target — verify register sequences match the datasheet. (3) HIL on a board farm — full system + scripted stimuli, run nightly. ~80% coverage on (1), ~50% on (3). Apple has a board farm — expect a question on how you would structure CI for a firmware codebase.',
+      },
+      {
+        id: 'w8d7',
+        day: 'Sun',
+        topic: 'Schematic literacy + HW-FW co-design',
+        reading: [
+          'Firmware engineers REVIEW schematics, not just write code. EE will hand you one and ask "OK for firmware?" before tape-out.',
+          'Pin assignment conflicts: timer pin == UART TX pin? Multiple peripherals on same GPIO bank?',
+          'Power sequencing: which rails come up first? MCU before or after external peripherals that depend on it?',
+          'Pull-ups/pull-downs: open-drain signals (I2C SDA/SCL, MFi reset) need external pulls. Boot-strap pins must default to wanted state.',
+          'Decoupling: bulk cap + 0.1µF per VDD pin within 1cm. Missing decoupling = mystery resets when BLE radio TX spikes draw current.',
+        ],
+        question:
+          'EE hands you a schematic and asks "is this OK for firmware?" What 5 things do you check?',
+        referenceAnswer:
+          '1) Pin assignments — verify no conflict between peripherals (timer A vs USART TX same pin). 2) Power sequencing — does MCU come up before peripherals that need its clock/GPIO drive? 3) Reset + debug — SWD/JTAG broken out? Power-on RC sized correctly? 4) Pull-ups on open-drain signals (I2C, MFi reset) and boot-strap pins. 5) Decoupling — bulk + 0.1µF per VDD pin within 1cm. Missing decoupling → BLE TX current spikes cause MCU brownout — manifests as random resets only when the radio is active.',
       },
     ],
   },
@@ -5216,6 +5307,20 @@ CFSR = 0x00000100
 \`\`\``,
           },
         ],
+      },
+      {
+        id: 'w11d6',
+        day: 'Sat',
+        topic: 'Behavioral: disagreement with hardware engineer',
+        reading: [
+          'Apple values cross-functional collaboration. Disagreements with HW peers are frequent and expected.',
+          'Resolve technically: propose an experiment, gather data, let measurement decide. Never argue from authority.',
+          'STAR template: Situation → Task → Action (the experiment) → Result (the data + decision).',
+        ],
+        question:
+          'Tell me about a time you disagreed with a hardware engineer. How did you resolve it?',
+        referenceAnswer:
+          'STAR. S: EE wanted to remove a 100nF decoupling cap to save BOM. T: I believed it was protecting against BLE radio current transients. A: Instead of arguing, I proposed an experiment — built both versions, scoped Vdd during 10K connection events. Data showed 80mV droop without cap, ~5mV with. We both saw it. Cap stayed. R: Decision became technical, not personal. Built trust for the next discussion. Apple lesson (per recent reports): never argue from authority — propose a measurement.',
       },
     ],
   },

@@ -2021,6 +2021,14 @@ const StyledTodayCard = styled.div`
     border: 1px solid var(--lightest-navy);
     color: var(--slate);
     min-width: 0;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.1s ease;
+
+    &:hover:not(:disabled) {
+      border-color: var(--green);
+      transform: translateY(-1px);
+    }
 
     .lbl {
       display: block;
@@ -2047,6 +2055,10 @@ const StyledTodayCard = styled.div`
       font-weight: 600;
     }
 
+    &.viewing {
+      box-shadow: 0 0 0 2px var(--green);
+    }
+
     &.weekend {
       opacity: 0.5;
       border-style: dashed;
@@ -2054,7 +2066,62 @@ const StyledTodayCard = styled.div`
 
     &.future {
       opacity: 0.4;
+      cursor: not-allowed;
     }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  .day-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+
+    button.nav-btn,
+    input.nav-date {
+      background: rgba(2, 12, 27, 0.5);
+      border: 1px solid var(--lightest-navy);
+      border-radius: var(--border-radius);
+      color: var(--lightest-slate);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 4px 10px;
+      cursor: pointer;
+      min-height: 30px;
+      color-scheme: dark;
+
+      &:hover:not(:disabled) {
+        border-color: var(--green);
+        color: var(--green);
+      }
+
+      &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+    }
+
+    .back-today {
+      margin-left: auto;
+      border-color: var(--green);
+      color: var(--green);
+    }
+  }
+
+  .viewing-past {
+    background: rgba(250, 204, 21, 0.08);
+    border: 1px solid rgba(250, 204, 21, 0.5);
+    border-radius: var(--border-radius);
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    color: #facc15;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-align: left;
   }
 
   .plan-rows {
@@ -2914,6 +2981,40 @@ const InterviewPrepPage = ({ location }) => {
     }
   }, []);
 
+  // Day navigation — let the user open a past day to complete a missed session.
+  // The viewed date drives buildDailyPlan, week-grid highlighting, and logDayActivity,
+  // so completion lands on the day being viewed.
+  const realToday = dateKey();
+  const isViewingPastDay = today < realToday;
+  const shiftViewedDay = useCallback(
+    delta => {
+      const [y, m, d] = today.split('-').map(Number);
+      const next = new Date(y, m - 1, d);
+      next.setDate(next.getDate() + delta);
+      const nextKey = dateKey(next);
+      if (nextKey > realToday) {
+        return;
+      }
+      setToday(nextKey);
+      setWeekendOverride(false);
+    },
+    [today, realToday],
+  );
+  const handleViewDate = useCallback(
+    date => {
+      if (!date || date > realToday) {
+        return;
+      }
+      setToday(date);
+      setWeekendOverride(false);
+    },
+    [realToday],
+  );
+  const handleBackToToday = useCallback(() => {
+    setToday(realToday);
+    setWeekendOverride(false);
+  }, [realToday]);
+
   // Browse-tab flat list with chip filter + search
   const browseList = (() => {
     let list = interviewPrepData.flatMap(w =>
@@ -3564,7 +3665,7 @@ const InterviewPrepPage = ({ location }) => {
             <div style={{ padding: '24px 50px', maxWidth: 760, margin: '0 auto' }}>
               <StyledTodayCard>
                 <header>
-                  <h2>Today&apos;s Mission</h2>
+                  <h2>{isViewingPastDay ? 'Past Session' : 'Today\'s Mission'}</h2>
                   <span className="date">
                     {new Date(today).toLocaleDateString(undefined, {
                       weekday: 'short',
@@ -3575,35 +3676,89 @@ const InterviewPrepPage = ({ location }) => {
                   </span>
                 </header>
 
+                <div className="day-nav">
+                  <button
+                    type="button"
+                    className="nav-btn"
+                    onClick={() => shiftViewedDay(-1)}
+                    aria-label="Previous day">
+                    ◄
+                  </button>
+                  <input
+                    type="date"
+                    className="nav-date"
+                    value={today}
+                    max={realToday}
+                    onChange={e => handleViewDate(e.target.value)}
+                    aria-label="Jump to date"
+                  />
+                  <button
+                    type="button"
+                    className="nav-btn"
+                    onClick={() => shiftViewedDay(1)}
+                    disabled={today >= realToday}
+                    aria-label="Next day">
+                    ►
+                  </button>
+                  {isViewingPastDay && (
+                    <button
+                      type="button"
+                      className="nav-btn back-today"
+                      onClick={handleBackToToday}>
+                      Back to today
+                    </button>
+                  )}
+                </div>
+
+                {isViewingPastDay && (
+                  <div className="viewing-past">
+                    📆 Viewing a past day. Completing work here will log activity to{' '}
+                    {new Date(today).toLocaleDateString(undefined, {
+                      weekday: 'long',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                    .
+                  </div>
+                )}
+
                 <div className="week-grid">
-                  {weekGrid.map(d => (
-                    <div
-                      key={d.date}
-                      className={[
-                        'day-cell',
-                        d.done ? 'done' : '',
-                        d.isToday ? 'today' : '',
-                        d.isWeekend ? 'weekend' : '',
-                        d.isFuture ? 'future' : '',
-                        d.isPreStart && !d.done ? 'future' : '',
-                      ]
-                        .filter(Boolean)
-                        .join(' ')}
-                      title={d.isPreStart ? `${d.date} (pre-start)` : d.date}>
-                      <span className="lbl">{d.label}</span>
-                      <span className="mark">
-                        {d.done
-                          ? '✓'
-                          : d.isPreStart
-                            ? '·'
-                            : d.isWeekend
-                              ? '–'
-                              : d.isToday
-                                ? '•'
-                                : ' '}
-                      </span>
-                    </div>
-                  ))}
+                  {weekGrid.map(d => {
+                    const canOpen = !d.isFuture;
+                    const isViewed = d.date === today;
+                    return (
+                      <button
+                        type="button"
+                        key={d.date}
+                        disabled={!canOpen}
+                        onClick={() => canOpen && handleViewDate(d.date)}
+                        className={[
+                          'day-cell',
+                          d.done ? 'done' : '',
+                          d.isToday ? 'today' : '',
+                          isViewed && !d.isToday ? 'viewing' : '',
+                          d.isWeekend ? 'weekend' : '',
+                          d.isFuture ? 'future' : '',
+                          d.isPreStart && !d.done ? 'future' : '',
+                        ]
+                          .filter(Boolean)
+                          .join(' ')}
+                        title={d.isPreStart ? `${d.date} (pre-start)` : d.date}>
+                        <span className="lbl">{d.label}</span>
+                        <span className="mark">
+                          {d.done
+                            ? '✓'
+                            : d.isPreStart
+                              ? '·'
+                              : d.isWeekend
+                                ? '–'
+                                : d.isToday
+                                  ? '•'
+                                  : ' '}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="plan-rows">

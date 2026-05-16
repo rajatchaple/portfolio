@@ -16,7 +16,6 @@ import {
   masteryHistogram,
   reviewBacklog,
   isWeekend as isWeekendDay,
-  computeDefaultStart,
   earliestActivityDate,
 } from '../data/interviewPrepStudy';
 import { getSavedPin, savePin, clearPin, pushToCloud, pullFromCloud } from '@utils/firebase';
@@ -58,6 +57,8 @@ const DAY_LOG_KEY = 'interview-prep-day-log';
 const STUDY_START_KEY = 'interview-prep-study-start';
 const CODING_DONE_KEY = 'interview-prep-coding-done';
 const STUDY_DAY_KEY = 'interview-prep-study-day-idx';
+// Fixed prep start — days before this are pre-start (not counted as missed).
+const PREP_START_DATE = '2026-05-18';
 
 const loadFromStorage = key => {
   if (typeof window === 'undefined') {
@@ -676,7 +677,7 @@ const StyledActionButton = styled.button`
   &:hover {
     opacity: 0.85;
     ${props =>
-      !props.$primary &&
+    !props.$primary &&
       `
       border-color: var(--green);
       color: var(--green);
@@ -721,7 +722,7 @@ const StyledSyncStatus = styled.div`
     border-radius: 50%;
     background: currentColor;
     ${props =>
-      props.$status === 'syncing' &&
+    props.$status === 'syncing' &&
       `
       animation: pulse 1s infinite;
     `}
@@ -883,14 +884,14 @@ const StyledTimerDisplay = styled.div`
     font-size: 28px;
     font-weight: 600;
     color: ${props => {
-      if (props.$seconds <= 30) {
-        return '#f87171';
-      }
-      if (props.$seconds <= 60) {
-        return '#facc15';
-      }
-      return 'var(--lightest-slate)';
-    }};
+    if (props.$seconds <= 30) {
+      return '#f87171';
+    }
+    if (props.$seconds <= 60) {
+      return '#facc15';
+    }
+    return 'var(--lightest-slate)';
+  }};
     min-width: 80px;
 
     @media (max-width: 768px) {
@@ -1315,17 +1316,17 @@ const StyledMCQOption = styled.button`
   }};
   border: 1px solid
     ${props => {
-      if (props.$revealed && props.$isCorrect) {
-        return '#4ade80';
-      }
-      if (props.$revealed && props.$isSelected && !props.$isCorrect) {
-        return '#f87171';
-      }
-      if (props.$isSelected) {
-        return 'var(--green)';
-      }
-      return 'var(--lightest-navy)';
-    }};
+    if (props.$revealed && props.$isCorrect) {
+      return '#4ade80';
+    }
+    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+      return '#f87171';
+    }
+    if (props.$isSelected) {
+      return 'var(--green)';
+    }
+    return 'var(--lightest-navy)';
+  }};
   border-radius: var(--border-radius);
   color: var(--lightest-slate);
   font-family: var(--font-sans);
@@ -1339,7 +1340,7 @@ const StyledMCQOption = styled.button`
 
   &:hover {
     ${props =>
-      !props.$revealed &&
+    !props.$revealed &&
       `
       border-color: var(--green);
       background: rgba(100, 255, 218, 0.05);
@@ -1798,8 +1799,8 @@ const StyledHeatCell = styled.div`
     props.$today
       ? '1px solid var(--green)'
       : props.$preStart && !props.$count
-      ? '1px dashed rgba(35, 53, 84, 0.6)'
-      : '1px solid transparent'};
+        ? '1px dashed rgba(35, 53, 84, 0.6)'
+        : '1px solid transparent'};
   min-width: 0;
 `;
 
@@ -2362,17 +2363,17 @@ const StyledMasteryDot = styled.span`
   }};
   border: 1px solid
     ${props => {
-      if (props.$mastery === 0) {
-        return 'var(--lightest-navy)';
-      }
-      if (props.$mastery <= 2) {
-        return '#f87171';
-      }
-      if (props.$mastery <= 3) {
-        return '#facc15';
-      }
-      return '#4ade80';
-    }};
+    if (props.$mastery === 0) {
+      return 'var(--lightest-navy)';
+    }
+    if (props.$mastery <= 2) {
+      return '#f87171';
+    }
+    if (props.$mastery <= 3) {
+      return '#facc15';
+    }
+    return '#4ade80';
+  }};
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
@@ -2391,8 +2392,8 @@ const StyledSessionPhase = styled.div`
     props.$phase === 'new'
       ? 'var(--green)'
       : props.$phase === 'review'
-      ? '#facc15'
-      : 'var(--slate)'};
+        ? '#facc15'
+        : 'var(--slate)'};
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 8px;
@@ -2727,21 +2728,14 @@ const InterviewPrepPage = ({ location }) => {
     const todayStr = dateKey();
     setToday(todayStr);
 
-    // Init studyStartDate: stored value > earliest dayLog activity > computed default
-    let startStored = null;
+    // Prep start is fixed at PREP_START_DATE. Only earlier real activity can
+    // pull it back (so genuine pre-start work is never marked as missed).
+    const earliest = earliestActivityDate(loadedDayLog);
+    const resolvedStart = earliest && earliest < PREP_START_DATE ? earliest : PREP_START_DATE;
     try {
-      startStored = window.localStorage.getItem(STUDY_START_KEY);
+      window.localStorage.setItem(STUDY_START_KEY, resolvedStart);
     } catch (e) {
       /* ignore */
-    }
-    let resolvedStart = startStored;
-    if (!resolvedStart) {
-      resolvedStart = earliestActivityDate(loadedDayLog) || computeDefaultStart(todayStr);
-      try {
-        window.localStorage.setItem(STUDY_START_KEY, resolvedStart);
-      } catch (e) {
-        /* ignore */
-      }
     }
     setStudyStartDate(resolvedStart);
     if (typeof window !== 'undefined') {
@@ -2750,7 +2744,7 @@ const InterviewPrepPage = ({ location }) => {
         setStudyDayIdx(savedIdx);
       }
       const t = window.localStorage.getItem('interview-prep-active-tab');
-      if (t && ['today', 'browse', 'practice', 'progress', 'studyday'].includes(t)) {
+      if (t && ['today', 'studyday'].includes(t)) {
         setActiveTab(t);
       }
     }
@@ -3672,10 +3666,10 @@ const InterviewPrepPage = ({ location }) => {
                     {quickFormat === 'session' &&
                       sessionStats.didnt === 0 &&
                       sessionStats.knew > 0 && (
-                        <div style={{ marginTop: 8, fontSize: 13 }}>
+                      <div style={{ marginTop: 8, fontSize: 13 }}>
                           Clean run — those cards moved up the mastery ladder.
-                        </div>
-                      )}
+                      </div>
+                    )}
                     {quickFormat !== 'session' && sessionStats.didnt > 0 && (
                       <div style={{ marginTop: 8, fontSize: 13 }}>
                         Tip: missed cards stay in your stats — review them again later.
@@ -3705,157 +3699,157 @@ const InterviewPrepPage = ({ location }) => {
                   {quickFormat === 'session' &&
                   deck[cardIdx]._kind === 'new' &&
                   !introSeen[deck[cardIdx].id] ? (
-                    <>
-                      <StyledSessionPhase $phase="new">
+                      <>
+                        <StyledSessionPhase $phase="new">
                         📚 Learn — first time seeing this
-                      </StyledSessionPhase>
-                      <div className="question">{deck[cardIdx].question}</div>
-                      <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                      {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
-                        <div
-                          style={{
-                            marginBottom: 20,
-                            textAlign: 'left',
-                            width: '100%',
-                            fontSize: 13,
-                            color: 'var(--slate)',
-                            lineHeight: 1.6,
-                          }}>
+                        </StyledSessionPhase>
+                        <div className="question">{deck[cardIdx].question}</div>
+                        <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                        {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
                           <div
                             style={{
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: 11,
-                              textTransform: 'uppercase',
-                              letterSpacing: 0.5,
-                              marginBottom: 6,
+                              marginBottom: 20,
+                              textAlign: 'left',
+                              width: '100%',
+                              fontSize: 13,
+                              color: 'var(--slate)',
+                              lineHeight: 1.6,
                             }}>
+                            <div
+                              style={{
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: 11,
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5,
+                                marginBottom: 6,
+                              }}>
                             Reading material
-                          </div>
-                          {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
-                            <div key={i}>▹ {r}</div>
-                          ))}
-                        </div>
-                      )}
-                      <button
-                        className="reveal"
-                        type="button"
-                        onClick={() =>
-                          setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
-                        }>
-                        Got it — test me
-                      </button>
-                    </>
-                  ) : quickFormat === 'mcq' ||
-                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
-                    mcq[deck[cardIdx].id] ? (
-                      <>
-                        {quickFormat === 'session' && (
-                          <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                            {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                          </StyledSessionPhase>
-                        )}
-                        <div className="question">{mcq[deck[cardIdx].id].question}</div>
-                        <StyledMCQOptions>
-                          {mcq[deck[cardIdx].id].options.map((opt, i) => {
-                            const correct = mcq[deck[cardIdx].id].correct;
-                            const revealed = mcqSelected !== null;
-                            return (
-                              <StyledMCQOption
-                                key={i}
-                                type="button"
-                                $isSelected={mcqSelected === i}
-                                $isCorrect={i === correct}
-                                $revealed={revealed}
-                                onClick={() => mcqSelected === null && setMcqSelected(i)}
-                                disabled={revealed}>
-                                <span className="letter">{String.fromCharCode(65 + i)}.</span>
-                                {opt}
-                              </StyledMCQOption>
-                            );
-                          })}
-                        </StyledMCQOptions>
-                        {mcqSelected !== null && (
-                          <>
-                            <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
-                            <div className="rate" style={{ marginTop: 20 }}>
-                              <button
-                                type="button"
-                                className="knew"
-                                onClick={() => {
-                                  const right = mcqSelected === mcq[deck[cardIdx].id].correct;
-                                  if (quickFormat === 'session') {
-                                    rateSessionCard(right);
-                                  } else {
-                                    rateCard(right);
-                                  }
-                                }}>
-                                {mcqSelected === mcq[deck[cardIdx].id].correct
-                                  ? '✓ Correct — Next'
-                                  : '✗ Wrong — Next'}
-                              </button>
                             </div>
-                          </>
+                            {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
+                              <div key={i}>▹ {r}</div>
+                            ))}
+                          </div>
                         )}
-                      </>
-                    ) : (
-                      <>
-                        <div className="question">No MCQ for this card.</div>
                         <button
                           className="reveal"
                           type="button"
-                          onClick={() => {
-                            if (cardIdx + 1 < deck.length) {
-                              setCardIdx(cardIdx + 1);
-                              setCardFlipped(false);
-                              setMcqSelected(null);
-                            } else {
-                              setCardIdx(deck.length);
-                            }
-                          }}>
+                          onClick={() =>
+                            setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
+                          }>
+                        Got it — test me
+                        </button>
+                      </>
+                    ) : quickFormat === 'mcq' ||
+                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
+                        mcq[deck[cardIdx].id] ? (
+                          <>
+                            {quickFormat === 'session' && (
+                              <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                                {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                              </StyledSessionPhase>
+                            )}
+                            <div className="question">{mcq[deck[cardIdx].id].question}</div>
+                            <StyledMCQOptions>
+                              {mcq[deck[cardIdx].id].options.map((opt, i) => {
+                                const correct = mcq[deck[cardIdx].id].correct;
+                                const revealed = mcqSelected !== null;
+                                return (
+                                  <StyledMCQOption
+                                    key={i}
+                                    type="button"
+                                    $isSelected={mcqSelected === i}
+                                    $isCorrect={i === correct}
+                                    $revealed={revealed}
+                                    onClick={() => mcqSelected === null && setMcqSelected(i)}
+                                    disabled={revealed}>
+                                    <span className="letter">{String.fromCharCode(65 + i)}.</span>
+                                    {opt}
+                                  </StyledMCQOption>
+                                );
+                              })}
+                            </StyledMCQOptions>
+                            {mcqSelected !== null && (
+                              <>
+                                <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
+                                <div className="rate" style={{ marginTop: 20 }}>
+                                  <button
+                                    type="button"
+                                    className="knew"
+                                    onClick={() => {
+                                      const right = mcqSelected === mcq[deck[cardIdx].id].correct;
+                                      if (quickFormat === 'session') {
+                                        rateSessionCard(right);
+                                      } else {
+                                        rateCard(right);
+                                      }
+                                    }}>
+                                    {mcqSelected === mcq[deck[cardIdx].id].correct
+                                      ? '✓ Correct — Next'
+                                      : '✗ Wrong — Next'}
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="question">No MCQ for this card.</div>
+                            <button
+                              className="reveal"
+                              type="button"
+                              onClick={() => {
+                                if (cardIdx + 1 < deck.length) {
+                                  setCardIdx(cardIdx + 1);
+                                  setCardFlipped(false);
+                                  setMcqSelected(null);
+                                } else {
+                                  setCardIdx(deck.length);
+                                }
+                              }}>
                           Skip
-                        </button>
-                      </>
-                    )
-                  ) : (
-                    <>
-                      {quickFormat === 'session' && (
-                        <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                          {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                        </StyledSessionPhase>
-                      )}
-                      <div className="question">{deck[cardIdx].question}</div>
-                      {!cardFlipped ? (
-                        <button
-                          className="reveal"
-                          type="button"
-                          onClick={() => setCardFlipped(true)}>
-                          Tap to reveal answer
-                        </button>
+                            </button>
+                          </>
+                        )
                       ) : (
                         <>
-                          <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                          <div className="rate">
+                          {quickFormat === 'session' && (
+                            <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                              {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                            </StyledSessionPhase>
+                          )}
+                          <div className="question">{deck[cardIdx].question}</div>
+                          {!cardFlipped ? (
                             <button
+                              className="reveal"
                               type="button"
-                              className="knew"
-                              onClick={() =>
-                                quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
-                              }>
+                              onClick={() => setCardFlipped(true)}>
+                          Tap to reveal answer
+                            </button>
+                          ) : (
+                            <>
+                              <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                              <div className="rate">
+                                <button
+                                  type="button"
+                                  className="knew"
+                                  onClick={() =>
+                                    quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
+                                  }>
                               ✓ Knew it
-                            </button>
-                            <button
-                              type="button"
-                              className="didnt"
-                              onClick={() =>
-                                quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
-                              }>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="didnt"
+                                  onClick={() =>
+                                    quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
+                                  }>
                               ✗ Didn&apos;t
-                            </button>
-                          </div>
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </>
                       )}
-                    </>
-                  )}
                 </>
               )}
             </StyledQuickCard>
@@ -3886,34 +3880,7 @@ const InterviewPrepPage = ({ location }) => {
             onClick={() => setActiveTab('studyday')}
             type="button">
             <span className="icon">📖</span>
-            <span className="lbl">By Day</span>
-          </StyledTab>
-          <StyledTab
-            $active={activeTab === 'browse'}
-            onClick={() => setActiveTab('browse')}
-            type="button">
-            <span className="icon">📚</span>
-            <span className="lbl">Browse</span>
-          </StyledTab>
-          <StyledTab
-            $active={activeTab === 'practice'}
-            onClick={() => {
-              setActiveQ(null);
-              setActiveTab('practice');
-            }}
-            type="button">
-            <span className="icon">🃏</span>
-            <span className="lbl">Practice</span>
-          </StyledTab>
-          <StyledTab
-            $active={activeTab === 'progress'}
-            onClick={() => {
-              setActiveQ(null);
-              setActiveTab('progress');
-            }}
-            type="button">
-            <span className="icon">📊</span>
-            <span className="lbl">Progress</span>
+            <span className="lbl">Topic</span>
           </StyledTab>
         </StyledTabBar>
 
@@ -3925,7 +3892,7 @@ const InterviewPrepPage = ({ location }) => {
             <div style={{ padding: '24px 50px', maxWidth: 760, margin: '0 auto' }}>
               <StyledTodayCard>
                 <header>
-                  <h2>{isViewingPastDay ? 'Past Session' : "Today's Mission"}</h2>
+                  <h2>{isViewingPastDay ? 'Past Session' : 'Today\'s Mission'}</h2>
                   <span className="date">
                     {new Date(today).toLocaleDateString(undefined, {
                       weekday: 'short',
@@ -4009,12 +3976,12 @@ const InterviewPrepPage = ({ location }) => {
                           {d.done
                             ? '✓'
                             : d.isPreStart
-                            ? '·'
-                            : d.isWeekend
-                            ? '–'
-                            : d.isToday
-                            ? '•'
-                            : ' '}
+                              ? '·'
+                              : d.isWeekend
+                                ? '–'
+                                : d.isToday
+                                  ? '•'
+                                  : ' '}
                         </span>
                       </button>
                     );
@@ -4361,8 +4328,8 @@ const InterviewPrepPage = ({ location }) => {
                                   {confidence[q.id] === 3
                                     ? '💪'
                                     : confidence[q.id] === 2
-                                    ? '😐'
-                                    : '😟'}
+                                      ? '😐'
+                                      : '😟'}
                                 </span>
                               )}
                               {isStale(q.id) && <StyledStaleBadge>⟳ stale</StyledStaleBadge>}
@@ -4590,8 +4557,8 @@ const InterviewPrepPage = ({ location }) => {
                               preStart && !cell.count
                                 ? `${cell.date}: pre-start`
                                 : `${cell.date}: ${cell.count} ${
-                                    cell.count === 1 ? 'item' : 'items'
-                                  }`
+                                  cell.count === 1 ? 'item' : 'items'
+                                }`
                             }
                           />
                         );

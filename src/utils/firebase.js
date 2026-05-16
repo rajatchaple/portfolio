@@ -45,12 +45,15 @@ export const clearPin = () => {
   localStorage.removeItem(PIN_STORAGE_KEY);
 };
 
-export const pushToCloud = async (pin, answers) => {
+// `bundle` is the full progress object (answers + studyState + dayLog +
+// codingDone + ...). `answers` is kept as a top-level field so older
+// answers-only records stay readable/writable (backward compatible).
+export const pushToCloud = async (pin, bundle) => {
   const userPath = hashPin(pin);
   const url = `${FIREBASE_DB_URL}/answers/${userPath}.json`;
 
   const payload = {
-    answers,
+    ...bundle,
     lastUpdated: new Date().toISOString(),
   };
 
@@ -79,12 +82,12 @@ export const pullFromCloud = async pin => {
 
   const data = await res.json();
 
-  if (!data || !data.answers) {
+  if (!data || typeof data !== 'object') {
     return null; // No data yet for this PIN
   }
 
-  return {
-    answers: data.answers,
-    lastUpdated: data.lastUpdated,
-  };
+  // Return the whole stored bundle (lastUpdated included). Older records
+  // only have { answers, lastUpdated }; missing keys are handled by the
+  // caller's merge (treated as empty).
+  return data;
 };

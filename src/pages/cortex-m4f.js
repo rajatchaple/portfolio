@@ -83,6 +83,157 @@ const saveToStorage = (key, data) => {
   }
 };
 
+// Parse a 'YYYY-MM-DD' string as a LOCAL date. `new Date('2026-05-18')`
+// parses as UTC midnight and renders as the previous day in US timezones.
+const localDate = iso => {
+  const [y, m, d] = (iso || '').split('-').map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
+};
+
+// Every localStorage key holding progress — used by Reset.
+const ALL_PROGRESS_KEYS = [
+  STORAGE_KEY,
+  CONFIDENCE_KEY,
+  REVIEWED_KEY,
+  SKETCH_KEY,
+  PRACTICAL_KEY,
+  FLASHCARD_KEY,
+  STUDY_STATE_KEY,
+  DAY_LOG_KEY,
+  STUDY_START_KEY,
+  CODING_DONE_KEY,
+  STUDY_DAY_KEY,
+  'interview-prep-active-tab',
+];
+
+// Read the full local progress bundle from localStorage.
+const buildLocalBundle = () => {
+  let studyDayIdx = 0;
+  if (typeof window !== 'undefined') {
+    const n = parseInt(window.localStorage.getItem(STUDY_DAY_KEY), 10);
+    if (!Number.isNaN(n)) {
+      studyDayIdx = n;
+    }
+  }
+  return {
+    answers: loadFromStorage(STORAGE_KEY),
+    confidence: loadFromStorage(CONFIDENCE_KEY),
+    lastReviewed: loadFromStorage(REVIEWED_KEY),
+    practicalDone: loadFromStorage(PRACTICAL_KEY),
+    flashcardStats: loadFromStorage(FLASHCARD_KEY),
+    codingDone: loadFromStorage(CODING_DONE_KEY),
+    studyState: loadFromStorage(STUDY_STATE_KEY),
+    dayLog: loadFromStorage(DAY_LOG_KEY),
+    sketches: loadFromStorage(SKETCH_KEY),
+    studyDayIdx,
+  };
+};
+
+// Per-key merge primitives. Every rule is "no progress is ever lost":
+// truthy/longer/more-recent/union wins, never blind overwrite.
+const keys2 = (a, b) => Object.keys({ ...(a || {}), ...(b || {}) });
+const mergeLongerString = (a, b) => {
+  const out = {};
+  keys2(a, b).forEach(k => {
+    const x = (a && a[k]) || '';
+    const y = (b && b[k]) || '';
+    out[k] = x.length >= y.length ? x : y;
+  });
+  return out;
+};
+const mergeOrBool = (a, b) => {
+  const out = {};
+  keys2(a, b).forEach(k => {
+    out[k] = !!((a && a[k]) || (b && b[k]));
+  });
+  return out;
+};
+const mergeMaxNum = (a, b) => {
+  const out = {};
+  keys2(a, b).forEach(k => {
+    out[k] = Math.max((a && a[k]) || 0, (b && b[k]) || 0);
+  });
+  return out;
+};
+const mergeLaterISO = (a, b) => {
+  const out = {};
+  keys2(a, b).forEach(k => {
+    const x = (a && a[k]) || '';
+    const y = (b && b[k]) || '';
+    out[k] = x > y ? x : y;
+  });
+  return out;
+};
+const mergeStudyState = (a, b) => {
+  const out = {};
+  keys2(a, b).forEach(k => {
+    const x = a && a[k];
+    const y = b && b[k];
+    if (!x) {
+      out[k] = y;
+    } else if (!y) {
+      out[k] = x;
+    } else {
+      // Most recent study action is the current truth; fall back to
+      // whichever has more total reviews.
+      const xt = x.lastSeen || '';
+      const yt = y.lastSeen || '';
+      if (xt || yt) {
+        out[k] = xt >= yt ? x : y;
+      } else {
+        const xr = (x.correctCount || 0) + (x.wrongCount || 0);
+        const yr = (y.correctCount || 0) + (y.wrongCount || 0);
+        out[k] = xr >= yr ? x : y;
+      }
+    }
+  });
+  return out;
+};
+const mergeDayLog = (a, b) => {
+  const out = {};
+  keys2(a, b).forEach(k => {
+    const x = (a && a[k]) || {};
+    const y = (b && b[k]) || {};
+    const uni = f => Array.from(new Set([...(x[f] || []), ...(y[f] || [])]));
+    out[k] = {
+      newCards: uni('newCards'),
+      reviewed: uni('reviewed'),
+      practicalsDone: uni('practicalsDone'),
+      answered: Math.max(x.answered || 0, y.answered || 0),
+    };
+  });
+  return out;
+};
+const mergeFlashcards = (a, b) => {
+  const out = {};
+  keys2(a, b).forEach(k => {
+    const x = (a && a[k]) || {};
+    const y = (b && b[k]) || {};
+    const xt = (x.right || 0) + (x.wrong || 0);
+    const yt = (y.right || 0) + (y.wrong || 0);
+    out[k] = xt >= yt ? x : y;
+  });
+  return out;
+};
+
+// Merge a local bundle with a remote one with no data loss.
+const mergeProgress = (local, remote) => {
+  const l = local || {};
+  const r = remote || {};
+  return {
+    answers: mergeLongerString(l.answers, r.answers),
+    confidence: mergeMaxNum(l.confidence, r.confidence),
+    lastReviewed: mergeLaterISO(l.lastReviewed, r.lastReviewed),
+    practicalDone: mergeOrBool(l.practicalDone, r.practicalDone),
+    flashcardStats: mergeFlashcards(l.flashcardStats, r.flashcardStats),
+    codingDone: mergeOrBool(l.codingDone, r.codingDone),
+    studyState: mergeStudyState(l.studyState, r.studyState),
+    dayLog: mergeDayLog(l.dayLog, r.dayLog),
+    sketches: mergeLongerString(l.sketches, r.sketches),
+    studyDayIdx: Math.max(l.studyDayIdx || 0, r.studyDayIdx || 0),
+  };
+};
+
 // --- Styled Components ---
 
 const StyledContainer = styled.div`
@@ -2712,32 +2863,70 @@ const InterviewPrepPage = ({ location }) => {
   const [syncStatus, setSyncStatus] = useState('idle'); // idle | syncing | synced | error
   const [lastSynced, setLastSynced] = useState(null);
 
-  // Load answers from localStorage + check for saved PIN on mount
+  // Gate auto-push until the initial cloud pull/merge has resolved, so a
+  // stale local bundle can never overwrite cloud before merging.
+  const syncReadyRef = useRef(false);
+
+  // Persist a merged bundle to localStorage AND reflect it in React state
+  // (no reload needed).
+  const applyBundle = useCallback(b => {
+    if (!b) {
+      return;
+    }
+    saveAnswers(b.answers || {});
+    saveToStorage(CONFIDENCE_KEY, b.confidence || {});
+    saveToStorage(REVIEWED_KEY, b.lastReviewed || {});
+    saveToStorage(PRACTICAL_KEY, b.practicalDone || {});
+    saveToStorage(FLASHCARD_KEY, b.flashcardStats || {});
+    saveToStorage(CODING_DONE_KEY, b.codingDone || {});
+    saveToStorage(STUDY_STATE_KEY, b.studyState || {});
+    saveToStorage(DAY_LOG_KEY, b.dayLog || {});
+    saveToStorage(SKETCH_KEY, b.sketches || {});
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(STUDY_DAY_KEY, String(b.studyDayIdx || 0));
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    setAnswers(b.answers || {});
+    setConfidence(b.confidence || {});
+    setLastReviewed(b.lastReviewed || {});
+    setPracticalDone(b.practicalDone || {});
+    setFlashcardStats(b.flashcardStats || {});
+    setCodingDone(b.codingDone || {});
+    setStudyState(b.studyState || {});
+    setDayLog(b.dayLog || {});
+    setStudyDayIdx(b.studyDayIdx || 0);
+  }, []);
+
+  // Load local state + check for saved PIN on mount
   useEffect(() => {
-    const loaded = loadAnswers();
-    setAnswers(loaded);
+    setAnswers(loadAnswers());
     setConfidence(loadFromStorage(CONFIDENCE_KEY));
     setLastReviewed(loadFromStorage(REVIEWED_KEY));
     setPracticalDone(loadFromStorage(PRACTICAL_KEY));
     setFlashcardStats(loadFromStorage(FLASHCARD_KEY));
     setCodingDone(loadFromStorage(CODING_DONE_KEY));
-    const loadedStudy = loadFromStorage(STUDY_STATE_KEY);
+    setStudyState(loadFromStorage(STUDY_STATE_KEY));
     const loadedDayLog = loadFromStorage(DAY_LOG_KEY);
-    setStudyState(loadedStudy);
     setDayLog(loadedDayLog);
     const todayStr = dateKey();
     setToday(todayStr);
 
     // Prep start is fixed at PREP_START_DATE. Only earlier real activity can
     // pull it back (so genuine pre-start work is never marked as missed).
-    const earliest = earliestActivityDate(loadedDayLog);
-    const resolvedStart = earliest && earliest < PREP_START_DATE ? earliest : PREP_START_DATE;
-    try {
-      window.localStorage.setItem(STUDY_START_KEY, resolvedStart);
-    } catch (e) {
-      /* ignore */
-    }
-    setStudyStartDate(resolvedStart);
+    const setStartFrom = log => {
+      const earliest = earliestActivityDate(log);
+      const rs = earliest && earliest < PREP_START_DATE ? earliest : PREP_START_DATE;
+      try {
+        window.localStorage.setItem(STUDY_START_KEY, rs);
+      } catch (e) {
+        /* ignore */
+      }
+      setStudyStartDate(rs);
+    };
+    setStartFrom(loadedDayLog);
     if (typeof window !== 'undefined') {
       const savedIdx = parseInt(window.localStorage.getItem(STUDY_DAY_KEY), 10);
       if (!Number.isNaN(savedIdx)) {
@@ -2752,44 +2941,66 @@ const InterviewPrepPage = ({ location }) => {
     const savedPin = getSavedPin();
     if (savedPin) {
       setPin(savedPin);
-      // Auto-pull from cloud on mount
+      // Pull cloud, merge with local (no data loss), apply, push union back.
       pullFromCloud(savedPin)
         .then(data => {
-          if (data && data.answers) {
-            // Merge: cloud wins for keys present in cloud
-            const merged = { ...loaded, ...data.answers };
-            setAnswers(merged);
-            saveAnswers(merged);
-            setLastSynced(data.lastUpdated);
-            setSyncStatus('synced');
-          }
+          const merged = mergeProgress(buildLocalBundle(), data || {});
+          applyBundle(merged);
+          setStartFrom(merged.dayLog);
+          setLastSynced((data && data.lastUpdated) || new Date().toISOString());
+          setSyncStatus('synced');
+          return pushToCloud(savedPin, merged);
         })
         .catch(() => {
-          // Silently fail — offline is fine, local data still works
+          // Offline is fine — local data still works
           setSyncStatus('idle');
+        })
+        .finally(() => {
+          syncReadyRef.current = true;
         });
+    } else {
+      syncReadyRef.current = true;
     }
   }, []);
 
-  // Cloud push helper
-  const cloudPush = useCallback(
-    async updatedAnswers => {
-      if (!pin) {
-        return;
-      }
-      setSyncStatus('syncing');
-      try {
-        await pushToCloud(pin, updatedAnswers);
-        setSyncStatus('synced');
-        setLastSynced(new Date().toISOString());
-        setTimeout(() => setSyncStatus('idle'), 3000);
-      } catch {
-        setSyncStatus('error');
-        setTimeout(() => setSyncStatus('idle'), 3000);
-      }
-    },
-    [pin],
-  );
+  // Push the full local bundle to the cloud.
+  const cloudPush = useCallback(async () => {
+    if (!pin) {
+      return;
+    }
+    setSyncStatus('syncing');
+    try {
+      await pushToCloud(pin, buildLocalBundle());
+      setSyncStatus('synced');
+      setLastSynced(new Date().toISOString());
+      setTimeout(() => setSyncStatus('idle'), 3000);
+    } catch {
+      setSyncStatus('error');
+      setTimeout(() => setSyncStatus('idle'), 3000);
+    }
+  }, [pin]);
+
+  // Debounced auto-push: any progress change (cards, day-log, coding,
+  // answers, ...) reaches the cloud, not just typed answers.
+  useEffect(() => {
+    if (!pin || !syncReadyRef.current) {
+      return undefined;
+    }
+    const t = setTimeout(() => cloudPush(), 2500);
+    return () => clearTimeout(t);
+  }, [
+    pin,
+    answers,
+    studyState,
+    dayLog,
+    codingDone,
+    confidence,
+    lastReviewed,
+    practicalDone,
+    flashcardStats,
+    studyDayIdx,
+    cloudPush,
+  ]);
 
   // PIN modal handlers
   const handlePinSubmit = useCallback(async () => {
@@ -2806,30 +3017,21 @@ const InterviewPrepPage = ({ location }) => {
     savePin(trimmed);
     setPin(trimmed);
 
-    // Try pulling existing data for this PIN
     setSyncStatus('syncing');
     try {
       const data = await pullFromCloud(trimmed);
-      if (data && data.answers) {
-        const currentAnswers = loadAnswers();
-        const merged = { ...currentAnswers, ...data.answers };
-        setAnswers(merged);
-        saveAnswers(merged);
-        setLastSynced(data.lastUpdated);
-      } else {
-        // First time with this PIN — push current local data up
-        const currentAnswers = loadAnswers();
-        if (Object.keys(currentAnswers).length > 0) {
-          await pushToCloud(trimmed, currentAnswers);
-        }
-      }
+      const merged = mergeProgress(buildLocalBundle(), data || {});
+      applyBundle(merged);
+      await pushToCloud(trimmed, merged);
+      setLastSynced(new Date().toISOString());
       setSyncStatus('synced');
+      syncReadyRef.current = true;
     } catch {
       setSyncStatus('error');
     }
     setShowPinModal(false);
     setPinInput('');
-  }, [pinInput]);
+  }, [pinInput, applyBundle]);
 
   const handleDisconnect = useCallback(() => {
     clearPin();
@@ -2844,15 +3046,10 @@ const InterviewPrepPage = ({ location }) => {
     }
     setSyncStatus('syncing');
     try {
-      // Pull first, merge, then push
       const data = await pullFromCloud(pin);
-      let merged = { ...answers };
-      if (data && data.answers) {
-        merged = { ...data.answers, ...answers }; // local wins on conflict
-      }
+      const merged = mergeProgress(buildLocalBundle(), data || {});
+      applyBundle(merged);
       await pushToCloud(pin, merged);
-      setAnswers(merged);
-      saveAnswers(merged);
       setSyncStatus('synced');
       setLastSynced(new Date().toISOString());
       setTimeout(() => setSyncStatus('idle'), 3000);
@@ -2860,7 +3057,7 @@ const InterviewPrepPage = ({ location }) => {
       setSyncStatus('error');
       setTimeout(() => setSyncStatus('idle'), 3000);
     }
-  }, [pin, answers]);
+  }, [pin, applyBundle]);
 
   // Find the active question object
   const activeQuestion = activeQ
@@ -2962,6 +3159,30 @@ const InterviewPrepPage = ({ location }) => {
     a.click();
     URL.revokeObjectURL(url);
   }, [answers]);
+
+  const handleResetProgress = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (
+      !window.confirm(
+        'Reset ALL progress? This wipes cards, coding, streak and day log. Cannot be undone.',
+      )
+    ) {
+      return;
+    }
+    ALL_PROGRESS_KEYS.forEach(k => {
+      try {
+        window.localStorage.removeItem(k);
+      } catch (e) {
+        /* ignore */
+      }
+    });
+    // Also disconnect cloud so the wiped state isn't immediately
+    // re-pulled on reload.
+    clearPin();
+    window.location.reload();
+  }, []);
 
   const handleImport = useCallback(
     e => {
@@ -3894,7 +4115,7 @@ const InterviewPrepPage = ({ location }) => {
                 <header>
                   <h2>{isViewingPastDay ? 'Past Session' : 'Today\'s Mission'}</h2>
                   <span className="date">
-                    {new Date(today).toLocaleDateString(undefined, {
+                    {localDate(today).toLocaleDateString(undefined, {
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric',
@@ -3940,7 +4161,7 @@ const InterviewPrepPage = ({ location }) => {
                 {isViewingPastDay && (
                   <div className="viewing-past">
                     📆 Viewing a past day. Completing work here will log activity to{' '}
-                    {new Date(today).toLocaleDateString(undefined, {
+                    {localDate(today).toLocaleDateString(undefined, {
                       weekday: 'long',
                       month: 'short',
                       day: 'numeric',
@@ -4039,7 +4260,7 @@ const InterviewPrepPage = ({ location }) => {
                       }}>
                       📅 Your prep starts{' '}
                       <strong style={{ color: 'var(--green)' }}>
-                        {new Date(studyStartDate).toLocaleDateString(undefined, {
+                        {localDate(studyStartDate).toLocaleDateString(undefined, {
                           weekday: 'long',
                           month: 'short',
                           day: 'numeric',
@@ -4199,6 +4420,100 @@ const InterviewPrepPage = ({ location }) => {
                   </>
                 )}
               </StyledCodingCard>
+
+              <div
+                style={{
+                  marginTop: 28,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 10,
+                }}>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                    color: 'var(--slate)',
+                  }}>
+                  {!pin
+                    ? 'Progress is on this device only'
+                    : syncStatus === 'syncing'
+                      ? 'Syncing…'
+                      : syncStatus === 'error'
+                        ? 'Sync failed — will retry'
+                        : lastSynced
+                          ? `Synced ${new Date(lastSynced).toLocaleTimeString()}`
+                          : 'Cloud connected'}
+                </div>
+                <div
+                  style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {!pin ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowPinModal(true)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid var(--green)',
+                        borderRadius: 'var(--border-radius)',
+                        color: 'var(--green)',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 11,
+                        padding: '8px 14px',
+                        cursor: 'pointer',
+                      }}>
+                      ☁ Sync across devices
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleManualSync}
+                        style={{
+                          background: 'transparent',
+                          border: '1px solid var(--green)',
+                          borderRadius: 'var(--border-radius)',
+                          color: 'var(--green)',
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: 11,
+                          padding: '8px 14px',
+                          cursor: 'pointer',
+                        }}>
+                        Sync now
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDisconnect}
+                        style={{
+                          background: 'transparent',
+                          border: '1px solid var(--lightest-navy)',
+                          borderRadius: 'var(--border-radius)',
+                          color: 'var(--slate)',
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: 11,
+                          padding: '8px 14px',
+                          cursor: 'pointer',
+                        }}>
+                        Disconnect
+                      </button>
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleResetProgress}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid var(--lightest-navy)',
+                      borderRadius: 'var(--border-radius)',
+                      color: 'var(--slate)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 11,
+                      padding: '8px 14px',
+                      cursor: 'pointer',
+                    }}>
+                    Reset progress
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -4507,7 +4822,7 @@ const InterviewPrepPage = ({ location }) => {
                   }}>
                   <span>📅 Prep start date:</span>
                   <strong style={{ color: 'var(--green)' }}>
-                    {new Date(studyStartDate).toLocaleDateString(undefined, {
+                    {localDate(studyStartDate).toLocaleDateString(undefined, {
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric',

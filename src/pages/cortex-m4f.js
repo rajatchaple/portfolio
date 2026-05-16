@@ -57,6 +57,7 @@ const STUDY_STATE_KEY = 'interview-prep-study-state';
 const DAY_LOG_KEY = 'interview-prep-day-log';
 const STUDY_START_KEY = 'interview-prep-study-start';
 const CODING_DONE_KEY = 'interview-prep-coding-done';
+const STUDY_DAY_KEY = 'interview-prep-study-day-idx';
 
 const loadFromStorage = key => {
   if (typeof window === 'undefined') {
@@ -675,7 +676,7 @@ const StyledActionButton = styled.button`
   &:hover {
     opacity: 0.85;
     ${props =>
-    !props.$primary &&
+      !props.$primary &&
       `
       border-color: var(--green);
       color: var(--green);
@@ -720,7 +721,7 @@ const StyledSyncStatus = styled.div`
     border-radius: 50%;
     background: currentColor;
     ${props =>
-    props.$status === 'syncing' &&
+      props.$status === 'syncing' &&
       `
       animation: pulse 1s infinite;
     `}
@@ -882,14 +883,14 @@ const StyledTimerDisplay = styled.div`
     font-size: 28px;
     font-weight: 600;
     color: ${props => {
-    if (props.$seconds <= 30) {
-      return '#f87171';
-    }
-    if (props.$seconds <= 60) {
-      return '#facc15';
-    }
-    return 'var(--lightest-slate)';
-  }};
+      if (props.$seconds <= 30) {
+        return '#f87171';
+      }
+      if (props.$seconds <= 60) {
+        return '#facc15';
+      }
+      return 'var(--lightest-slate)';
+    }};
     min-width: 80px;
 
     @media (max-width: 768px) {
@@ -1314,17 +1315,17 @@ const StyledMCQOption = styled.button`
   }};
   border: 1px solid
     ${props => {
-    if (props.$revealed && props.$isCorrect) {
-      return '#4ade80';
-    }
-    if (props.$revealed && props.$isSelected && !props.$isCorrect) {
-      return '#f87171';
-    }
-    if (props.$isSelected) {
-      return 'var(--green)';
-    }
-    return 'var(--lightest-navy)';
-  }};
+      if (props.$revealed && props.$isCorrect) {
+        return '#4ade80';
+      }
+      if (props.$revealed && props.$isSelected && !props.$isCorrect) {
+        return '#f87171';
+      }
+      if (props.$isSelected) {
+        return 'var(--green)';
+      }
+      return 'var(--lightest-navy)';
+    }};
   border-radius: var(--border-radius);
   color: var(--lightest-slate);
   font-family: var(--font-sans);
@@ -1338,7 +1339,7 @@ const StyledMCQOption = styled.button`
 
   &:hover {
     ${props =>
-    !props.$revealed &&
+      !props.$revealed &&
       `
       border-color: var(--green);
       background: rgba(100, 255, 218, 0.05);
@@ -1528,6 +1529,66 @@ const StyledTabBody = styled.div`
 
   @media (min-width: 769px) {
     padding-bottom: 24px;
+  }
+`;
+
+const StyledDayNavBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+
+  .nav-btn {
+    background: rgba(2, 12, 27, 0.5);
+    border: 1px solid var(--lightest-navy);
+    border-radius: var(--border-radius);
+    color: var(--green);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 8px 14px;
+    cursor: pointer;
+    min-height: 38px;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      border-color: var(--green);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      color: var(--slate);
+    }
+  }
+
+  .day-pos {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+
+    select {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(2, 12, 27, 0.5);
+      border: 1px solid var(--lightest-navy);
+      border-radius: var(--border-radius);
+      color: var(--lightest-slate);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 10px;
+      cursor: pointer;
+      color-scheme: dark;
+    }
+
+    .counter {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--slate);
+    }
   }
 `;
 
@@ -1737,8 +1798,8 @@ const StyledHeatCell = styled.div`
     props.$today
       ? '1px solid var(--green)'
       : props.$preStart && !props.$count
-        ? '1px dashed rgba(35, 53, 84, 0.6)'
-        : '1px solid transparent'};
+      ? '1px dashed rgba(35, 53, 84, 0.6)'
+      : '1px solid transparent'};
   min-width: 0;
 `;
 
@@ -2301,17 +2362,17 @@ const StyledMasteryDot = styled.span`
   }};
   border: 1px solid
     ${props => {
-    if (props.$mastery === 0) {
-      return 'var(--lightest-navy)';
-    }
-    if (props.$mastery <= 2) {
-      return '#f87171';
-    }
-    if (props.$mastery <= 3) {
-      return '#facc15';
-    }
-    return '#4ade80';
-  }};
+      if (props.$mastery === 0) {
+        return 'var(--lightest-navy)';
+      }
+      if (props.$mastery <= 2) {
+        return '#f87171';
+      }
+      if (props.$mastery <= 3) {
+        return '#facc15';
+      }
+      return '#4ade80';
+    }};
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
@@ -2330,8 +2391,8 @@ const StyledSessionPhase = styled.div`
     props.$phase === 'new'
       ? 'var(--green)'
       : props.$phase === 'review'
-        ? '#facc15'
-        : 'var(--slate)'};
+      ? '#facc15'
+      : 'var(--slate)'};
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 8px;
@@ -2589,6 +2650,7 @@ SketchPad.propTypes = {
 const InterviewPrepPage = ({ location }) => {
   const [answers, setAnswers] = useState({});
   const [activeQ, setActiveQ] = useState(null);
+  const [studyDayIdx, setStudyDayIdx] = useState(0);
   const [currentDraft, setCurrentDraft] = useState('');
   const [showReference, setShowReference] = useState(false);
   const [showReading, setShowReading] = useState(false);
@@ -2683,8 +2745,12 @@ const InterviewPrepPage = ({ location }) => {
     }
     setStudyStartDate(resolvedStart);
     if (typeof window !== 'undefined') {
+      const savedIdx = parseInt(window.localStorage.getItem(STUDY_DAY_KEY), 10);
+      if (!Number.isNaN(savedIdx)) {
+        setStudyDayIdx(savedIdx);
+      }
       const t = window.localStorage.getItem('interview-prep-active-tab');
-      if (t && ['today', 'browse', 'practice', 'progress'].includes(t)) {
+      if (t && ['today', 'browse', 'practice', 'progress', 'studyday'].includes(t)) {
         setActiveTab(t);
       }
     }
@@ -2824,6 +2890,37 @@ const InterviewPrepPage = ({ location }) => {
       return updated;
     });
   }, []);
+
+  // Study-by-Day: linear curriculum order (w1d1 -> w1d2 -> ...).
+  const orderedQuestions = interviewPrepData.flatMap(w => w.questions);
+  const clampedStudyIdx = Math.min(Math.max(studyDayIdx, 0), orderedQuestions.length - 1);
+  const studyDayQuestion = orderedQuestions[clampedStudyIdx];
+  const studyDayWeek = interviewPrepData.find(w =>
+    w.questions.some(q => q.id === studyDayQuestion.id),
+  )?.week;
+
+  const goStudyDay = useCallback(
+    idx => {
+      const next = Math.min(Math.max(idx, 0), orderedQuestions.length - 1);
+      setStudyDayIdx(next);
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem(STUDY_DAY_KEY, String(next));
+        } catch (e) {
+          /* ignore */
+        }
+      }
+    },
+    [orderedQuestions.length],
+  );
+
+  // When the Study-by-Day tab is showing, keep the shared detail panel
+  // (driven by activeQ) pointed at the current curriculum day.
+  useEffect(() => {
+    if (activeTab === 'studyday' && studyDayQuestion) {
+      handleSelectQuestion(studyDayQuestion);
+    }
+  }, [activeTab, clampedStudyIdx]);
 
   const handleSave = useCallback(() => {
     if (!activeQ) {
@@ -3319,6 +3416,162 @@ const InterviewPrepPage = ({ location }) => {
 
   const fileInputRef = useRef(null);
 
+  // Shared question-detail panel — used by both Browse and Study-by-Day.
+  const questionDetailBlock = activeQuestion ? (
+    <StyledQuestionDetail>
+      {timerVisible && (
+        <StyledTimerDisplay $seconds={timerSeconds}>
+          <span className="time">{formatTimer(timerSeconds)}</span>
+          <div className="timer-controls">
+            <button className="timer-btn" type="button" onClick={() => setTimerRunning(r => !r)}>
+              {timerRunning ? 'Pause' : 'Start'}
+            </button>
+            <button
+              className="timer-btn"
+              type="button"
+              onClick={() => {
+                setTimerRunning(false);
+                setTimerSeconds(300);
+              }}>
+              Reset
+            </button>
+          </div>
+          {timerSeconds === 0 && (
+            <span
+              style={{
+                color: '#f87171',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+              }}>
+              Time&apos;s up!
+            </span>
+          )}
+        </StyledTimerDisplay>
+      )}
+      <div className="topic-label">
+        Week {interviewPrepData.find(w => w.questions.some(q => q.id === activeQ))?.week} ·{' '}
+        {activeQuestion.day} — {activeQuestion.topic}
+        {tiers[activeQ] && (
+          <StyledTierBadge
+            $color={tierMeta[tiers[activeQ]].color}
+            style={{ marginLeft: 10 }}
+            title={tierMeta[tiers[activeQ]].description}>
+            {tierMeta[tiers[activeQ]].label} · {tierMeta[tiers[activeQ]].name}
+          </StyledTierBadge>
+        )}
+      </div>
+      <div className="question-text">{activeQuestion.question}</div>
+
+      <StyledReadingSection>
+        <h3>Reading Material</h3>
+        <ul>
+          {activeQuestion.reading.map((r, i) => (
+            <li key={i}>{r}</li>
+          ))}
+        </ul>
+      </StyledReadingSection>
+
+      {practical[activeQ] && (
+        <StyledPracticalSection>
+          <h3>🛠 Hands-On — do these, don&apos;t just read</h3>
+          <ol>
+            {practical[activeQ].exercises.map((ex, i) => {
+              const done = practicalDone[`${activeQ}:${i}`];
+              return (
+                <li key={i} className={done ? 'done' : ''}>
+                  <button
+                    type="button"
+                    className="check"
+                    onClick={() => togglePractical(activeQ, i)}
+                    aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
+                    {done ? '✓' : ''}
+                  </button>
+                  {ex}
+                </li>
+              );
+            })}
+          </ol>
+          {practical[activeQ].drill && (
+            <div className="drill">
+              <span className="drill-label">Drill:</span>
+              {practical[activeQ].drill}
+            </div>
+          )}
+        </StyledPracticalSection>
+      )}
+
+      {activeQuestion.readingNotes && activeQuestion.readingNotes.length > 0 && (
+        <StyledReferenceToggle>
+          <button onClick={() => setShowReading(!showReading)}>
+            {showReading ? '▾ Hide Study Notes' : '▸ Show Study Notes'}
+          </button>
+          {showReading && (
+            <div className="ref-answer" style={{ padding: '20px 20px 12px' }}>
+              <StyledNotesPanel>
+                {activeQuestion.readingNotes.map((section, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      marginBottom: i < activeQuestion.readingNotes.length - 1 ? 28 : 0,
+                    }}>
+                    <div className="note-source">{section.source}</div>
+                    <MarkdownBlock content={section.content} />
+                  </div>
+                ))}
+              </StyledNotesPanel>
+            </div>
+          )}
+        </StyledReferenceToggle>
+      )}
+
+      <StyledAnswerSection $saved={saved}>
+        <h3>
+          Your Answer
+          <span className="save-indicator">✓ Saved</span>
+        </h3>
+        <StyledTextarea
+          value={currentDraft}
+          onChange={e => setCurrentDraft(e.target.value)}
+          placeholder="Write your answer from memory... try without looking at the reference first. (Ctrl+S to save)"
+        />
+        <StyledAnswerActions>
+          <StyledActionButton $primary onClick={handleSave}>
+            Save Answer
+          </StyledActionButton>
+          <StyledActionButton onClick={handleDelete} disabled={!answers[activeQ]}>
+            Clear
+          </StyledActionButton>
+        </StyledAnswerActions>
+
+        <StyledConfidenceSection>
+          <span className="label">Confidence:</span>
+          {[
+            { level: 1, label: 'Low', color: '#f87171' },
+            { level: 2, label: 'Medium', color: '#facc15' },
+            { level: 3, label: 'High', color: '#4ade80' },
+          ].map(c => (
+            <StyledConfidenceBtn
+              key={c.level}
+              $active={confidence[activeQ] === c.level}
+              $color={c.color}
+              onClick={() => handleConfidence(activeQ, c.level)}>
+              {c.label}
+            </StyledConfidenceBtn>
+          ))}
+        </StyledConfidenceSection>
+      </StyledAnswerSection>
+
+      <SketchPad questionId={activeQ} />
+
+      <StyledReferenceToggle>
+        <button onClick={() => setShowReference(!showReference)}>
+          {showReference ? '▾ Hide Reference Answer' : '▸ Show Reference Answer'}
+        </button>
+        {showReference && <div className="ref-answer">{activeQuestion.referenceAnswer}</div>}
+      </StyledReferenceToggle>
+    </StyledQuestionDetail>
+  ) : null;
+
   return (
     <Layout location={location}>
       <StyledContainer>
@@ -3419,10 +3672,10 @@ const InterviewPrepPage = ({ location }) => {
                     {quickFormat === 'session' &&
                       sessionStats.didnt === 0 &&
                       sessionStats.knew > 0 && (
-                      <div style={{ marginTop: 8, fontSize: 13 }}>
+                        <div style={{ marginTop: 8, fontSize: 13 }}>
                           Clean run — those cards moved up the mastery ladder.
-                      </div>
-                    )}
+                        </div>
+                      )}
                     {quickFormat !== 'session' && sessionStats.didnt > 0 && (
                       <div style={{ marginTop: 8, fontSize: 13 }}>
                         Tip: missed cards stay in your stats — review them again later.
@@ -3452,157 +3705,157 @@ const InterviewPrepPage = ({ location }) => {
                   {quickFormat === 'session' &&
                   deck[cardIdx]._kind === 'new' &&
                   !introSeen[deck[cardIdx].id] ? (
-                      <>
-                        <StyledSessionPhase $phase="new">
+                    <>
+                      <StyledSessionPhase $phase="new">
                         📚 Learn — first time seeing this
-                        </StyledSessionPhase>
-                        <div className="question">{deck[cardIdx].question}</div>
-                        <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                        {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
+                      </StyledSessionPhase>
+                      <div className="question">{deck[cardIdx].question}</div>
+                      <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                      {deck[cardIdx].reading && deck[cardIdx].reading.length > 0 && (
+                        <div
+                          style={{
+                            marginBottom: 20,
+                            textAlign: 'left',
+                            width: '100%',
+                            fontSize: 13,
+                            color: 'var(--slate)',
+                            lineHeight: 1.6,
+                          }}>
                           <div
                             style={{
-                              marginBottom: 20,
-                              textAlign: 'left',
-                              width: '100%',
-                              fontSize: 13,
-                              color: 'var(--slate)',
-                              lineHeight: 1.6,
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: 11,
+                              textTransform: 'uppercase',
+                              letterSpacing: 0.5,
+                              marginBottom: 6,
                             }}>
-                            <div
-                              style={{
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: 11,
-                                textTransform: 'uppercase',
-                                letterSpacing: 0.5,
-                                marginBottom: 6,
-                              }}>
                             Reading material
-                            </div>
-                            {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
-                              <div key={i}>▹ {r}</div>
-                            ))}
                           </div>
+                          {deck[cardIdx].reading.slice(0, 3).map((r, i) => (
+                            <div key={i}>▹ {r}</div>
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        className="reveal"
+                        type="button"
+                        onClick={() =>
+                          setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
+                        }>
+                        Got it — test me
+                      </button>
+                    </>
+                  ) : quickFormat === 'mcq' ||
+                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
+                    mcq[deck[cardIdx].id] ? (
+                      <>
+                        {quickFormat === 'session' && (
+                          <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                            {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                          </StyledSessionPhase>
                         )}
+                        <div className="question">{mcq[deck[cardIdx].id].question}</div>
+                        <StyledMCQOptions>
+                          {mcq[deck[cardIdx].id].options.map((opt, i) => {
+                            const correct = mcq[deck[cardIdx].id].correct;
+                            const revealed = mcqSelected !== null;
+                            return (
+                              <StyledMCQOption
+                                key={i}
+                                type="button"
+                                $isSelected={mcqSelected === i}
+                                $isCorrect={i === correct}
+                                $revealed={revealed}
+                                onClick={() => mcqSelected === null && setMcqSelected(i)}
+                                disabled={revealed}>
+                                <span className="letter">{String.fromCharCode(65 + i)}.</span>
+                                {opt}
+                              </StyledMCQOption>
+                            );
+                          })}
+                        </StyledMCQOptions>
+                        {mcqSelected !== null && (
+                          <>
+                            <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
+                            <div className="rate" style={{ marginTop: 20 }}>
+                              <button
+                                type="button"
+                                className="knew"
+                                onClick={() => {
+                                  const right = mcqSelected === mcq[deck[cardIdx].id].correct;
+                                  if (quickFormat === 'session') {
+                                    rateSessionCard(right);
+                                  } else {
+                                    rateCard(right);
+                                  }
+                                }}>
+                                {mcqSelected === mcq[deck[cardIdx].id].correct
+                                  ? '✓ Correct — Next'
+                                  : '✗ Wrong — Next'}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <div className="question">No MCQ for this card.</div>
                         <button
                           className="reveal"
                           type="button"
-                          onClick={() =>
-                            setIntroSeen(prev => ({ ...prev, [deck[cardIdx].id]: true }))
-                          }>
-                        Got it — test me
+                          onClick={() => {
+                            if (cardIdx + 1 < deck.length) {
+                              setCardIdx(cardIdx + 1);
+                              setCardFlipped(false);
+                              setMcqSelected(null);
+                            } else {
+                              setCardIdx(deck.length);
+                            }
+                          }}>
+                          Skip
                         </button>
                       </>
-                    ) : quickFormat === 'mcq' ||
-                    (quickFormat === 'session' && mcq[deck[cardIdx].id]) ? (
-                        mcq[deck[cardIdx].id] ? (
-                          <>
-                            {quickFormat === 'session' && (
-                              <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                                {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                              </StyledSessionPhase>
-                            )}
-                            <div className="question">{mcq[deck[cardIdx].id].question}</div>
-                            <StyledMCQOptions>
-                              {mcq[deck[cardIdx].id].options.map((opt, i) => {
-                                const correct = mcq[deck[cardIdx].id].correct;
-                                const revealed = mcqSelected !== null;
-                                return (
-                                  <StyledMCQOption
-                                    key={i}
-                                    type="button"
-                                    $isSelected={mcqSelected === i}
-                                    $isCorrect={i === correct}
-                                    $revealed={revealed}
-                                    onClick={() => mcqSelected === null && setMcqSelected(i)}
-                                    disabled={revealed}>
-                                    <span className="letter">{String.fromCharCode(65 + i)}.</span>
-                                    {opt}
-                                  </StyledMCQOption>
-                                );
-                              })}
-                            </StyledMCQOptions>
-                            {mcqSelected !== null && (
-                              <>
-                                <div className="explanation">{mcq[deck[cardIdx].id].explanation}</div>
-                                <div className="rate" style={{ marginTop: 20 }}>
-                                  <button
-                                    type="button"
-                                    className="knew"
-                                    onClick={() => {
-                                      const right = mcqSelected === mcq[deck[cardIdx].id].correct;
-                                      if (quickFormat === 'session') {
-                                        rateSessionCard(right);
-                                      } else {
-                                        rateCard(right);
-                                      }
-                                    }}>
-                                    {mcqSelected === mcq[deck[cardIdx].id].correct
-                                      ? '✓ Correct — Next'
-                                      : '✗ Wrong — Next'}
-                                  </button>
-                                </div>
-                              </>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <div className="question">No MCQ for this card.</div>
-                            <button
-                              className="reveal"
-                              type="button"
-                              onClick={() => {
-                                if (cardIdx + 1 < deck.length) {
-                                  setCardIdx(cardIdx + 1);
-                                  setCardFlipped(false);
-                                  setMcqSelected(null);
-                                } else {
-                                  setCardIdx(deck.length);
-                                }
-                              }}>
-                          Skip
-                            </button>
-                          </>
-                        )
+                    )
+                  ) : (
+                    <>
+                      {quickFormat === 'session' && (
+                        <StyledSessionPhase $phase={deck[cardIdx]._kind}>
+                          {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
+                        </StyledSessionPhase>
+                      )}
+                      <div className="question">{deck[cardIdx].question}</div>
+                      {!cardFlipped ? (
+                        <button
+                          className="reveal"
+                          type="button"
+                          onClick={() => setCardFlipped(true)}>
+                          Tap to reveal answer
+                        </button>
                       ) : (
                         <>
-                          {quickFormat === 'session' && (
-                            <StyledSessionPhase $phase={deck[cardIdx]._kind}>
-                              {deck[cardIdx]._kind === 'new' ? '🧠 Test recall' : '🔁 Spaced review'}
-                            </StyledSessionPhase>
-                          )}
-                          <div className="question">{deck[cardIdx].question}</div>
-                          {!cardFlipped ? (
+                          <div className="answer">{deck[cardIdx].referenceAnswer}</div>
+                          <div className="rate">
                             <button
-                              className="reveal"
                               type="button"
-                              onClick={() => setCardFlipped(true)}>
-                          Tap to reveal answer
-                            </button>
-                          ) : (
-                            <>
-                              <div className="answer">{deck[cardIdx].referenceAnswer}</div>
-                              <div className="rate">
-                                <button
-                                  type="button"
-                                  className="knew"
-                                  onClick={() =>
-                                    quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
-                                  }>
+                              className="knew"
+                              onClick={() =>
+                                quickFormat === 'session' ? rateSessionCard(true) : rateCard(true)
+                              }>
                               ✓ Knew it
-                                </button>
-                                <button
-                                  type="button"
-                                  className="didnt"
-                                  onClick={() =>
-                                    quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
-                                  }>
+                            </button>
+                            <button
+                              type="button"
+                              className="didnt"
+                              onClick={() =>
+                                quickFormat === 'session' ? rateSessionCard(false) : rateCard(false)
+                              }>
                               ✗ Didn&apos;t
-                                </button>
-                              </div>
-                            </>
-                          )}
+                            </button>
+                          </div>
                         </>
                       )}
+                    </>
+                  )}
                 </>
               )}
             </StyledQuickCard>
@@ -3627,6 +3880,13 @@ const InterviewPrepPage = ({ location }) => {
             type="button">
             <span className="icon">🏠</span>
             <span className="lbl">Today</span>
+          </StyledTab>
+          <StyledTab
+            $active={activeTab === 'studyday'}
+            onClick={() => setActiveTab('studyday')}
+            type="button">
+            <span className="icon">📖</span>
+            <span className="lbl">By Day</span>
           </StyledTab>
           <StyledTab
             $active={activeTab === 'browse'}
@@ -3665,7 +3925,7 @@ const InterviewPrepPage = ({ location }) => {
             <div style={{ padding: '24px 50px', maxWidth: 760, margin: '0 auto' }}>
               <StyledTodayCard>
                 <header>
-                  <h2>{isViewingPastDay ? 'Past Session' : 'Today\'s Mission'}</h2>
+                  <h2>{isViewingPastDay ? 'Past Session' : "Today's Mission"}</h2>
                   <span className="date">
                     {new Date(today).toLocaleDateString(undefined, {
                       weekday: 'short',
@@ -3749,12 +4009,12 @@ const InterviewPrepPage = ({ location }) => {
                           {d.done
                             ? '✓'
                             : d.isPreStart
-                              ? '·'
-                              : d.isWeekend
-                                ? '–'
-                                : d.isToday
-                                  ? '•'
-                                  : ' '}
+                            ? '·'
+                            : d.isWeekend
+                            ? '–'
+                            : d.isToday
+                            ? '•'
+                            : ' '}
                         </span>
                       </button>
                     );
@@ -3975,6 +4235,49 @@ const InterviewPrepPage = ({ location }) => {
             </div>
           )}
 
+          {/* STUDY BY DAY TAB */}
+          {activeTab === 'studyday' && (
+            <div style={{ padding: '20px 50px', maxWidth: 860, margin: '0 auto' }}>
+              <StyledDayNavBar>
+                <button
+                  type="button"
+                  className="nav-btn"
+                  onClick={() => goStudyDay(clampedStudyIdx - 1)}
+                  disabled={clampedStudyIdx <= 0}
+                  aria-label="Previous day">
+                  ◄ Prev
+                </button>
+                <div className="day-pos">
+                  <select
+                    value={clampedStudyIdx}
+                    onChange={e => goStudyDay(parseInt(e.target.value, 10))}
+                    aria-label="Jump to a curriculum day">
+                    {interviewPrepData
+                      .flatMap(w => w.questions.map(q => ({ wk: w.week, q })))
+                      .map(({ wk, q }, gi) => (
+                        <option key={q.id} value={gi}>
+                          W{wk} · {q.day} — {q.topic}
+                        </option>
+                      ))}
+                  </select>
+                  <span className="counter">
+                    Day {clampedStudyIdx + 1} of {orderedQuestions.length}
+                    {studyDayWeek ? ` · Week ${studyDayWeek}` : ''}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="nav-btn"
+                  onClick={() => goStudyDay(clampedStudyIdx + 1)}
+                  disabled={clampedStudyIdx >= orderedQuestions.length - 1}
+                  aria-label="Next day">
+                  Next ►
+                </button>
+              </StyledDayNavBar>
+              {questionDetailBlock}
+            </div>
+          )}
+
           {/* BROWSE TAB */}
           {activeTab === 'browse' && (
             <>
@@ -4058,8 +4361,8 @@ const InterviewPrepPage = ({ location }) => {
                                   {confidence[q.id] === 3
                                     ? '💪'
                                     : confidence[q.id] === 2
-                                      ? '😐'
-                                      : '😟'}
+                                    ? '😐'
+                                    : '😟'}
                                 </span>
                               )}
                               {isStale(q.id) && <StyledStaleBadge>⟳ stale</StyledStaleBadge>}
@@ -4082,165 +4385,7 @@ const InterviewPrepPage = ({ location }) => {
                       </div>
                     </StyledEmptyState>
                   ) : (
-                    <StyledQuestionDetail>
-                      {timerVisible && (
-                        <StyledTimerDisplay $seconds={timerSeconds}>
-                          <span className="time">{formatTimer(timerSeconds)}</span>
-                          <div className="timer-controls">
-                            <button
-                              className="timer-btn"
-                              type="button"
-                              onClick={() => setTimerRunning(r => !r)}>
-                              {timerRunning ? 'Pause' : 'Start'}
-                            </button>
-                            <button
-                              className="timer-btn"
-                              type="button"
-                              onClick={() => {
-                                setTimerRunning(false);
-                                setTimerSeconds(300);
-                              }}>
-                              Reset
-                            </button>
-                          </div>
-                          {timerSeconds === 0 && (
-                            <span
-                              style={{
-                                color: '#f87171',
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: 12,
-                              }}>
-                              Time&apos;s up!
-                            </span>
-                          )}
-                        </StyledTimerDisplay>
-                      )}
-                      <div className="topic-label">
-                        Week{' '}
-                        {interviewPrepData.find(w => w.questions.some(q => q.id === activeQ))?.week}{' '}
-                        · {activeQuestion.day} — {activeQuestion.topic}
-                        {tiers[activeQ] && (
-                          <StyledTierBadge
-                            $color={tierMeta[tiers[activeQ]].color}
-                            style={{ marginLeft: 10 }}
-                            title={tierMeta[tiers[activeQ]].description}>
-                            {tierMeta[tiers[activeQ]].label} · {tierMeta[tiers[activeQ]].name}
-                          </StyledTierBadge>
-                        )}
-                      </div>
-                      <div className="question-text">{activeQuestion.question}</div>
-
-                      <StyledReadingSection>
-                        <h3>Reading Material</h3>
-                        <ul>
-                          {activeQuestion.reading.map((r, i) => (
-                            <li key={i}>{r}</li>
-                          ))}
-                        </ul>
-                      </StyledReadingSection>
-
-                      {practical[activeQ] && (
-                        <StyledPracticalSection>
-                          <h3>🛠 Hands-On — do these, don&apos;t just read</h3>
-                          <ol>
-                            {practical[activeQ].exercises.map((ex, i) => {
-                              const done = practicalDone[`${activeQ}:${i}`];
-                              return (
-                                <li key={i} className={done ? 'done' : ''}>
-                                  <button
-                                    type="button"
-                                    className="check"
-                                    onClick={() => togglePractical(activeQ, i)}
-                                    aria-label={done ? 'Mark incomplete' : 'Mark complete'}>
-                                    {done ? '✓' : ''}
-                                  </button>
-                                  {ex}
-                                </li>
-                              );
-                            })}
-                          </ol>
-                          {practical[activeQ].drill && (
-                            <div className="drill">
-                              <span className="drill-label">Drill:</span>
-                              {practical[activeQ].drill}
-                            </div>
-                          )}
-                        </StyledPracticalSection>
-                      )}
-
-                      {activeQuestion.readingNotes && activeQuestion.readingNotes.length > 0 && (
-                        <StyledReferenceToggle>
-                          <button onClick={() => setShowReading(!showReading)}>
-                            {showReading ? '▾ Hide Study Notes' : '▸ Show Study Notes'}
-                          </button>
-                          {showReading && (
-                            <div className="ref-answer" style={{ padding: '20px 20px 12px' }}>
-                              <StyledNotesPanel>
-                                {activeQuestion.readingNotes.map((section, i) => (
-                                  <div
-                                    key={i}
-                                    style={{
-                                      marginBottom:
-                                        i < activeQuestion.readingNotes.length - 1 ? 28 : 0,
-                                    }}>
-                                    <div className="note-source">{section.source}</div>
-                                    <MarkdownBlock content={section.content} />
-                                  </div>
-                                ))}
-                              </StyledNotesPanel>
-                            </div>
-                          )}
-                        </StyledReferenceToggle>
-                      )}
-
-                      <StyledAnswerSection $saved={saved}>
-                        <h3>
-                          Your Answer
-                          <span className="save-indicator">✓ Saved</span>
-                        </h3>
-                        <StyledTextarea
-                          value={currentDraft}
-                          onChange={e => setCurrentDraft(e.target.value)}
-                          placeholder="Write your answer from memory... try without looking at the reference first. (Ctrl+S to save)"
-                        />
-                        <StyledAnswerActions>
-                          <StyledActionButton $primary onClick={handleSave}>
-                            Save Answer
-                          </StyledActionButton>
-                          <StyledActionButton onClick={handleDelete} disabled={!answers[activeQ]}>
-                            Clear
-                          </StyledActionButton>
-                        </StyledAnswerActions>
-
-                        <StyledConfidenceSection>
-                          <span className="label">Confidence:</span>
-                          {[
-                            { level: 1, label: 'Low', color: '#f87171' },
-                            { level: 2, label: 'Medium', color: '#facc15' },
-                            { level: 3, label: 'High', color: '#4ade80' },
-                          ].map(c => (
-                            <StyledConfidenceBtn
-                              key={c.level}
-                              $active={confidence[activeQ] === c.level}
-                              $color={c.color}
-                              onClick={() => handleConfidence(activeQ, c.level)}>
-                              {c.label}
-                            </StyledConfidenceBtn>
-                          ))}
-                        </StyledConfidenceSection>
-                      </StyledAnswerSection>
-
-                      <SketchPad questionId={activeQ} />
-
-                      <StyledReferenceToggle>
-                        <button onClick={() => setShowReference(!showReference)}>
-                          {showReference ? '▾ Hide Reference Answer' : '▸ Show Reference Answer'}
-                        </button>
-                        {showReference && (
-                          <div className="ref-answer">{activeQuestion.referenceAnswer}</div>
-                        )}
-                      </StyledReferenceToggle>
-                    </StyledQuestionDetail>
+                    questionDetailBlock
                   )}
                 </StyledRightPanel>
               </StyledPanels>
@@ -4445,8 +4590,8 @@ const InterviewPrepPage = ({ location }) => {
                               preStart && !cell.count
                                 ? `${cell.date}: pre-start`
                                 : `${cell.date}: ${cell.count} ${
-                                  cell.count === 1 ? 'item' : 'items'
-                                }`
+                                    cell.count === 1 ? 'item' : 'items'
+                                  }`
                             }
                           />
                         );

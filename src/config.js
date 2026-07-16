@@ -37,14 +37,6 @@ module.exports = {
       name: 'Contact',
       url: '/#contact',
     },
-    {
-      name: 'Learn Embedded',
-      url: '/#learn-embedded',
-    },
-    {
-      name: 'Cortex M4F',
-      url: '/cortex-m4f',
-    },
   ],
 
   colors: {

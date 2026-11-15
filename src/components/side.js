@@ -19,7 +19,8 @@ const StyledSideElement = styled.div`
     right: ${props => (props.orientation === 'left' ? 'auto' : '20px')};
   }
 
-  @media (max-width: 768px) {
+  /* Hidden on phones, and on wide screens where the glass sidebar shows socials */
+  @media (max-width: 768px), (min-width: 1081px) {
     display: none;
   }
 `;

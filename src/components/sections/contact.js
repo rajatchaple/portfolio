@@ -1,74 +1,59 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { srConfig, email } from '@config';
-import sr from '@utils/sr';
-import { usePrefersReducedMotion } from '@hooks';
+import { email } from '@config';
 
 const StyledContactSection = styled.section`
-  max-width: 600px;
-  margin: 0 auto 100px;
-  text-align: center;
-
-  @media (max-width: 768px) {
-    margin: 0 auto 50px;
+  .glass-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: clamp(28px, 4vw, 44px);
   }
 
-  .overline {
-    display: block;
-    margin-bottom: 20px;
-    color: var(--green);
-    font-family: var(--font-mono);
-    font-size: var(--fz-md);
-    font-weight: 400;
-
-    &:before {
-      bottom: 0;
-      font-size: var(--fz-sm);
-    }
-
-    &:after {
-      display: none;
-    }
+  .section-head {
+    margin: 0;
   }
 
-  .title {
-    font-size: clamp(40px, 5vw, 60px);
+  p {
+    max-width: 520px;
+    margin: 12px 0 0;
+    color: var(--slate);
+    font-size: var(--fz-lg);
+    line-height: 1.6;
   }
 
-  .email-link {
-    ${({ theme }) => theme.mixins.bigButton};
-    margin-top: 50px;
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 `;
 
-const Contact = () => {
-  const revealContainer = useRef(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      return;
-    }
-
-    sr.reveal(revealContainer.current, srConfig());
-  }, []);
-
-  return (
-    <StyledContactSection id="contact" ref={revealContainer}>
-      <h2 className="numbered-heading overline">What’s Next?</h2>
-
-      <h2 className="title">Get In Touch</h2>
-
-      <p>
-        You are right, I am always looking for new and better opportunities, my inbox is always open.
-        Whether you have a question or just want to say hi, I’ll try my best to get back to you!
-      </p>
-
-      <a className="email-link" href={`mailto:${email}`}>
-        Say Hello
-      </a>
-    </StyledContactSection>
-  );
-};
+const Contact = () => (
+  <StyledContactSection id="contact">
+    <div className="glass-card" data-reveal>
+      <div>
+        <div className="section-head">
+          <span className="eyebrow">Contact</span>
+          <h2>Get in touch</h2>
+        </div>
+        <p>
+          My inbox is always open. Whether you have a question or just want to say hi, I’ll do my
+          best to get back to you.
+        </p>
+      </div>
+      <div className="actions">
+        <a className="pill-btn dark" href={`mailto:${email}`}>
+          Say hello
+        </a>
+        <a className="pill-btn" href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+          Resume
+        </a>
+      </div>
+    </div>
+  </StyledContactSection>
+);
 
 export default Contact;

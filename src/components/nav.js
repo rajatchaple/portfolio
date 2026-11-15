@@ -17,11 +17,18 @@ const StyledHeader = styled.header`
   padding: 0px 50px;
   width: 100%;
   height: var(--nav-height);
-  background-color: rgba(5,5,5,0.85); //rgba(17,17,23,0.85);//rgba(10, 25, 47, 0.85);
+  background-color: var(--nav-bg);
+  border-bottom: 1px solid transparent;
+
+  /* The glass sidebar replaces the top nav on wide screens */
+  @media (min-width: 1081px) {
+    display: none;
+  }
   filter: none !important;
   pointer-events: auto !important;
   user-select: auto !important;
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   transition: var(--transition);
 
   @media (max-width: 1080px) {
@@ -34,18 +41,19 @@ const StyledHeader = styled.header`
   @media (prefers-reduced-motion: no-preference) {
     ${props =>
     props.scrollDirection === 'up' &&
-    !props.scrolledToTop &&
-    css`
+      !props.scrolledToTop &&
+      css`
         height: var(--nav-scroll-height);
         transform: translateY(0px);
-        background-color: rgba(17,17,23,0.85);//rgba(10, 25, 47, 0.85);
+        background-color: var(--nav-bg-scrolled);
+        border-bottom-color: var(--glass-border);
         box-shadow: 0 10px 30px -10px var(--navy-shadow);
       `};
 
     ${props =>
     props.scrollDirection === 'down' &&
-    !props.scrolledToTop &&
-    css`
+      !props.scrolledToTop &&
+      css`
         height: var(--nav-scroll-height);
         transform: translateY(calc(var(--nav-scroll-height) * -1));
         box-shadow: 0 10px 30px -10px var(--navy-shadow);
@@ -58,7 +66,7 @@ const StyledNav = styled.nav`
   position: relative;
   width: 100%;
   color: var(--lightest-slate);
-  font-family: 'Fira Code'#var(--font-mono);
+  font-family: 'Fira Code' #var(--font-mono);
   counter-reset: item 0;
   z-index: 12;
 

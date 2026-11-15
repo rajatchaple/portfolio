@@ -1,26 +1,61 @@
 import { css } from 'styled-components';
 
-const button = css`
+// Frosted glass button with a soft lift on hover
+const glassButton = (padding, fontSize) => css`
   color: var(--green);
-  background-color: transparent;
-  border: 1px solid var(--green);
+  background-color: var(--surface-1);
+  border: 1px solid var(--accent-border);
   border-radius: var(--border-radius);
-  font-size: var(--fz-xs);
+  padding: ${padding};
+  font-size: ${fontSize};
   font-family: var(--font-mono);
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
   transition: var(--transition);
-  padding: 1.25rem 1.75rem;
 
   &:hover,
   &:focus,
   &:active {
     background-color: var(--green-tint);
+    border-color: var(--green);
+    box-shadow: var(--glow);
     outline: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    &:hover {
+      transform: translateY(-2px);
+    }
   }
   &:after {
     display: none !important;
+  }
+`;
+
+const button = glassButton('1.25rem 1.75rem', 'var(--fz-xs)');
+
+// Glass panel. No backdrop-filter here: in-flow cards sit over a soft
+// gradient where blur is invisible but costs a GPU pass every frame.
+const glass = css`
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow: inset 0 1px 0 var(--glass-highlight), 0 12px 40px -16px var(--navy-shadow);
+`;
+
+// Real frosted blur, only for floating UI that overlaps moving content
+const frosted = css`
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+`;
+
+const glassHover = css`
+  transition: transform 0.5s var(--easing), box-shadow 0.5s var(--easing),
+    border-color 0.5s var(--easing);
+  &:hover,
+  &:focus-within {
+    border-color: var(--glass-border-hover);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 24px 50px -18px var(--navy-shadow);
   }
 `;
 
@@ -87,51 +122,15 @@ const mixins = {
 
   button,
 
-  smallButton: css`
-    color: var(--green);
-    background-color: transparent;
-    border: 1px solid var(--green);
-    border-radius: var(--border-radius);
-    padding: 0.75rem 1rem;
-    font-size: var(--fz-xs);
-    font-family: var(--font-mono);
-    line-height: 1;
-    text-decoration: none;
-    cursor: pointer;
-    transition: var(--transition);
-    &:hover,
-    &:focus,
-    &:active {
-      background-color: var(--green-tint);
-      outline: none;
-    }
-    &:after {
-      display: none !important;
-    }
-  `,
+  smallButton: glassButton('0.75rem 1rem', 'var(--fz-xs)'),
 
-  bigButton: css`
-    color: var(--green);
-    background-color: transparent;
-    border: 1px solid var(--green);
-    border-radius: var(--border-radius);
-    padding: 1.25rem 1.75rem;
-    font-size: var(--fz-sm);
-    font-family: var(--font-mono);
-    line-height: 1;
-    text-decoration: none;
-    cursor: pointer;
-    transition: var(--transition);
-    &:hover,
-    &:focus,
-    &:active {
-      background-color: var(--green-tint);
-      outline: none;
-    }
-    &:after {
-      display: none !important;
-    }
-  `,
+  bigButton: glassButton('1.25rem 1.75rem', 'var(--fz-sm)'),
+
+  glass,
+
+  frosted,
+
+  glassHover,
 
   boxShadow: css`
     box-shadow: 0 10px 30px -15px var(--navy-shadow);
@@ -139,7 +138,7 @@ const mixins = {
 
     &:hover,
     &:focus {
-      box-shadow: 0 20px 30px -15px var(--navy-shadow);
+      box-shadow: 0 20px 40px -15px var(--navy-shadow);
     }
   `,
 

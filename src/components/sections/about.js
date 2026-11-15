@@ -1,176 +1,103 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { StaticImage } from 'gatsby-plugin-image';
 import styled from 'styled-components';
-import { srConfig } from '@config';
-import sr from '@utils/sr';
-import { usePrefersReducedMotion } from '@hooks';
 
 const StyledAboutSection = styled.section`
-  max-width: 900px;
-
-  .inner {
+  .glass-card {
     display: grid;
-    grid-template-columns: 3fr 2fr;
-    grid-gap: 50px;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 44px;
+    padding: clamp(24px, 4vw, 44px);
 
     @media (max-width: 768px) {
-      display: block;
+      grid-template-columns: 1fr;
+      gap: 28px;
     }
   }
-`;
-const StyledText = styled.div`
-  ul.skills-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(140px, 200px));
-    grid-gap: 0 10px;
-    padding: 0;
-    margin: 20px 0 0 0;
+
+  p {
+    margin: 0 0 16px;
+    color: var(--slate);
+    font-size: var(--fz-lg);
+    line-height: 1.65;
+  }
+
+  .skills-title {
+    margin: 26px 0 12px;
+    color: var(--lightest-slate);
+    font-size: var(--fz-sm);
+    font-weight: 600;
+  }
+
+  .photo {
+    align-self: start;
+    max-width: 320px;
+    border-radius: 18px;
     overflow: hidden;
-    list-style: none;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 18px 40px -22px var(--navy-shadow);
 
-    li {
-      position: relative;
-      margin-bottom: 10px;
-      padding-left: 20px;
-      font-family: var(--font-mono);
-      font-size: var(--fz-xs);
-
-      &:before {
-        content: '▹';
-        position: absolute;
-        left: 0;
-        color: var(--green);
-        font-size: var(--fz-sm);
-        line-height: 12px;
-      }
-    }
-  }
-`;
-const StyledPic = styled.div`
-  position: relative;
-  max-width: 300px;
-
-  @media (max-width: 768px) {
-    margin: 50px auto 0;
-    width: 70%;
-  }
-
-  .wrapper {
-    ${({ theme }) => theme.mixins.boxShadow};
-    display: block;
-    position: relative;
-    width: 100%;
-    border-radius: var(--border-radius);
-    background-color: var(--grey);
-
-    &:hover,
-    &:focus {
-      outline: 0;
-
-      &:after {
-        top: 15px;
-        left: 15px;
-      }
-
-      .img {
-        filter: none;
-        mix-blend-mode: normal;
-      }
-    }
-
-    .img {
-      position: relative;
-      border-radius: var(--border-radius);
-      mix-blend-mode: multiply;
-      filter: grayscale(100%) contrast(1);
-      transition: var(--transition);
-    }
-
-    &:before,
-    &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: var(--border-radius);
-      transition: var(--transition);
-    }
-
-    &:before {
-      top: 0;
-      left: 0;
-      background-color: var(--navy);
-      mix-blend-mode: screen;
-    }
-
-    &:after {
-      border: 2px solid var(--green);
-      top: 20px;
-      left: 20px;
-      z-index: -1;
+    @media (max-width: 768px) {
+      order: -1;
+      max-width: 220px;
     }
   }
 `;
 
-const About = () => {
-  const revealContainer = useRef(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
+const skills = [
+  'Bare-metal',
+  'Device drivers',
+  'Low-power design',
+  'Altium PCB design',
+  'Multi-threading',
+  'Event-driven scheduling',
+];
 
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      return;
-    }
+const About = () => (
+  <StyledAboutSection id="about">
+    <div className="section-head" data-reveal>
+      <span className="eyebrow">About</span>
+      <h2>A bit about me</h2>
+    </div>
 
-    sr.reveal(revealContainer.current, srConfig());
-  }, []);
+    <div className="glass-card" data-reveal style={{ '--reveal-delay': '120ms' }}>
+      <div>
+        <p>
+          I&apos;m Rajat Chaple, an embedded systems engineer with 7+ years of experience developing
+          robust firmware and real-time software for automotive and consumer electronics. I hold a
+          Master’s in Embedded Systems from the University of Colorado Boulder and have contributed
+          to projects at Lucid Motors, Canoo, Analog Devices, and John Deere.
+        </p>
+        <p>
+          My expertise spans bare-metal development, C programming, MATLAB/Simulink modeling, and
+          device driver design. I’ve worked extensively with CAN, UART, SPI, and I2C, and have
+          hands-on experience with battery management, telematics (JDLink), and system-level
+          debugging.
+        </p>
+        <p>
+          I enjoy bridging hardware and software to solve complex problems. Outside work, I’m into
+          table tennis, badminton, bowling, and the Marvel Cinematic Universe.
+        </p>
 
-  // const skills = ['JavaScript (ES6+)', 'TypeScript', 'React', 'Eleventy', 'Node.js', 'WordPress'];
-  const skills = ['Bare-metal', 'Device Drivers', 'Low power design', 'Altium PCB Design', 'Multi-threading', 'event-driven scheduling'];
-
-  return (
-    <StyledAboutSection id="about" ref={revealContainer}>
-      <h2 className="numbered-heading">About Me</h2>
-
-      <div className="inner">
-        <StyledText>
-          <div>
-            <p>
-              I'm Rajat Chaple, an embedded systems engineer with 7+ years of experience developing robust firmware and real-time software for automotive and consumer electronics. I hold a Master’s in Embedded Systems from the University of Colorado Boulder and have contributed to innovative projects at Lucid Motors, Canoo, Analog Devices, and John Deere.
-            </p>
-
-            <p>
-              My expertise spans bare-metal development, C programming, MATLAB/Simulink modeling, and device driver design. I’ve worked extensively with CAN, UART, SPI, and I2C protocols, and have hands-on experience with battery management, telematics (JDLink), and system-level debugging.
-            </p>
-
-            <p>
-              I enjoy bridging hardware and software to solve complex problems and create efficient embedded solutions. Outside work, I’m passionate about table tennis, badminton, bowling, and the Marvel Cinematic Universe.
-            </p>
-
-            <p><strong>Technologies I’ve Been Working With Recently:</strong></p>
-          </div>
-
-          <ul className="skills-list">
-            {skills && skills.map((skill, i) => <li key={i}>{skill}</li>)}
-          </ul>
-        </StyledText>
-
-
-        <StyledPic>
-          <div className="wrapper">
-            <StaticImage
-              className="img"
-              src="../../images/me.jpg"
-              width={500}
-              quality={95}
-              formats={['AUTO', 'WEBP', 'AVIF']}
-              alt="Headshot"
-            />
-          </div>
-        </StyledPic>
+        <p className="skills-title">Recently working with</p>
+        <ul className="tag-list">
+          {skills.map(skill => (
+            <li key={skill}>{skill}</li>
+          ))}
+        </ul>
       </div>
-    </StyledAboutSection>
-  );
-};
+
+      <div className="photo">
+        <StaticImage
+          src="../../images/me.jpg"
+          width={500}
+          quality={90}
+          formats={['AUTO', 'WEBP', 'AVIF']}
+          alt="Rajat Chaple"
+        />
+      </div>
+    </div>
+  </StyledAboutSection>
+);
 
 export default About;

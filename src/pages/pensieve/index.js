@@ -59,16 +59,14 @@ const StyledPost = styled.li`
   }
 
   .post__inner {
-    ${({ theme }) => theme.mixins.boxShadow};
+    ${({ theme }) => theme.mixins.glass};
+    ${({ theme }) => theme.mixins.glassHover};
     ${({ theme }) => theme.mixins.flexBetween};
     flex-direction: column;
     align-items: flex-start;
     position: relative;
     height: 100%;
     padding: 2rem 1.75rem;
-    border-radius: var(--border-radius);
-    transition: var(--transition);
-    background-color: var(--light-navy);
 
     header,
     a {
@@ -211,7 +209,10 @@ export default PensievePage;
 export const pageQuery = graphql`
   {
     allMarkdownRemark(
-      filter: { fileAbsolutePath: { regex: "/content/posts/" }, frontmatter: { draft: { ne: true } } }
+      filter: {
+        fileAbsolutePath: { regex: "/content/posts/" }
+        frontmatter: { draft: { ne: true } }
+      }
       sort: { fields: [frontmatter___date], order: DESC }
     ) {
       edges {

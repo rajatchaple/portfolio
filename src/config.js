@@ -47,13 +47,13 @@ module.exports = {
 
   srConfig: (delay = 200, viewFactor = 0.25) => ({
     origin: 'bottom',
-    distance: '20px',
-    duration: 500,
+    distance: '24px',
+    duration: 800,
     delay,
     rotate: { x: 0, y: 0, z: 0 },
     opacity: 0,
-    scale: 1,
-    easing: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
+    scale: 0.98,
+    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
     mobile: true,
     reset: false,
     useDelay: 'always',

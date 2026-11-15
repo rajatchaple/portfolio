@@ -84,6 +84,42 @@ const GlobalStyle = createGlobalStyle`
       font-size: var(--fz-lg);
     }
 
+    /* Warm "blurred room" backdrop behind the glass.
+       :before is the static base; :after is a slowly drifting light layer.
+       Only transform animates, so it stays on the compositor. */
+    &:before,
+    &:after {
+      content: '';
+      position: fixed;
+      pointer-events: none;
+    }
+    &:before {
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(60% 50% at 8% 6%, var(--bg-glow-1) 0%, transparent 70%),
+        radial-gradient(50% 60% at 100% 100%, var(--bg-glow-2) 0%, transparent 70%),
+        radial-gradient(40% 40% at 85% 15%, var(--bg-glow-3) 0%, transparent 70%),
+        linear-gradient(140deg, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-3) 100%);
+    }
+    &:after {
+      top: -20vmax;
+      left: -20vmax;
+      z-index: -1;
+      width: 140vmax;
+      height: 140vmax;
+      will-change: transform;
+      background:
+        radial-gradient(22vmax 22vmax at 30% 35%, var(--drift-1), transparent 70%),
+        radial-gradient(26vmax 26vmax at 70% 65%, var(--drift-2), transparent 70%);
+    }
+
+    @media (prefers-reduced-motion: no-preference) and (min-width: 769px) {
+      &:after {
+        animation: glassDrift 30s ease-in-out infinite alternate;
+      }
+    }
+
     &.hidden {
       overflow: hidden;
     }
@@ -101,6 +137,169 @@ const GlobalStyle = createGlobalStyle`
         pointer-events: none;
         user-select: none;
       }
+    }
+  }
+
+  @keyframes glassDrift {
+    0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50% { transform: translate3d(6vw, 4vh, 0) rotate(8deg); }
+    100% { transform: translate3d(-4vw, 8vh, 0) rotate(-6deg); }
+  }
+
+  /* Quiet staggered entrance: set --i on each element */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Shared section heading: small eyebrow + title */
+  .section-head {
+    margin-bottom: 28px;
+
+    .eyebrow {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(26px, 3vw, 34px);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+  }
+
+  /* Quiet tag pills (tech, skills) */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: 5px 11px;
+      border-radius: 999px;
+      color: var(--light-slate);
+      background: var(--surface-2);
+      border: 1px solid var(--glass-border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+  }
+
+  /* Calm glass card used by every home-page section */
+  .glass-card {
+    ${({ theme }) => theme.mixins.glass};
+    position: relative;
+    isolation: isolate;
+    transition: transform 0.7s var(--ease-soft), border-color 0.5s var(--ease-soft);
+  }
+  a.glass-card,
+  .glass-card.is-interactive {
+    /* Hover shadow is drawn once and faded in: opacity is GPU-cheap */
+    &:after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      box-shadow: 0 26px 50px -26px var(--navy-shadow);
+      opacity: 0;
+      transition: opacity 0.7s var(--ease-soft);
+      pointer-events: none;
+    }
+    &:hover,
+    &:focus-within {
+      transform: translate3d(0, -3px, 0);
+      border-color: var(--glass-border-hover);
+      &:after {
+        opacity: 1;
+      }
+    }
+  }
+
+  /* Scroll reveal: elements with data-reveal fade/rise in once visible.
+     Only hidden after JS marks the page ready, so content never stays invisible. */
+  .reveal-ready [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition: opacity 1s var(--ease-soft), transform 1.2s var(--ease-soft);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal-ready [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 20px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    color: var(--lightest-slate);
+    background: var(--surface-2);
+    font-size: var(--fz-sm);
+    font-weight: 500;
+    transition: transform 0.6s var(--ease-soft), background-color 0.4s var(--ease-soft),
+      box-shadow 0.6s var(--ease-soft);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--lightest-slate);
+      background: var(--surface-3);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px -14px var(--navy-shadow);
+    }
+
+    &.dark {
+      color: var(--on-ink);
+      background: var(--ink);
+      border-color: var(--ink);
+
+      &:hover,
+      &:focus-visible {
+        color: var(--on-ink);
+        background: var(--ink-hover);
+      }
+    }
+  }
+
+  @keyframes sidebarIn {
+    from { opacity: 0; transform: translate3d(-24px, 0, 0); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *:before,
+    *:after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Leave room for the fixed glass sidebar on wide screens */
+  @media (min-width: 1081px) {
+    #content {
+      margin-left: calc(var(--sidebar-width) + var(--shell-gap) * 2);
     }
   }
 

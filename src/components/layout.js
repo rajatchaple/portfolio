@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled, { ThemeProvider } from 'styled-components';
-import { Head, Loader, Nav, Social, Email, Footer } from '@components';
+import { Head, Loader, Nav, Sidebar, Social, Email, Footer } from '@components';
 import { GlobalStyle, theme } from '@styles';
+import { initSmoothScroll } from '@utils/smoothScroll';
 
 const StyledContent = styled.div`
   display: flex;
@@ -26,6 +27,38 @@ const Layout = ({ children, location }) => {
       });
     }
   };
+
+  // Inertial wheel scrolling (desktop only; off for reduced motion)
+  useEffect(() => initSmoothScroll(), []);
+
+  // Scroll reveal: fade/rise each [data-reveal] element in once it enters the viewport.
+  // Pure CSS transitions on opacity/transform, so it stays on the compositor.
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+    const root = document.documentElement;
+    const targets = Array.from(document.querySelectorAll('[data-reveal]'));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || typeof IntersectionObserver === 'undefined') {
+      targets.forEach(el => el.classList.add('is-revealed'));
+      return;
+    }
+    root.classList.add('reveal-ready');
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+    );
+    targets.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, [isLoading]);
 
   useEffect(() => {
     if (isLoading) {
@@ -63,6 +96,7 @@ const Layout = ({ children, location }) => {
           ) : (
             <StyledContent>
               <Nav isHome={isHome} />
+              <Sidebar isHome={isHome} />
               <Social isHome={isHome} />
               <Email isHome={isHome} />
 

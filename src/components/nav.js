@@ -1,258 +1,140 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'gatsby';
 import PropTypes from 'prop-types';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styled, { css } from 'styled-components';
-import { navLinks } from '@config';
-import { loaderDelay } from '@utils';
-import { useScrollDirection, usePrefersReducedMotion } from '@hooks';
+import { StaticImage } from 'gatsby-plugin-image';
+import styled from 'styled-components';
+import { useScrollDirection } from '@hooks';
 import { Menu } from '@components';
-import { IconLogo } from '@components/icons';
 
+/* Phones and tablets: a floating glass pill that matches the desktop sidebar.
+   Hides while scrolling down, glides back on scroll up. */
 const StyledHeader = styled.header`
-  ${({ theme }) => theme.mixins.flexBetween};
   position: fixed;
-  top: 0;
+  top: 12px;
+  left: 12px;
+  right: 12px;
   z-index: 11;
-  padding: 0px 50px;
-  width: 100%;
-  height: var(--nav-height);
-  background-color: var(--nav-bg);
-  border-bottom: 1px solid transparent;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.6s var(--ease-soft);
 
-  /* The glass sidebar replaces the top nav on wide screens */
+  &.is-hidden {
+    transform: translate3d(0, calc(-100% - 20px), 0);
+  }
+
   @media (min-width: 1081px) {
     display: none;
   }
-  filter: none !important;
-  pointer-events: auto !important;
-  user-select: auto !important;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  transition: var(--transition);
 
-  @media (max-width: 1080px) {
-    padding: 0 40px;
+  .bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 10px 0 12px;
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    background: var(--glass-bg), var(--nav-bg);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 10px 30px -14px var(--navy-shadow);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    animation: fadeUp 0.9s var(--ease-soft) both;
+    transition: box-shadow 0.4s;
   }
-  @media (max-width: 768px) {
-    padding: 0 25px;
+
+  &.is-scrolled .bar {
+    background: var(--glass-bg), var(--nav-bg-scrolled);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 14px 34px -14px var(--navy-shadow);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    ${props =>
-    props.scrollDirection === 'up' &&
-      !props.scrolledToTop &&
-      css`
-        height: var(--nav-scroll-height);
-        transform: translateY(0px);
-        background-color: var(--nav-bg-scrolled);
-        border-bottom-color: var(--glass-border);
-        box-shadow: 0 10px 30px -10px var(--navy-shadow);
-      `};
-
-    ${props =>
-    props.scrollDirection === 'down' &&
-      !props.scrolledToTop &&
-      css`
-        height: var(--nav-scroll-height);
-        transform: translateY(calc(var(--nav-scroll-height) * -1));
-        box-shadow: 0 10px 30px -10px var(--navy-shadow);
-      `};
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
   }
-`;
 
-const StyledNav = styled.nav`
-  ${({ theme }) => theme.mixins.flexBetween};
-  position: relative;
-  width: 100%;
-  color: var(--lightest-slate);
-  font-family: 'Fira Code' #var(--font-mono);
-  counter-reset: item 0;
-  z-index: 12;
+  .avatar {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px var(--glass-border);
+  }
 
-  .logo {
-    ${({ theme }) => theme.mixins.flexCenter};
+  .name {
+    color: var(--lightest-slate);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
 
-    a {
-      color: var(--green);
-      width: 42px;
-      height: 42px;
+  .role {
+    color: var(--dark-slate);
+    font-size: 12px;
+    line-height: 1.3;
+  }
 
-      &:hover,
-      &:focus {
-        svg {
-          fill: var(--green-tint);
-        }
-      }
-
-      svg {
-        fill: none;
-        transition: var(--transition);
-        user-select: none;
-      }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    .bar {
+      animation: none;
     }
-  }
-`;
-
-const StyledLinks = styled.div`
-  display: flex;
-  align-items: center;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-
-  ol {
-    ${({ theme }) => theme.mixins.flexBetween};
-    padding: 0;
-    margin: 0;
-    list-style: none;
-
-    li {
-      margin: 0 5px;
-      position: relative;
-      counter-increment: item 1;
-      font-size: var(--fz-xs);
-
-      a {
-        padding: 10px;
-
-        &:before {
-          content: '0' counter(item) '.';
-          margin-right: 5px;
-          color: var(--green);
-          font-size: var(--fz-xxs);
-          text-align: right;
-        }
-      }
-    }
-  }
-
-  .resume-button {
-    ${({ theme }) => theme.mixins.smallButton};
-    margin-left: 15px;
-    font-size: var(--fz-xs);
   }
 `;
 
 const Nav = ({ isHome }) => {
-  const [isMounted, setIsMounted] = useState(!isHome);
   const scrollDirection = useScrollDirection('down');
   const [scrolledToTop, setScrolledToTop] = useState(true);
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  const handleScroll = () => {
-    setScrolledToTop(window.pageYOffset < 50);
-  };
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (prefersReducedMotion) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setIsMounted(true);
-    }, 100);
-
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      clearTimeout(timeout);
-      window.removeEventListener('scroll', handleScroll);
-    };
+    const onScroll = () => setScrolledToTop(window.pageYOffset < 50);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const timeout = isHome ? loaderDelay : 0;
-  const fadeClass = isHome ? 'fade' : '';
-  const fadeDownClass = isHome ? 'fadedown' : '';
+  const hidden = !menuOpen && !scrolledToTop && scrollDirection === 'down';
+  const className = [hidden && 'is-hidden', !scrolledToTop && 'is-scrolled']
+    .filter(Boolean)
+    .join(' ');
 
-  const Logo = (
-    <div className="logo" tabIndex="-1">
-      {isHome ? (
-        <a href="/" aria-label="home">
-          <IconLogo />
-        </a>
-      ) : (
-        <Link to="/" aria-label="home">
-          <IconLogo />
-        </Link>
-      )}
-    </div>
-  );
-
-  const ResumeLink = (
-    <a className="resume-button" href="/resume.pdf" target="_blank" rel="noopener noreferrer">
-      Resume
-    </a>
+  const brand = (
+    <>
+      <span className="avatar">
+        <StaticImage
+          src="../images/me.jpg"
+          alt="Rajat Chaple"
+          width={76}
+          height={76}
+          quality={90}
+        />
+      </span>
+      <span>
+        <div className="name">Rajat Chaple</div>
+        <div className="role">Embedded Software</div>
+      </span>
+    </>
   );
 
   return (
-    <StyledHeader scrollDirection={scrollDirection} scrolledToTop={scrolledToTop}>
-      <StyledNav>
-        {prefersReducedMotion ? (
-          <>
-            {Logo}
-
-            <StyledLinks>
-              <ol>
-                {navLinks &&
-                  navLinks.map(({ url, name }, i) => (
-                    <li key={i}>
-                      <Link to={url}>{name}</Link>
-                    </li>
-                  ))}
-              </ol>
-              <div>{ResumeLink}</div>
-            </StyledLinks>
-
-            <Menu />
-          </>
+    <StyledHeader className={className}>
+      <div className="bar">
+        {isHome ? (
+          <a className="brand" href="#top" aria-label="Back to top">
+            {brand}
+          </a>
         ) : (
-          <>
-            <TransitionGroup component={null}>
-              {isMounted && (
-                <CSSTransition classNames={fadeClass} timeout={timeout}>
-                  <>{Logo}</>
-                </CSSTransition>
-              )}
-            </TransitionGroup>
-
-            <StyledLinks>
-              <ol>
-                <TransitionGroup component={null}>
-                  {isMounted &&
-                    navLinks &&
-                    navLinks.map(({ url, name }, i) => (
-                      <CSSTransition key={i} classNames={fadeDownClass} timeout={timeout}>
-                        <li key={i} style={{ transitionDelay: `${isHome ? i * 100 : 0}ms` }}>
-                          <Link to={url}>{name}</Link>
-                        </li>
-                      </CSSTransition>
-                    ))}
-                </TransitionGroup>
-              </ol>
-
-              <TransitionGroup component={null}>
-                {isMounted && (
-                  <CSSTransition classNames={fadeDownClass} timeout={timeout}>
-                    <div style={{ transitionDelay: `${isHome ? navLinks.length * 100 : 0}ms` }}>
-                      {ResumeLink}
-                    </div>
-                  </CSSTransition>
-                )}
-              </TransitionGroup>
-            </StyledLinks>
-
-            <TransitionGroup component={null}>
-              {isMounted && (
-                <CSSTransition classNames={fadeClass} timeout={timeout}>
-                  <Menu />
-                </CSSTransition>
-              )}
-            </TransitionGroup>
-          </>
+          <Link className="brand" to="/" aria-label="Home">
+            {brand}
+          </Link>
         )}
-      </StyledNav>
+        <Menu isHome={isHome} onToggle={setMenuOpen} />
+      </div>
     </StyledHeader>
   );
 };

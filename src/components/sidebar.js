@@ -51,7 +51,7 @@ const paths = {
   ),
 };
 
-const LineIcon = ({ name }) => (
+export const LineIcon = ({ name }) => (
   <svg
     className="feather"
     viewBox="0 0 24 24"

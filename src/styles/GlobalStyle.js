@@ -127,10 +127,6 @@ const GlobalStyle = createGlobalStyle`
     &.blur {
       overflow: hidden;
 
-      header {
-        background-color: transparent;
-      }
-
       #content > * {
         filter: blur(5px) brightness(0.7);
         transition: var(--transition);

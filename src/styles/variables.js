@@ -93,7 +93,10 @@ const variables = css`
 
   /* "Night": near-black with neutral smoked glass and an amber accent,
      used automatically when the visitor's system is in dark mode.
-     Not pure #000 everywhere: the glass needs a faint glow behind it to read. */
+     Not pure #000 everywhere: the glass needs a faint glow behind it to read.
+     DISABLED: the site is light-only for now. To re-enable dark mode,
+     delete the comment markers wrapping the @media block below. */
+  /*
   @media (prefers-color-scheme: dark) {
     :root {
       color-scheme: dark;
@@ -134,6 +137,7 @@ const variables = css`
       --menu-bg: rgba(8, 8, 8, 0.96);
     }
   }
+  */
 `;
 
 export default variables;

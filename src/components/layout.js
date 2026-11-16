@@ -96,7 +96,7 @@ const Layout = ({ children, location }) => {
           ) : (
             <StyledContent>
               <Nav isHome={isHome} />
-              <Sidebar isHome={isHome} />
+              <Sidebar isHome={isHome} pathname={location.pathname} />
               <Social isHome={isHome} />
               <Email isHome={isHome} />
 

@@ -14,6 +14,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   const detailedProjectTemplate = path.resolve(`src/templates/detailed-project.js`);
   const tagTemplate = path.resolve('src/templates/tag.js');
   const pageTemplate = path.resolve(`src/templates/page.js`);
+  const noteTemplate = path.resolve(`src/templates/note.js`);
 
   const result = await graphql(`
     {
@@ -46,7 +47,22 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
           }
         }
       }
-      tagsGroup: allMarkdownRemark(limit: 2000) {
+      notesRemark: allMarkdownRemark(
+        filter: {
+          fileAbsolutePath: { regex: "/content/notes/" }
+          frontmatter: { draft: { ne: true } }
+        }
+      ) {
+        nodes {
+          fields {
+            slug
+          }
+        }
+      }
+      tagsGroup: allMarkdownRemark(
+        filter: { fileAbsolutePath: { regex: "/content/posts/" } }
+        limit: 2000
+      ) {
         group(field: frontmatter___tags) {
           fieldValue
         }
@@ -86,23 +102,14 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   // Create project detail pages
   const projects = result.data.projectsRemark.edges;
 
-  console.log('Projects found:', projects.length);
-  projects.forEach(({ node }, index) => {
-    console.log(`Project ${index}:`, {
-      slug: node.frontmatter.slug,
-      frontmatter: node.frontmatter,
-      filePath: node.fileAbsolutePath
-    });
-    
+  projects.forEach(({ node }) => {
     if (node.frontmatter.slug) {
       // Determine if this should use the detailed project template
-      const isDetailedProject = node.fileAbsolutePath.includes('/cubit/') || 
-                               node.frontmatter.showInProjects === false;
-      
+      const isDetailedProject =
+        node.fileAbsolutePath.includes('/cubit/') || node.frontmatter.showInProjects === false;
+
       const templateToUse = isDetailedProject ? detailedProjectTemplate : projectTemplate;
-      
-      console.log(`Using ${isDetailedProject ? 'detailed' : 'standard'} template for:`, node.frontmatter.slug);
-      
+
       createPage({
         path: node.frontmatter.slug,
         component: templateToUse,
@@ -111,8 +118,17 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
         },
       });
     } else {
-      console.log('Skipping project with no slug:', node);
+      reporter.warn(`Skipping project with no slug: ${node.fileAbsolutePath}`);
     }
+  });
+
+  // Create note (cheatsheet) pages: content/notes/<name>.md -> /notes/<name>/
+  result.data.notesRemark.nodes.forEach(({ fields }) => {
+    createPage({
+      path: fields.slug,
+      component: noteTemplate,
+      context: { slug: fields.slug },
+    });
   });
 
   // Extract tag data from query
@@ -135,6 +151,19 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       context: { id: node.id },
     });
   });
+};
+
+// Notes get their URL from the file name, so a new note needs no slug in frontmatter
+exports.onCreateNode = ({ node, getNode, actions }) => {
+  if (node.internal.type !== 'MarkdownRemark') {
+    return;
+  }
+  const file = getNode(node.parent);
+  if (!file || !/[\\/]content[\\/]notes[\\/]/.test(file.absolutePath)) {
+    return;
+  }
+  const name = file.name === 'index' ? path.basename(file.dir) : file.name;
+  actions.createNodeField({ node, name: 'slug', value: `/notes/${_.kebabCase(name)}/` });
 };
 
 // https://www.gatsbyjs.org/docs/node-apis/#onCreateWebpackConfig

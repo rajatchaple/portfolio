@@ -37,6 +37,12 @@ const paths = {
       <polyline points="22,6 12,13 2,6" />
     </>
   ),
+  Notes: (
+    <>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </>
+  ),
   Resume: (
     <>
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -248,8 +254,12 @@ const StyledSidebar = styled.aside`
   }
 `;
 
-const Sidebar = ({ isHome }) => {
-  const [active, setActive] = useState(isHome ? 0 : -1);
+// Non-home pages that have their own sidebar entry (e.g. /notes/...)
+const pageIndex = pathname =>
+  links.findIndex(({ url }) => !url.includes('#') && pathname.startsWith(url));
+
+const Sidebar = ({ isHome, pathname }) => {
+  const [active, setActive] = useState(isHome ? 0 : pageIndex(pathname || ''));
 
   // Scroll-spy: highlight the section closest to the top of the viewport
   useEffect(() => {
@@ -278,7 +288,8 @@ const Sidebar = ({ isHome }) => {
 
   // On the home page, glide to the section instead of jumping
   const handleNav = (e, url) => {
-    const el = isHome && document.getElementById(url.split('#')[1]);
+    const id = url.split('#')[1];
+    const el = isHome && id && document.getElementById(id);
     if (!el) {
       return;
     }
@@ -359,6 +370,7 @@ const Sidebar = ({ isHome }) => {
 
 Sidebar.propTypes = {
   isHome: PropTypes.bool,
+  pathname: PropTypes.string,
 };
 
 export default Sidebar;

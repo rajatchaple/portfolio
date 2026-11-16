@@ -1,7 +1,7 @@
 ---
 date: '1'
 title: 'Cubit (a measurement device)'
-cover: './cubit.jpg'
+cover: './cubit-board.jpg'
 github: 'https://github.com/rajatchaple/ecen5833_s22_lpedt_project'
 external: '/projects/cubit'
 

@@ -49,6 +49,14 @@ const StyledIntro = styled.section`
     line-height: 1.55;
   }
 
+  .aside {
+    max-width: 600px;
+    margin: 10px 0 0;
+    color: var(--dark-slate);
+    font-size: clamp(16px, 1.7vw, 18px);
+    line-height: 1.5;
+  }
+
   .actions {
     display: flex;
     flex-wrap: wrap;
@@ -122,6 +130,11 @@ const Intro = () => {
       <p className="lede" style={{ '--i': 2 }}>
         I build firmware for vehicles and consumer electronics: bare-metal drivers, low-power
         hardware, and safety-critical battery software.
+      </p>
+
+      <p className="aside" style={{ '--i': 2.5 }}>
+        Off the clock I draw with machines, take photos, and build things I don&apos;t strictly
+        need.
       </p>
 
       <div className="actions" style={{ '--i': 3 }}>

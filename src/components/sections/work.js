@@ -5,6 +5,35 @@ import { GatsbyImage, getImage } from 'gatsby-plugin-image';
 import styled from 'styled-components';
 import { Icon } from '@components/icons';
 
+/*
+ * Eased (smoothstep) fade-in/fade-out mask along one axis. A linear ramp shows a
+ * visible "start line"; easing the alpha makes the falloff look like light.
+ * `edge` is how far in from each side the fade reaches, in %.
+ */
+const easedMask = (dir, edge) => {
+  const steps = 8;
+  const ramp = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const a = (t * t * (3 - 2 * t)).toFixed(3);
+    ramp.push([a, (t * edge).toFixed(2)]);
+  }
+  const up = ramp.map(([a, p]) => `rgba(0,0,0,${a}) ${p}%`);
+  const down = ramp
+    .slice()
+    .reverse()
+    .map(([a, p]) => `rgba(0,0,0,${a}) ${(100 - p).toFixed(2)}%`);
+  return `linear-gradient(${dir}, ${[...up, ...down].join(', ')})`;
+};
+
+// Mask = horizontal fade intersected with vertical fade (soft rounded corners)
+const featherMask = (x, y) => `
+  -webkit-mask-image: ${easedMask('to right', x)}, ${easedMask('to bottom', y)};
+  -webkit-mask-composite: source-in;
+  mask-image: ${easedMask('to right', x)}, ${easedMask('to bottom', y)};
+  mask-composite: intersect;
+`;
+
 const StyledWork = styled.section`
   .featured {
     display: grid;
@@ -23,23 +52,43 @@ const StyledWork = styled.section`
     }
   }
 
+  /* The photo is set into the card's glass, not laid on or under it:
+       .photo    the photo, crisp in the middle, dissolving straight into the glass
+       ::after   the card's surface sheen carrying on over the photo
+     No frame, no shadow, no edge: nothing says "separate object".
+     Static layers only; the card's lift is the only hover motion. */
   .cover {
+    position: relative;
     display: block;
-    border-radius: 14px;
-    overflow: hidden;
     aspect-ratio: 16 / 10;
-    background: var(--surface-1);
+    isolation: isolate;
+
+    .photo {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      ${featherMask(16, 18)}
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: linear-gradient(
+        125deg,
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0) 30%,
+        rgba(255, 255, 255, 0) 70%,
+        rgba(255, 255, 255, 0.08) 100%
+      );
+      ${featherMask(9, 11)}
+    }
 
     .gatsby-image-wrapper {
       width: 100%;
       height: 100%;
-    }
-    img {
-      transition: transform 0.8s var(--easing) !important;
-    }
-    &:hover img,
-    &:focus-visible img {
-      transform: scale(1.03);
     }
   }
 
@@ -273,7 +322,7 @@ const Work = () => {
               <article className="glass-card is-interactive feature">
                 {image && (
                   <Cover className="cover" aria-label={title} {...coverProps}>
-                    <GatsbyImage image={image} alt={title} />
+                    <GatsbyImage image={image} alt={title} className="photo" />{' '}
                   </Cover>
                 )}
                 <div className="feature-body">
